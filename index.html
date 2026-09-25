@@ -19,6 +19,7 @@
 
 </head>
 
+
 <body>
 
 
@@ -63,9 +64,7 @@
             </div>
 
 
-            <!-- =================================================
-                 LOGIN FORM
-                 ================================================= -->
+            <!-- ==================== LOGIN ==================== -->
 
             <div
                 id="loginForm"
@@ -152,9 +151,7 @@
             </div>
 
 
-            <!-- =================================================
-                 SIGNUP FORM
-                 ================================================= -->
+            <!-- ==================== SIGNUP ==================== -->
 
             <div
                 id="signupForm"
@@ -263,7 +260,6 @@
 </section>
 
 
-
 <!-- =====================================================
      CODEXA APP
      ===================================================== -->
@@ -290,7 +286,6 @@
 
 
         <div class="actions">
-
 
             <button
                 id="savedProjectsBtn"
@@ -359,7 +354,6 @@
     </header>
 
 
-
     <!-- =================================================
          MAIN
          ================================================= -->
@@ -368,7 +362,7 @@
 
 
         <!-- =================================================
-             COMPILER PAGE
+             COMPILER
              ================================================= -->
 
         <section
@@ -413,8 +407,7 @@
             </section>
 
 
-
-            <!-- ==================== OPENED PROJECT BAR ==================== -->
+            <!-- ==================== OPENED PROJECT ==================== -->
 
             <div
                 id="openedProjectBar"
@@ -434,7 +427,6 @@
                 </span>
 
             </div>
-
 
 
             <!-- ==================== PREVIEW ==================== -->
@@ -464,7 +456,6 @@
                 ></iframe>
 
             </section>
-
 
 
             <!-- ==================== EDITORS ==================== -->
@@ -503,9 +494,6 @@
 <button onclick="sayHello()">Click Me</button></textarea>
 
                 </div>
-
-
-
                 <!-- ==================== CSS ==================== -->
 
                 <div class="editor css-editor">
@@ -531,26 +519,25 @@
                         id="cssCode"
                         spellcheck="false"
                     >body {
-font-family: Arial;
-text-align: center;
-padding: 40px;
+    font-family: Arial;
+    text-align: center;
+    padding: 40px;
 }
 
 h1 {
-color: #8b5cf6;
+    color: #8b5cf6;
 }
 
 button {
-padding: 10px 18px;
-border: 0;
-border-radius: 10px;
-background: #8b5cf6;
-color: white;
-cursor: pointer;
+    padding: 10px 18px;
+    border: 0;
+    border-radius: 10px;
+    background: #8b5cf6;
+    color: white;
+    cursor: pointer;
 }</textarea>
 
                 </div>
-
 
 
                 <!-- ==================== JAVASCRIPT ==================== -->
@@ -578,7 +565,7 @@ cursor: pointer;
                         id="jsCode"
                         spellcheck="false"
                     >function sayHello() {
-alert("Hello from Codexa!");
+    alert("Hello from Codexa!");
 }</textarea>
 
                 </div>
@@ -589,9 +576,8 @@ alert("Hello from Codexa!");
         </section>
 
 
-
         <!-- =================================================
-             SAVED PROJECTS PAGE
+             SAVED PROJECTS
              ================================================= -->
 
         <section
@@ -637,9 +623,7 @@ alert("Hello from Codexa!");
 
         </section>
 
-
     </main>
-
 
 
     <!-- =================================================
@@ -648,36 +632,15 @@ alert("Hello from Codexa!");
 
     <footer class="codexa-footer">
 
-        <span>
-            Codexa
-        </span>
-
-        <span>
-            —
-        </span>
-
-        <span>
-            Build
-        </span>
-
-        <span>
-            •
-        </span>
-
-        <span>
-            Run
-        </span>
-
-        <span>
-            •
-        </span>
-
-        <span>
-            Create
-        </span>
+        <span>Codexa</span>
+        <span>—</span>
+        <span>Build</span>
+        <span>•</span>
+        <span>Run</span>
+        <span>•</span>
+        <span>Create</span>
 
     </footer>
-
 
 
     <!-- =================================================
@@ -692,9 +655,8 @@ alert("Hello from Codexa!");
     ></div>
 
 
-
     <!-- =================================================
-         CONFIRMATION OVERLAY
+         CONFIRMATION
          ================================================= -->
 
     <div
@@ -750,40 +712,29 @@ alert("Hello from Codexa!");
 
     </div>
 
-
 </div>
 
 
-
 <!-- =====================================================
-     SUPABASE CLIENT
+     SUPABASE
      ===================================================== -->
 
-<script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-></script>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 
 <!-- =====================================================
      JSZIP
      ===================================================== -->
 
-<script
-    src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"
-></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 
 <!-- =====================================================
-     CODEXA SCRIPT
+     CODEXA
      ===================================================== -->
 
-<script
-    src="script.js"
-></script>
+<script src="script.js"></script>
 
 
 </body>
-
 </html>
