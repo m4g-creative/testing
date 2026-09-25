@@ -14,6 +14,7 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
     "sb_publishable_tACoZGEalQ9xoMoGGcyUFA_hOshBQxA";
 
+
 const supabaseClient =
     window.supabase.createClient(
         SUPABASE_URL,
@@ -25,14 +26,12 @@ const supabaseClient =
    DOM ELEMENTS
    ===================================================== */
 
-
-/* ==================== AUTH ==================== */
-
 const authPage =
     document.getElementById("authPage");
 
 const appShell =
     document.getElementById("appShell");
+
 
 const loginForm =
     document.getElementById("loginForm");
@@ -75,8 +74,6 @@ const showLoginBtn =
     document.getElementById("showLoginBtn");
 
 
-/* ==================== APP ==================== */
-
 const savedProjectsBtn =
     document.getElementById("savedProjectsBtn");
 
@@ -96,8 +93,6 @@ const logoutBtn =
     document.getElementById("logoutBtn");
 
 
-/* ==================== COMPILER ==================== */
-
 const compilerPage =
     document.getElementById("compilerPage");
 
@@ -115,6 +110,7 @@ const backToSavedProjectsFromCompiler =
         "backToSavedProjectsFromCompiler"
     );
 
+
 const preview =
     document.getElementById("preview");
 
@@ -127,8 +123,6 @@ const cssCode =
 const jsCode =
     document.getElementById("jsCode");
 
-
-/* ==================== SAVED PROJECTS ==================== */
 
 const savedProjectsPage =
     document.getElementById(
@@ -144,16 +138,12 @@ const projectsGrid =
     document.getElementById("projectsGrid");
 
 
-/* ==================== OTHER ==================== */
-
 const fullscreenBtn =
     document.getElementById("fullscreenBtn");
 
 const toastContainer =
     document.getElementById("toastContainer");
 
-
-/* ==================== CONFIRMATION ==================== */
 
 const confirmOverlay =
     document.getElementById("confirmOverlay");
@@ -176,16 +166,13 @@ const confirmAction =
    ===================================================== */
 
 let currentUser = null;
-
 let currentSession = null;
-
 let activeProjectId = null;
-
 let confirmCallback = null;
 
 
 /* =====================================================
-   AUTH PAGE / APP PAGE
+   AUTH / APP VISIBILITY
    ===================================================== */
 
 function showAuthPage() {
@@ -216,9 +203,13 @@ function showApp() {
 
 function showLoginForm() {
 
-    loginForm.classList.remove("hidden-auth");
+    loginForm.classList.remove(
+        "hidden-auth"
+    );
 
-    signupForm.classList.add("hidden-auth");
+    signupForm.classList.add(
+        "hidden-auth"
+    );
 
     clearAuthMessages();
 
@@ -227,9 +218,13 @@ function showLoginForm() {
 
 function showSignupForm() {
 
-    loginForm.classList.add("hidden-auth");
+    loginForm.classList.add(
+        "hidden-auth"
+    );
 
-    signupForm.classList.remove("hidden-auth");
+    signupForm.classList.remove(
+        "hidden-auth"
+    );
 
     clearAuthMessages();
 
@@ -239,7 +234,6 @@ function showSignupForm() {
 function clearAuthMessages() {
 
     loginMessage.textContent = "";
-
     signupMessage.textContent = "";
 
     loginMessage.className =
@@ -252,7 +246,7 @@ function clearAuthMessages() {
 
 
 /* =====================================================
-   AUTH MESSAGE
+   AUTH MESSAGES
    ===================================================== */
 
 function showLoginMessage(
@@ -295,7 +289,8 @@ function setButtonLoading(
 
     if (!button) return;
 
-    button.disabled = loading;
+    button.disabled =
+        loading;
 
     button.textContent =
         loading
@@ -349,9 +344,8 @@ async function loginUser() {
         } =
             await supabaseClient.auth.signInWithPassword({
 
-                email: email,
-
-                password: password
+                email,
+                password
 
             });
 
@@ -381,12 +375,6 @@ async function loginUser() {
 
         currentUser =
             data.user;
-
-
-        showLoginMessage(
-            "Login successful.",
-            "success"
-        );
 
 
         loginPassword.value = "";
@@ -445,9 +433,11 @@ async function signupUser() {
         signupPasswordConfirm.value;
 
 
-    if (!email ||
+    if (
+        !email ||
         !password ||
-        !confirmPassword) {
+        !confirmPassword
+    ) {
 
         showSignupMessage(
             "Please fill in all fields."
@@ -498,9 +488,8 @@ async function signupUser() {
         } =
             await supabaseClient.auth.signUp({
 
-                email: email,
-
-                password: password
+                email,
+                password
 
             });
 
@@ -515,11 +504,6 @@ async function signupUser() {
         }
 
 
-        /*
-         * When email confirmation is enabled,
-         * Supabase normally returns no active session.
-         */
-
         if (!data.session) {
 
             showSignupMessage(
@@ -528,7 +512,6 @@ async function signupUser() {
             );
 
             signupPassword.value = "";
-
             signupPasswordConfirm.value = "";
 
             return;
@@ -595,11 +578,6 @@ async function logoutUser() {
 
         if (error) {
 
-            console.error(
-                "Logout Error:",
-                error
-            );
-
             showToast(
                 "Logout Failed",
                 error.message,
@@ -611,9 +589,7 @@ async function logoutUser() {
 
 
         currentUser = null;
-
         currentSession = null;
-
         activeProjectId = null;
 
 
@@ -641,7 +617,7 @@ async function logoutUser() {
 
 
 /* =====================================================
-   AUTH STATE LISTENER
+   AUTH STATE
    ===================================================== */
 
 supabaseClient.auth.onAuthStateChange(
@@ -688,12 +664,19 @@ function showCompilerPage() {
 
 
 /* =====================================================
-   BUILD LIVE PREVIEW
+   PREVIEW
    ===================================================== */
 
 function buildPreview() {
 
-    if (!preview) return;
+    if (
+        !preview ||
+        !htmlCode ||
+        !cssCode ||
+        !jsCode
+    ) {
+        return;
+    }
 
 
     const html =
@@ -708,9 +691,7 @@ function buildPreview() {
 
     const documentContent = `
 <!DOCTYPE html>
-
 <html>
-
 <head>
 
 <meta charset="UTF-8">
@@ -721,9 +702,7 @@ function buildPreview() {
 >
 
 <style>
-
 ${css}
-
 </style>
 
 </head>
@@ -733,13 +712,10 @@ ${css}
 ${html}
 
 <script>
-
 ${js}
-
 <\/script>
 
 </body>
-
 </html>
 `;
 
@@ -751,7 +727,7 @@ ${js}
 
 
 /* =====================================================
-   RUN PROJECT
+   RUN
    ===================================================== */
 
 function runProject() {
@@ -789,7 +765,7 @@ jsCode.addEventListener(
 
 
 /* =====================================================
-   SAVE CURRENT PROJECT
+   SAVE PROJECT
    ===================================================== */
 
 async function saveCurrentProject() {
@@ -847,18 +823,10 @@ async function saveCurrentProject() {
 
 
     saveBtn.disabled = true;
-
-    saveBtn.textContent =
-        "Saving...";
+    saveBtn.textContent = "Saving...";
 
 
     try {
-
-        /*
-         * If an existing saved project is open,
-         * update that project instead of creating
-         * another copy.
-         */
 
         if (activeProjectId) {
 
@@ -936,12 +904,8 @@ async function saveCurrentProject() {
             }
 
 
-            if (data) {
-
-                activeProjectId =
-                    data.id;
-
-            }
+            activeProjectId =
+                data?.id || null;
 
 
             openedProjectBar.style.display =
@@ -982,9 +946,7 @@ async function saveCurrentProject() {
     finally {
 
         saveBtn.disabled = false;
-
-        saveBtn.textContent =
-            "Save Project";
+        saveBtn.textContent = "Save Project";
 
     }
 
@@ -992,7 +954,7 @@ async function saveCurrentProject() {
 
 
 /* =====================================================
-   TOAST SYSTEM
+   TOAST
    ===================================================== */
 
 function showToast(
@@ -1053,14 +1015,9 @@ function showToast(
     const close =
         document.createElement("button");
 
-    close.className =
-        "toast-close";
-
-    close.type =
-        "button";
-
-    close.textContent =
-        "×";
+    close.type = "button";
+    close.className = "toast-close";
+    close.textContent = "×";
 
 
     content.appendChild(
@@ -1072,17 +1029,9 @@ function showToast(
     );
 
 
-    toast.appendChild(
-        icon
-    );
-
-    toast.appendChild(
-        content
-    );
-
-    toast.appendChild(
-        close
-    );
+    toast.appendChild(icon);
+    toast.appendChild(content);
+    toast.appendChild(close);
 
 
     toastContainer.appendChild(
@@ -1092,20 +1041,12 @@ function showToast(
 
     close.addEventListener(
         "click",
-        () => {
-
-            removeToast(toast);
-
-        }
+        () => removeToast(toast)
     );
 
 
     setTimeout(
-        () => {
-
-            removeToast(toast);
-
-        },
+        () => removeToast(toast),
         4500
     );
 
@@ -1138,10 +1079,14 @@ function removeToast(toast) {
     );
 
 }
+/* =====================================================
+   CODEXA — JAVASCRIPT PART 2/3
+   CONFIRM + SAVED PROJECTS + CLEAR
+   ===================================================== */
 
 
 /* =====================================================
-   CONFIRMATION SYSTEM
+   CONFIRMATION
    ===================================================== */
 
 function showConfirm(
@@ -1156,7 +1101,6 @@ function showConfirm(
     confirmMessage.textContent =
         message;
 
-
     confirmCallback =
         callback;
 
@@ -1164,7 +1108,6 @@ function showConfirm(
     confirmOverlay.classList.add(
         "active"
     );
-
 
     confirmOverlay.setAttribute(
         "aria-hidden",
@@ -1180,22 +1123,16 @@ function hideConfirm() {
         "active"
     );
 
-
     confirmOverlay.setAttribute(
         "aria-hidden",
         "true"
     );
-
 
     confirmCallback =
         null;
 
 }
 
-
-/* =====================================================
-   CONFIRM BUTTONS
-   ===================================================== */
 
 confirmCancel.addEventListener(
     "click",
@@ -1207,7 +1144,10 @@ confirmAction.addEventListener(
     "click",
     async () => {
 
-        if (typeof confirmCallback === "function") {
+        if (
+            typeof confirmCallback ===
+            "function"
+        ) {
 
             const callback =
                 confirmCallback;
@@ -1224,13 +1164,9 @@ confirmAction.addEventListener(
 
         }
 
- }
+    }
 );
 
-
-/* =====================================================
-   ESCAPE KEY
-   ===================================================== */
 
 document.addEventListener(
     "keydown",
@@ -1250,118 +1186,7 @@ document.addEventListener(
 
 
 /* =====================================================
-   AUTH EVENTS
-   ===================================================== */
-
-loginBtn.addEventListener(
-    "click",
-    loginUser
-);
-
-
-signupBtn.addEventListener(
-    "click",
-    signupUser
-);
-
-
-showSignupBtn.addEventListener(
-    "click",
-    showSignupForm
-);
-
-
-showLoginBtn.addEventListener(
-    "click",
-    showLoginForm
-);
-
-
-logoutBtn.addEventListener(
-    "click",
-    () => {
-
-        showConfirm(
-            "Logout",
-            "Are you sure you want to logout from Codexa?",
-            logoutUser
-        );
-
-    }
-);
-
-
-/* =====================================================
-   APP EVENTS
-   ===================================================== */
-
-runBtn.addEventListener(
-    "click",
-    runProject
-);
-
-
-saveBtn.addEventListener(
-    "click",
-    saveCurrentProject
-);
-
-
-/* =====================================================
-   SAVED PROJECTS BUTTON
-   ===================================================== */
-
-savedProjectsBtn.addEventListener(
-    "click",
-    async () => {
-
-        await showSavedProjects();
-
-    }
-);
-
-
-/* =====================================================
-   BACK TO SAVED PROJECTS
-   ===================================================== */
-
-backToSavedProjectsFromCompiler.addEventListener(
-    "click",
-    async () => {
-
-        await showSavedProjects();
-
-    }
-);
-
-
-/* =====================================================
-   BACK TO COMPILER
-   ===================================================== */
-
-backToCompilerBtn.addEventListener(
-    "click",
-    () => {
-
-        showCompilerPage();
-
-    }
-);
-
-
-/* =====================================================
-   INITIAL PREVIEW
-   ===================================================== */
-
-buildPreview();
-/* =====================================================
-   CODEXA — JAVASCRIPT PART 2/3
-   SAVED PROJECTS + OPEN + DELETE + CLEAR
-   ===================================================== */
-
-
-/* =====================================================
-   SHOW SAVED PROJECTS PAGE
+   SHOW SAVED PROJECTS
    ===================================================== */
 
 async function showSavedProjects() {
@@ -1393,14 +1218,15 @@ async function showSavedProjects() {
 
 
 /* =====================================================
-   LOAD SAVED PROJECTS FROM SUPABASE
+   LOAD SAVED PROJECTS
    ===================================================== */
 
 async function loadSavedProjects() {
 
     if (!currentUser) {
 
-        projectsGrid.innerHTML = "";
+        projectsGrid.innerHTML =
+            "";
 
         return;
     }
@@ -1457,13 +1283,18 @@ async function loadSavedProjects() {
 
         projectsGrid.innerHTML = `
             <div class="projects-empty">
-                <h3>Unable to load projects</h3>
+
+                <h3>
+                    Unable to load projects
+                </h3>
+
                 <p>
                     ${escapeHtml(
                         error.message ||
                         "Something went wrong."
                     )}
                 </p>
+
             </div>
         `;
 
@@ -1488,7 +1319,8 @@ function renderSavedProjects(
     projects
 ) {
 
-    projectsGrid.innerHTML = "";
+    projectsGrid.innerHTML =
+        "";
 
 
     if (!projects.length) {
@@ -1526,14 +1358,8 @@ function renderSavedProjects(
     projects.forEach(
         (project) => {
 
-            const card =
-                createProjectCard(
-                    project
-                );
-
-
             projectsGrid.appendChild(
-                card
+                createProjectCard(project)
             );
 
         }
@@ -1543,7 +1369,7 @@ function renderSavedProjects(
 
 
 /* =====================================================
-   CREATE PROJECT CARD
+   PROJECT CARD
    ===================================================== */
 
 function createProjectCard(
@@ -1595,9 +1421,7 @@ function createProjectCard(
         <div class="project-card-preview">
 
             <div class="mini-preview-line long"></div>
-
             <div class="mini-preview-line medium"></div>
-
             <div class="mini-preview-line short"></div>
 
         </div>
@@ -1631,63 +1455,27 @@ function createProjectCard(
     `;
 
 
-    const openButton =
-        card.querySelector(
-            ".project-open-btn"
-        );
-
-
-    const downloadButton =
-        card.querySelector(
-            ".project-download-btn"
-        );
-
-
-    const deleteButton =
-        card.querySelector(
-            ".project-delete-btn"
-        );
-
-
-    /* ==================== OPEN ==================== */
-
-    openButton.addEventListener(
+    card.querySelector(
+        ".project-open-btn"
+    ).addEventListener(
         "click",
-        () => {
-
-            openSavedProject(
-                project
-            );
-
-        }
+        () => openSavedProject(project)
     );
 
 
-    /* ==================== DOWNLOAD ==================== */
-
-    downloadButton.addEventListener(
+    card.querySelector(
+        ".project-download-btn"
+    ).addEventListener(
         "click",
-        () => {
-
-            downloadSavedProject(
-                project
-            );
-
-        }
+        () => downloadSavedProject(project)
     );
 
 
-    /* ==================== DELETE ==================== */
-
-    deleteButton.addEventListener(
+    card.querySelector(
+        ".project-delete-btn"
+    ).addEventListener(
         "click",
-        () => {
-
-            confirmDeleteProject(
-                project
-            );
-
-        }
+        () => confirmDeleteProject(project)
     );
 
 
@@ -1697,7 +1485,7 @@ function createProjectCard(
 
 
 /* =====================================================
-   OPEN SAVED PROJECT
+   OPEN PROJECT
    ===================================================== */
 
 function openSavedProject(
@@ -1727,10 +1515,8 @@ function openSavedProject(
     htmlCode.value =
         project.html_code || "";
 
-
     cssCode.value =
         project.css_code || "";
-
 
     jsCode.value =
         project.js_code || "";
@@ -1750,7 +1536,6 @@ function openSavedProject(
 
     showCompilerPage();
 
-
     buildPreview();
 
 
@@ -1764,7 +1549,7 @@ function openSavedProject(
 
 
 /* =====================================================
-   DELETE PROJECT CONFIRMATION
+   DELETE CONFIRMATION
    ===================================================== */
 
 function confirmDeleteProject(
@@ -1849,11 +1634,6 @@ async function deleteProject(
         }
 
 
-        /*
-         * If the deleted project was currently open,
-         * reset the compiler state.
-         */
-
         if (
             activeProjectId ===
             projectId
@@ -1902,9 +1682,7 @@ async function deleteProject(
 function clearEditor() {
 
     htmlCode.value = "";
-
     cssCode.value = "";
-
     jsCode.value = "";
 
 
@@ -1920,10 +1698,6 @@ function clearEditor() {
 }
 
 
-/* =====================================================
-   CLEAR BUTTON
-   ===================================================== */
-
 clearBtn.addEventListener(
     "click",
     () => {
@@ -1931,11 +1705,7 @@ clearBtn.addEventListener(
         showConfirm(
             "Clear Editor",
             "Are you sure you want to clear all HTML, CSS and JavaScript code?",
-            () => {
-
-                clearEditor();
-
-            }
+            clearEditor
         );
 
     }
@@ -1975,14 +1745,11 @@ function resetCompiler() {
     projectNameInput.value =
         "";
 
-
     htmlCode.value =
         "";
 
-
     cssCode.value =
         "";
-
 
     jsCode.value =
         "";
@@ -2002,7 +1769,7 @@ function resetCompiler() {
 
 
 /* =====================================================
-   FORMAT PROJECT DATE
+   FORMAT DATE
    ===================================================== */
 
 function formatProjectDate(
@@ -2010,24 +1777,20 @@ function formatProjectDate(
 ) {
 
     if (!dateValue) {
-
         return "Unknown";
-
     }
 
 
     const date =
-        new Date(
-            dateValue
-        );
+        new Date(dateValue);
 
 
-    if (Number.isNaN(
-        date.getTime()
-    )) {
-
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
         return "Unknown";
-
     }
 
 
@@ -2081,7 +1844,7 @@ function escapeHtml(
 
 
 /* =====================================================
-   PROJECT NAME ENTER KEY
+   PROJECT NAME ENTER
    ===================================================== */
 
 projectNameInput.addEventListener(
@@ -2103,7 +1866,7 @@ projectNameInput.addEventListener(
 
 
 /* =====================================================
-   HANDLE AUTH PAGE ENTER KEY
+   AUTH ENTER
    ===================================================== */
 
 loginPassword.addEventListener(
@@ -2140,9 +1903,85 @@ signupPasswordConfirm.addEventListener(
 
     }
 );
+
+
+/* =====================================================
+   AUTH EVENTS
+   ===================================================== */
+
+loginBtn.addEventListener(
+    "click",
+    loginUser
+);
+
+
+signupBtn.addEventListener(
+    "click",
+    signupUser
+);
+
+
+showSignupBtn.addEventListener(
+    "click",
+    showSignupForm
+);
+
+
+showLoginBtn.addEventListener(
+    "click",
+    showLoginForm
+);
+
+
+logoutBtn.addEventListener(
+    "click",
+    () => {
+
+        showConfirm(
+            "Logout",
+            "Are you sure you want to logout from Codexa?",
+            logoutUser
+        );
+
+    }
+);
+
+
+/* =====================================================
+   APP EVENTS
+   ===================================================== */
+
+runBtn.addEventListener(
+    "click",
+    runProject
+);
+
+
+saveBtn.addEventListener(
+    "click",
+    saveCurrentProject
+);
+
+
+savedProjectsBtn.addEventListener(
+    "click",
+    showSavedProjects
+);
+
+
+backToSavedProjectsFromCompiler.addEventListener(
+    "click",
+    showSavedProjects
+);
+
+
+backToCompilerBtn.addEventListener(
+    "click",
+    showCompilerPage
+);
 /* =====================================================
    CODEXA — JAVASCRIPT PART 3/3
-   DOWNLOAD + COPY + FULLSCREEN + FINAL INIT
+   DOWNLOAD + COPY + FULLSCREEN + INIT
    ===================================================== */
 
 
@@ -2177,13 +2016,15 @@ function sanitizeFilename(
         .slice(
             0,
             80
-        ) || "codexa-project";
+        )
+        ||
+        "codexa-project";
 
 }
 
 
 /* =====================================================
-   CREATE PROJECT ZIP
+   CREATE ZIP
    ===================================================== */
 
 async function createProjectZip(
@@ -2211,15 +2052,9 @@ async function createProjectZip(
         "codexa-project";
 
 
-    const folderName =
-        sanitizeFilename(
-            projectName
-        );
-
-
     const folder =
         zip.folder(
-            folderName
+            sanitizeFilename(projectName)
         );
 
 
@@ -2241,11 +2076,6 @@ async function createProjectZip(
     );
 
 
-    /*
-     * Add a small README so the downloaded
-     * project is easy to understand.
-     */
-
     folder.file(
         "README.txt",
         `Codexa Project
@@ -2263,11 +2093,9 @@ Created with Codexa — Build • Run • Create
     );
 
 
-    return await zip.generateAsync(
-        {
-            type: "blob"
-        }
-    );
+    return await zip.generateAsync({
+        type: "blob"
+    });
 
 }
 
@@ -2335,9 +2163,7 @@ async function downloadCurrentProject() {
 
 
         const link =
-            document.createElement(
-                "a"
-            );
+            document.createElement("a");
 
 
         link.href =
@@ -2356,7 +2182,6 @@ async function downloadCurrentProject() {
 
 
         link.click();
-
 
         link.remove();
 
@@ -2446,9 +2271,7 @@ async function downloadSavedProject(
 
 
         const link =
-            document.createElement(
-                "a"
-            );
+            document.createElement("a");
 
 
         link.href =
@@ -2468,7 +2291,6 @@ async function downloadSavedProject(
 
 
         link.click();
-
 
         link.remove();
 
@@ -2624,7 +2446,7 @@ async function copyCode(
 
 
 /* =====================================================
-   FULLSCREEN PREVIEW
+   FULLSCREEN
    ===================================================== */
 
 async function toggleFullscreen() {
@@ -2683,10 +2505,6 @@ async function toggleFullscreen() {
 }
 
 
-/* =====================================================
-   FULLSCREEN BUTTON
-   ===================================================== */
-
 fullscreenBtn.addEventListener(
     "click",
     toggleFullscreen
@@ -2694,35 +2512,24 @@ fullscreenBtn.addEventListener(
 
 
 /* =====================================================
-   UPDATE FULLSCREEN BUTTON TEXT
+   FULLSCREEN TEXT
    ===================================================== */
 
 document.addEventListener(
     "fullscreenchange",
     () => {
 
-        if (
+        fullscreenBtn.textContent =
             document.fullscreenElement
-        ) {
-
-            fullscreenBtn.textContent =
-                "Exit Fullscreen";
-
-        }
-
-        else {
-
-            fullscreenBtn.textContent =
-                "Fullscreen";
-
-        }
+                ? "Exit Fullscreen"
+                : "Fullscreen";
 
     }
 );
 
 
 /* =====================================================
-   GITHUB BUTTON
+   GITHUB
    ===================================================== */
 
 const githubBtn =
@@ -2738,8 +2545,8 @@ if (githubBtn) {
         () => {
 
             /*
-             * The actual GitHub URL is already
-             * present in the HTML.
+             * The HTML anchor handles
+             * the GitHub navigation.
              */
 
         }
@@ -2749,24 +2556,7 @@ if (githubBtn) {
 
 
 /* =====================================================
-   PREVENT ACCIDENTAL PAGE RELOAD
-   ===================================================== */
-
-window.addEventListener(
-    "beforeunload",
-    () => {
-
-        /*
-         * Project data is stored in Supabase,
-         * so no localStorage backup is required.
-         */
-
-    }
-);
-
-
-/* =====================================================
-   FINAL INITIALIZATION
+   INITIALIZATION
    ===================================================== */
 
 async function initializeCodexa() {
@@ -2805,13 +2595,6 @@ async function initializeCodexa() {
                 data.session.user;
 
 
-            /*
-             * IMPORTANT:
-             * Always start on Compiler after
-             * refresh/login. Never automatically
-             * open Saved Projects.
-             */
-
             showApp();
 
             showCompilerPage();
@@ -2846,6 +2629,13 @@ async function initializeCodexa() {
     }
 
 }
+
+
+/* =====================================================
+   INITIAL PREVIEW
+   ===================================================== */
+
+buildPreview();
 
 
 /* =====================================================
