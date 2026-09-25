@@ -1,0 +1,2518 @@
+/* =====================================================
+   CODEXA — STYLE.CSS — FRESH PART 1/3
+   ROOT + AUTH + APP + HEADER + PROJECT + PREVIEW
+   ===================================================== */
+
+
+/* ==================== ROOT ==================== */
+
+:root {
+    --bg: #070812;
+    --card: rgba(20, 22, 45, 0.88);
+
+    --purple: #8b5cf6;
+    --pink: #ec4899;
+    --cyan: #22d3ee;
+    --blue: #3b82f6;
+    --yellow: #facc15;
+
+    --text: #ffffff;
+    --muted: #a8aec7;
+
+    --border: rgba(255, 255, 255, 0.10);
+}
+
+
+/* ==================== RESET ==================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+
+    color: var(--text);
+
+    background:
+        radial-gradient(
+            circle at 10% 10%,
+            rgba(139, 92, 246, 0.12),
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 90% 20%,
+            rgba(34, 211, 238, 0.08),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 50% 100%,
+            rgba(236, 72, 153, 0.07),
+            transparent 35%
+        ),
+        var(--bg);
+
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    overflow-x: hidden;
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+}
+
+textarea {
+    resize: vertical;
+}
+
+::selection {
+    background: rgba(139, 92, 246, 0.35);
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   AUTH PAGE
+   IMPORTANT:
+   Hidden by default.
+   JS will add .active when user is logged out.
+   ===================================================== */
+
+.auth-page {
+    min-height: 100vh;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px 20px;
+
+    position: relative;
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(139, 92, 246, 0.15),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 80% 80%,
+            rgba(34, 211, 238, 0.10),
+            transparent 35%
+        );
+}
+
+.auth-page.active {
+    display: flex;
+}
+
+.auth-page::before,
+.auth-page::after {
+    content: "";
+
+    position: absolute;
+
+    width: 280px;
+    height: 280px;
+
+    border-radius: 50%;
+
+    filter: blur(80px);
+
+    pointer-events: none;
+}
+
+.auth-page::before {
+    top: -100px;
+    left: -100px;
+
+    background: rgba(139, 92, 246, 0.18);
+}
+
+.auth-page::after {
+    right: -100px;
+    bottom: -100px;
+
+    background: rgba(34, 211, 238, 0.12);
+}
+
+
+/* ==================== AUTH CARD ==================== */
+
+.auth-card {
+    width: 100%;
+    max-width: 430px;
+
+    padding: 34px;
+
+    position: relative;
+    z-index: 2;
+
+    border: 1px solid var(--border);
+    border-radius: 24px;
+
+    background: rgba(15, 17, 38, 0.90);
+
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    box-shadow:
+        0 25px 80px rgba(0, 0, 0, 0.45),
+        0 0 45px rgba(139, 92, 246, 0.08);
+
+    animation: cardIn 0.5s ease both;
+}
+
+
+/* ==================== AUTH LOGO ==================== */
+
+.auth-logo {
+    width: 62px;
+    height: 62px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 18px;
+
+    font-size: 27px;
+    font-weight: 900;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(139, 92, 246, 0.25),
+            rgba(236, 72, 153, 0.18)
+        );
+
+    border: 1px solid rgba(139, 92, 246, 0.30);
+
+    box-shadow:
+        0 0 30px rgba(139, 92, 246, 0.18);
+}
+
+
+/* ==================== AUTH TEXT ==================== */
+
+.auth-card h1 {
+    text-align: center;
+
+    font-size: 30px;
+    font-weight: 800;
+
+    letter-spacing: -0.7px;
+
+    margin-bottom: 8px;
+}
+
+.auth-subtitle {
+    text-align: center;
+
+    color: var(--muted);
+
+    font-size: 14px;
+    line-height: 1.6;
+
+    margin-bottom: 28px;
+}
+
+
+/* ==================== AUTH FORMS ==================== */
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+.auth-form.hidden {
+    display: none;
+}
+
+.auth-label {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    color: #d9dcf0;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.auth-input {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    color: #ffffff;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    outline: none;
+
+    background: rgba(255, 255, 255, 0.045);
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.auth-input::placeholder {
+    color: #737992;
+}
+
+.auth-input:focus {
+    border-color: rgba(139, 92, 246, 0.65);
+
+    background: rgba(139, 92, 246, 0.06);
+
+    box-shadow:
+        0 0 0 3px rgba(139, 92, 246, 0.10),
+        0 0 20px rgba(139, 92, 246, 0.08);
+}
+
+
+/* ==================== AUTH SUBMIT ==================== */
+
+.auth-submit {
+    width: 100%;
+
+    margin-top: 5px;
+
+    padding: 13px 18px;
+
+    border-radius: 12px;
+
+    color: #ffffff;
+
+    font-weight: 700;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--pink)
+        );
+
+    box-shadow:
+        0 10px 30px rgba(139, 92, 246, 0.20);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.auth-submit:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 14px 35px rgba(139, 92, 246, 0.30);
+}
+
+.auth-submit:active {
+    transform: translateY(0);
+}
+
+.auth-submit:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* ==================== AUTH SWITCH ==================== */
+
+.auth-switch {
+    margin-top: 20px;
+
+    text-align: center;
+
+    color: var(--muted);
+
+    font-size: 13px;
+}
+
+.auth-switch button {
+    padding: 0;
+
+    color: #c4a7ff;
+
+    background: transparent;
+
+    font-weight: 700;
+
+    transition: color 0.2s ease;
+}
+
+.auth-switch button:hover {
+    color: #ffffff;
+}
+
+
+/* ==================== AUTH MESSAGE ==================== */
+
+.auth-message {
+    display: none;
+
+    margin-bottom: 18px;
+
+    padding: 11px 13px;
+
+    border-radius: 11px;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+.auth-message.show {
+    display: block;
+}
+
+.auth-message.success {
+    color: #c8ffd9;
+
+    border: 1px solid rgba(34, 197, 94, 0.25);
+
+    background: rgba(34, 197, 94, 0.09);
+}
+
+.auth-message.error {
+    color: #ffd0d0;
+
+    border: 1px solid rgba(239, 68, 68, 0.25);
+
+    background: rgba(239, 68, 68, 0.09);
+}
+
+
+/* =====================================================
+   APP SHELL
+   IMPORTANT:
+   Hidden by default.
+   JS adds .active after successful authentication.
+   ===================================================== */
+
+#appShell {
+    display: none;
+
+    min-height: 100vh;
+}
+
+#appShell.active {
+    display: block;
+}
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+header {
+    width: 100%;
+
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 15px 24px;
+
+    border-bottom: 1px solid var(--border);
+
+    background: rgba(7, 8, 18, 0.82);
+
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+
+
+/* ==================== LOGO ==================== */
+
+.logo {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    color: #ffffff;
+
+    font-size: 21px;
+    font-weight: 900;
+
+    letter-spacing: -0.5px;
+}
+
+.logo-mark {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    font-size: 15px;
+    font-weight: 900;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--purple),
+            var(--pink)
+        );
+
+    box-shadow:
+        0 0 22px rgba(139, 92, 246, 0.25);
+}
+
+
+/* ==================== HEADER ACTIONS ==================== */
+
+.actions {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    flex-wrap: wrap;
+}
+
+.nav-btn,
+.save-btn,
+.run-btn,
+.github-btn,
+.logout-btn {
+    padding: 9px 13px;
+
+    border-radius: 9px;
+
+    color: #ffffff;
+
+    border: 1px solid var(--border);
+
+    background: rgba(255, 255, 255, 0.045);
+
+    font-size: 13px;
+    font-weight: 650;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.nav-btn:hover,
+.github-btn:hover,
+.logout-btn:hover {
+    transform: translateY(-1px);
+
+    border-color: rgba(139, 92, 246, 0.40);
+
+    background: rgba(139, 92, 246, 0.10);
+}
+
+.save-btn {
+    border-color: rgba(139, 92, 246, 0.35);
+
+    background: rgba(139, 92, 246, 0.13);
+}
+
+.save-btn:hover {
+    transform: translateY(-1px);
+
+    background: rgba(139, 92, 246, 0.20);
+
+    box-shadow:
+        0 8px 25px rgba(139, 92, 246, 0.15);
+}
+
+.run-btn {
+    border-color: rgba(34, 211, 238, 0.30);
+
+    background: rgba(34, 211, 238, 0.10);
+}
+
+.run-btn:hover {
+    transform: translateY(-1px);
+
+    background: rgba(34, 211, 238, 0.16);
+
+    box-shadow:
+        0 8px 25px rgba(34, 211, 238, 0.12);
+}
+
+.logout-btn {
+    border-color: rgba(236, 72, 153, 0.28);
+
+    background: rgba(236, 72, 153, 0.07);
+}
+
+
+/* =====================================================
+   SAVED VIEW
+   ===================================================== */
+
+body.saved-view .actions {
+    display: none;
+}
+
+
+/* =====================================================
+   MAIN CONTAINER
+   ===================================================== */
+
+.container {
+    width: min(1400px, calc(100% - 40px));
+
+    margin: 0 auto;
+
+    padding: 30px 0 50px;
+}
+
+.compiler-page {
+    display: block;
+
+    animation: pageIn 0.35s ease both;
+}
+
+
+/* =====================================================
+   PROJECT NAME
+   ===================================================== */
+
+.project-name-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 20px;
+    padding: 20px;
+
+    border: 1px solid var(--border);
+    border-radius: 18px;
+
+    background: var(--card);
+
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+
+    box-shadow:
+        0 15px 45px rgba(0, 0, 0, 0.20);
+}
+
+.project-name-info h2 {
+    margin-bottom: 5px;
+
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.project-name-info p {
+    color: var(--muted);
+
+    font-size: 12px;
+}
+
+.project-name-input-wrap {
+    width: min(420px, 100%);
+}
+
+#projectNameInput {
+    width: 100%;
+
+    padding: 12px 14px;
+
+    color: #ffffff;
+
+    border: 1px solid var(--border);
+    border-radius: 11px;
+
+    outline: none;
+
+    background: rgba(255, 255, 255, 0.045);
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+#projectNameInput::placeholder {
+    color: #72788f;
+}
+
+#projectNameInput:focus {
+    border-color: rgba(139, 92, 246, 0.60);
+
+    box-shadow:
+        0 0 0 3px rgba(139, 92, 246, 0.08);
+}
+
+
+/* =====================================================
+   OPENED PROJECT BAR
+   ===================================================== */
+
+.opened-project-bar {
+    display: none;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 18px;
+    padding: 12px 15px;
+
+    border: 1px solid rgba(34, 211, 238, 0.18);
+    border-radius: 12px;
+
+    background: rgba(34, 211, 238, 0.055);
+
+    color: #b8f6ff;
+
+    font-size: 13px;
+}
+
+.opened-project-bar.show {
+    display: flex;
+
+    animation: pageIn 0.25s ease both;
+}
+
+#openedProjectText {
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+#backToSavedProjectsFromCompiler {
+    flex-shrink: 0;
+
+    padding: 7px 10px;
+
+    border: 1px solid rgba(34, 211, 238, 0.20);
+    border-radius: 8px;
+
+    color: #9cecf6;
+
+    background: rgba(34, 211, 238, 0.07);
+
+    font-size: 12px;
+    font-weight: 700;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+#backToSavedProjectsFromCompiler:hover {
+    transform: translateY(-1px);
+
+    background: rgba(34, 211, 238, 0.13);
+}
+
+
+/* =====================================================
+   PREVIEW
+   ===================================================== */
+
+.preview-card {
+    margin-bottom: 22px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+    border-radius: 18px;
+
+    background: var(--card);
+
+    box-shadow:
+        0 15px 50px rgba(0, 0, 0, 0.22);
+}
+
+.preview-header {
+    min-height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 12px 16px;
+
+    border-bottom: 1px solid var(--border);
+
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.preview-title {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    font-size: 14px;
+    font-weight: 750;
+}
+
+.preview-dot {
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    background: var(--cyan);
+
+    box-shadow:
+        0 0 12px rgba(34, 211, 238, 0.75);
+}
+
+#fullscreenBtn {
+    padding: 7px 10px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    color: #dce0f0;
+
+    background: rgba(255, 255, 255, 0.04);
+
+    font-size: 12px;
+    font-weight: 650;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+#fullscreenBtn:hover {
+    background: rgba(139, 92, 246, 0.10);
+
+    border-color: rgba(139, 92, 246, 0.30);
+}
+
+#preview {
+    width: 100%;
+    height: 430px;
+
+    display: block;
+
+    border: 0;
+
+    background: #ffffff;
+}
+
+
+/* =====================================================
+   PREVIEW FULLSCREEN
+   ===================================================== */
+
+.preview-card:fullscreen {
+    width: 100vw;
+    height: 100vh;
+
+    margin: 0;
+
+    border: none;
+
+    border-radius: 0;
+
+    background: var(--bg);
+}
+
+.preview-card:fullscreen #preview {
+    height: calc(100vh - 52px);
+}
+/* =====================================================
+   CODEXA — STYLE.CSS — FRESH PART 2/3
+   EDITORS + SAVED PROJECTS + FOOTER + TOAST + CONFIRM
+   ===================================================== */
+
+
+/* =====================================================
+   EDITORS
+   ===================================================== */
+
+.editors {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.editor {
+    min-width: 0;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+    border-radius: 18px;
+
+    background: var(--card);
+
+    box-shadow:
+        0 15px 45px rgba(0, 0, 0, 0.20);
+
+    animation: editorIn 0.45s ease both;
+}
+
+.editor:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.editor:nth-child(2) {
+    animation-delay: 0.10s;
+}
+
+.editor:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+
+/* ==================== EDITOR HEADER ==================== */
+
+.editor-header {
+    min-height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 11px 14px;
+
+    border-bottom: 1px solid var(--border);
+
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.editor-title {
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.editor-icon {
+    width: 27px;
+    height: 27px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 7px;
+
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.html-editor .editor-icon {
+    color: #ffb36b;
+
+    background: rgba(255, 126, 46, 0.12);
+}
+
+.css-editor .editor-icon {
+    color: #69b7ff;
+
+    background: rgba(59, 130, 246, 0.12);
+}
+
+.js-editor .editor-icon {
+    color: #ffe27a;
+
+    background: rgba(250, 204, 21, 0.12);
+}
+
+
+/* ==================== COPY BUTTON ==================== */
+
+.copy-btn {
+    padding: 6px 9px;
+
+    border: 1px solid var(--border);
+    border-radius: 7px;
+
+    color: #aeb5cf;
+
+    background: rgba(255, 255, 255, 0.035);
+
+    font-size: 11px;
+    font-weight: 650;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.copy-btn:hover {
+    color: #ffffff;
+
+    border-color: rgba(139, 92, 246, 0.30);
+
+    background: rgba(139, 92, 246, 0.10);
+}
+
+
+/* ==================== EDITOR TEXTAREA ==================== */
+
+.editor textarea {
+    width: 100%;
+    min-height: 360px;
+
+    display: block;
+
+    padding: 16px;
+
+    border: none;
+    outline: none;
+
+    color: #e8ebf7;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.018),
+            rgba(255, 255, 255, 0.008)
+        );
+
+    font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        Menlo,
+        monospace;
+
+    font-size: 13px;
+    line-height: 1.65;
+
+    tab-size: 4;
+
+    scrollbar-width: thin;
+
+    scrollbar-color:
+        rgba(139, 92, 246, 0.35)
+        transparent;
+}
+
+.editor textarea::placeholder {
+    color: #5f657b;
+}
+
+.editor textarea:focus {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(139, 92, 246, 0.025),
+            rgba(255, 255, 255, 0.008)
+        );
+}
+
+.editor textarea::-webkit-scrollbar {
+    width: 7px;
+}
+
+.editor textarea::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.editor textarea::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+
+    background: rgba(139, 92, 246, 0.28);
+}
+
+.editor textarea::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.45);
+}
+
+
+/* =====================================================
+   SAVED PROJECTS PAGE
+   ===================================================== */
+
+.saved-page {
+    display: none;
+
+    animation: pageIn 0.35s ease both;
+}
+
+.saved-page.active {
+    display: block;
+}
+
+
+/* ==================== SAVED TOP ==================== */
+
+.saved-top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 28px;
+}
+
+.saved-top-left {
+    min-width: 0;
+}
+
+.section-label {
+    display: inline-block;
+
+    margin-bottom: 8px;
+
+    color: #a78bfa;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.saved-top h1 {
+    margin-bottom: 8px;
+
+    font-size: clamp(27px, 4vw, 38px);
+    line-height: 1.1;
+
+    letter-spacing: -1px;
+}
+
+.saved-top p {
+    max-width: 650px;
+
+    color: var(--muted);
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* ==================== BACK BUTTON ==================== */
+
+#backToCompilerBtn {
+    flex-shrink: 0;
+
+    padding: 10px 14px;
+
+    border: 1px solid var(--border);
+    border-radius: 10px;
+
+    color: #ffffff;
+
+    background: rgba(255, 255, 255, 0.045);
+
+    font-size: 13px;
+    font-weight: 700;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+#backToCompilerBtn:hover {
+    transform: translateY(-1px);
+
+    border-color: rgba(139, 92, 246, 0.35);
+
+    background: rgba(139, 92, 246, 0.10);
+}
+
+
+/* ==================== PROJECT GRID ==================== */
+
+.projects-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+
+/* ==================== PROJECT CARD ==================== */
+
+.project-card {
+    min-width: 0;
+
+    position: relative;
+
+    overflow: hidden;
+
+    padding: 20px;
+
+    border: 1px solid var(--border);
+    border-radius: 18px;
+
+    background: var(--card);
+
+    box-shadow:
+        0 15px 45px rgba(0, 0, 0, 0.20);
+
+    animation: projectIn 0.4s ease both;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.project-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--purple),
+            var(--pink),
+            var(--cyan)
+        );
+
+    opacity: 0.75;
+}
+
+.project-card:hover {
+    transform: translateY(-3px);
+
+    border-color: rgba(139, 92, 246, 0.25);
+
+    box-shadow:
+        0 20px 55px rgba(0, 0, 0, 0.28),
+        0 0 30px rgba(139, 92, 246, 0.06);
+}
+
+
+/* ==================== PROJECT CARD CONTENT ==================== */
+
+.project-number {
+    width: 32px;
+    height: 32px;
+
+    margin-bottom: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    color: #cbb8ff;
+
+    background: rgba(139, 92, 246, 0.11);
+
+    border: 1px solid rgba(139, 92, 246, 0.18);
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.project-card h3 {
+    margin-bottom: 7px;
+
+    overflow: hidden;
+
+    color: #ffffff;
+
+    font-size: 17px;
+    font-weight: 750;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.project-date {
+    margin-bottom: 18px;
+
+    color: #777e98;
+
+    font-size: 11px;
+}
+
+
+/* ==================== PROJECT ACTIONS ==================== */
+
+.project-actions {
+    display: flex;
+
+    gap: 8px;
+}
+
+.project-actions button {
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 9px 10px;
+
+    border-radius: 8px;
+
+    color: #ffffff;
+
+    border: 1px solid var(--border);
+
+    background: rgba(255, 255, 255, 0.04);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.project-actions button:hover {
+    transform: translateY(-1px);
+}
+
+.open-project {
+    border-color: rgba(139, 92, 246, 0.25) !important;
+
+    background: rgba(139, 92, 246, 0.08) !important;
+}
+
+.open-project:hover {
+    border-color: rgba(139, 92, 246, 0.40) !important;
+
+    background: rgba(139, 92, 246, 0.14) !important;
+}
+
+.download-project {
+    border-color: rgba(34, 211, 238, 0.20) !important;
+
+    background: rgba(34, 211, 238, 0.06) !important;
+}
+
+.download-project:hover {
+    border-color: rgba(34, 211, 238, 0.35) !important;
+
+    background: rgba(34, 211, 238, 0.11) !important;
+}
+
+.delete-project {
+    border-color: rgba(236, 72, 153, 0.20) !important;
+
+    background: rgba(236, 72, 153, 0.055) !important;
+}
+
+.delete-project:hover {
+    border-color: rgba(236, 72, 153, 0.38) !important;
+
+    background: rgba(236, 72, 153, 0.11) !important;
+}
+
+
+/* =====================================================
+   EMPTY PROJECTS
+   ===================================================== */
+
+.empty-projects {
+    padding: 65px 25px;
+
+    text-align: center;
+
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+
+    background: rgba(255, 255, 255, 0.018);
+}
+
+.empty-projects-icon {
+    width: 52px;
+    height: 52px;
+
+    margin: 0 auto 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 15px;
+
+    color: #bda8ff;
+
+    background: rgba(139, 92, 246, 0.09);
+
+    border: 1px solid rgba(139, 92, 246, 0.16);
+
+    font-size: 20px;
+}
+
+.empty-projects h2 {
+    margin-bottom: 7px;
+
+    font-size: 19px;
+}
+
+.empty-projects p {
+    color: var(--muted);
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+
+.codexa-footer {
+    padding: 28px 20px 35px;
+
+    text-align: center;
+
+    color: #6e748c;
+
+    font-size: 12px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.055);
+}
+
+.codexa-footer span {
+    color: #979db4;
+}
+
+
+/* =====================================================
+   TOAST
+   ===================================================== */
+
+#toastContainer {
+    position: fixed;
+
+    top: 78px;
+    right: 20px;
+
+    z-index: 500;
+
+    width: min(360px, calc(100vw - 40px));
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 11px;
+
+    padding: 13px 14px;
+
+    border: 1px solid var(--border);
+    border-radius: 13px;
+
+    background:
+        rgba(16, 18, 38, 0.94);
+
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+
+    box-shadow:
+        0 15px 40px rgba(0, 0, 0, 0.35);
+
+    pointer-events: auto;
+
+    animation: toastIn 0.3s ease both;
+}
+
+.toast.removing {
+    animation: toastOut 0.25s ease forwards;
+}
+
+.toast-icon {
+    width: 29px;
+    height: 29px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    color: #cdbaff;
+
+    background: rgba(139, 92, 246, 0.12);
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.toast-content {
+    min-width: 0;
+
+    flex: 1;
+}
+
+.toast-title {
+    margin-bottom: 2px;
+
+    color: #ffffff;
+
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.toast-message {
+    color: #9ba2bb;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+    word-break: break-word;
+}
+
+.toast-close {
+    flex-shrink: 0;
+
+    padding: 2px;
+
+    color: #737991;
+
+    background: transparent;
+
+    font-size: 15px;
+
+    transition: color 0.2s ease;
+}
+
+.toast-close:hover {
+    color: #ffffff;
+}
+
+
+/* =====================================================
+   CONFIRMATION OVERLAY
+   ===================================================== */
+
+#confirmOverlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 600;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.68);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+#confirmOverlay.show {
+    display: flex;
+
+    animation: pageIn 0.2s ease both;
+}
+
+
+/* ==================== CONFIRM BOX ==================== */
+
+.confirm-box {
+    width: min(430px, 100%);
+
+    position: relative;
+
+    padding: 27px;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+    border-radius: 20px;
+
+    background:
+        rgba(17, 19, 41, 0.97);
+
+    box-shadow:
+        0 30px 90px rgba(0, 0, 0, 0.50);
+
+    animation: cardIn 0.25s ease both;
+}
+
+.confirm-box::before {
+    content: "";
+
+    position: absolute;
+
+    top: -90px;
+    right: -90px;
+
+    width: 190px;
+    height: 190px;
+
+    border-radius: 50%;
+
+    background: rgba(139, 92, 246, 0.10);
+
+    filter: blur(35px);
+
+    pointer-events: none;
+}
+
+.confirm-icon {
+    width: 47px;
+    height: 47px;
+
+    margin-bottom: 17px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    color: #cbb8ff;
+
+    background: rgba(139, 92, 246, 0.11);
+
+    border: 1px solid rgba(139, 92, 246, 0.18);
+
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.confirm-box h2 {
+    margin-bottom: 8px;
+
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.confirm-box p {
+    margin-bottom: 23px;
+
+    color: var(--muted);
+
+    font-size: 13px;
+
+    line-height: 1.65;
+}
+
+
+/* ==================== CONFIRM BUTTONS ==================== */
+
+.confirm-buttons {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 9px;
+}
+
+.confirm-buttons button {
+    padding: 9px 14px;
+
+    border-radius: 9px;
+
+    color: #ffffff;
+
+    border: 1px solid var(--border);
+
+    background: rgba(255, 255, 255, 0.045);
+
+    font-size: 12px;
+    font-weight: 700;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.confirm-buttons button:hover {
+    transform: translateY(-1px);
+
+    background: rgba(255, 255, 255, 0.08);
+}
+
+#confirmAction {
+    border-color: rgba(139, 92, 246, 0.30);
+
+    background: rgba(139, 92, 246, 0.14);
+}
+
+#confirmAction:hover {
+    background: rgba(139, 92, 246, 0.21);
+}
+
+#confirmAction.danger {
+    border-color: rgba(236, 72, 153, 0.30);
+
+    background: rgba(236, 72, 153, 0.11);
+}
+
+#confirmAction.danger:hover {
+    background: rgba(236, 72, 153, 0.18);
+}
+/* =====================================================
+   CODEXA — STYLE.CSS — FRESH PART 3/3
+   ANIMATIONS + RESPONSIVE + MOBILE + ACCESSIBILITY
+   ===================================================== */
+
+
+/* =====================================================
+   ANIMATIONS
+   ===================================================== */
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateX(25px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(25px) scale(0.97);
+    }
+}
+
+@keyframes cardIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes editorIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pageIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes projectIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+
+@media (max-width: 1050px) {
+
+    .editors {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .editor.js-editor {
+        grid-column: 1 / -1;
+    }
+
+    .projects-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .project-name-card {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .project-name-input-wrap {
+        width: 100%;
+    }
+}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (max-width: 720px) {
+
+    /* ---------- HEADER ---------- */
+
+    header {
+        padding: 12px 14px;
+
+        align-items: flex-start;
+
+        gap: 12px;
+    }
+
+    .logo {
+        font-size: 18px;
+    }
+
+    .logo-mark {
+        width: 31px;
+        height: 31px;
+
+        border-radius: 9px;
+    }
+
+    .actions {
+        justify-content: flex-end;
+
+        gap: 6px;
+    }
+
+    .nav-btn,
+    .save-btn,
+    .run-btn,
+    .github-btn,
+    .logout-btn {
+        padding: 8px 9px;
+
+        font-size: 11px;
+    }
+
+
+    /* ---------- AUTH ---------- */
+
+    .auth-page {
+        padding: 20px 14px;
+    }
+
+    .auth-card {
+        padding: 26px 20px;
+
+        border-radius: 20px;
+    }
+
+    .auth-card h1 {
+        font-size: 26px;
+    }
+
+    .auth-logo {
+        width: 55px;
+        height: 55px;
+    }
+
+
+    /* ---------- MAIN ---------- */
+
+    .container {
+        width: min(100% - 24px, 1400px);
+
+        padding-top: 20px;
+        padding-bottom: 35px;
+    }
+
+
+    /* ---------- PROJECT NAME ---------- */
+
+    .project-name-card {
+        padding: 16px;
+
+        margin-bottom: 15px;
+
+        border-radius: 15px;
+    }
+
+    .project-name-info h2 {
+        font-size: 16px;
+    }
+
+
+    /* ---------- OPENED PROJECT ---------- */
+
+    .opened-project-bar {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        padding: 11px 12px;
+    }
+
+    #backToSavedProjectsFromCompiler {
+        width: 100%;
+    }
+
+
+    /* ---------- PREVIEW ---------- */
+
+    .preview-card {
+        border-radius: 15px;
+
+        margin-bottom: 16px;
+    }
+
+    .preview-header {
+        padding: 10px 12px;
+    }
+
+    #preview {
+        height: 350px;
+    }
+
+
+    /* ---------- EDITORS ---------- */
+
+    .editors {
+        grid-template-columns: 1fr;
+
+        gap: 14px;
+    }
+
+    .editor.js-editor {
+        grid-column: auto;
+    }
+
+    .editor {
+        border-radius: 15px;
+    }
+
+    .editor textarea {
+        min-height: 300px;
+
+        padding: 13px;
+
+        font-size: 12px;
+    }
+
+
+    /* ---------- SAVED PROJECTS ---------- */
+
+    .saved-top {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        margin-bottom: 20px;
+    }
+
+    .saved-top h1 {
+        font-size: 28px;
+    }
+
+    .saved-top p {
+        font-size: 13px;
+    }
+
+    #backToCompilerBtn {
+        width: 100%;
+    }
+
+    .projects-grid {
+        grid-template-columns: 1fr;
+
+        gap: 14px;
+    }
+
+    .project-card {
+        padding: 17px;
+
+        border-radius: 15px;
+    }
+
+    .project-actions {
+        flex-wrap: wrap;
+    }
+
+    .project-actions button {
+        min-width: calc(50% - 4px);
+    }
+
+
+    /* ---------- EMPTY PROJECTS ---------- */
+
+    .empty-projects {
+        padding: 50px 18px;
+    }
+
+
+    /* ---------- TOAST ---------- */
+
+    #toastContainer {
+        top: 70px;
+        right: 12px;
+
+        width: calc(100vw - 24px);
+    }
+
+
+    /* ---------- CONFIRM ---------- */
+
+    .confirm-box {
+        padding: 23px;
+
+        border-radius: 17px;
+    }
+
+    .confirm-buttons {
+        flex-direction: column-reverse;
+    }
+
+    .confirm-buttons button {
+        width: 100%;
+    }
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+   ===================================================== */
+
+@media (max-width: 430px) {
+
+    /* ---------- HEADER ---------- */
+
+    header {
+        padding: 10px 11px;
+
+        gap: 8px;
+    }
+
+    .logo {
+        gap: 7px;
+
+        font-size: 16px;
+    }
+
+    .logo-mark {
+        width: 28px;
+        height: 28px;
+
+        font-size: 12px;
+    }
+
+    .actions {
+        gap: 4px;
+    }
+
+    .nav-btn,
+    .save-btn,
+    .run-btn,
+    .github-btn,
+    .logout-btn {
+        padding: 7px 7px;
+
+        font-size: 10px;
+    }
+
+
+    /* ---------- AUTH ---------- */
+
+    .auth-card {
+        padding: 23px 16px;
+    }
+
+    .auth-card h1 {
+        font-size: 24px;
+    }
+
+    .auth-subtitle {
+        font-size: 13px;
+    }
+
+
+    /* ---------- MAIN ---------- */
+
+    .container {
+        width: calc(100% - 18px);
+
+        padding-top: 16px;
+    }
+
+
+    /* ---------- PROJECT NAME ---------- */
+
+    .project-name-card {
+        padding: 14px;
+    }
+
+    #projectNameInput {
+        padding: 11px 12px;
+
+        font-size: 13px;
+    }
+
+
+    /* ---------- PREVIEW ---------- */
+
+    .preview-header {
+        min-height: 47px;
+
+        padding: 9px 10px;
+    }
+
+    .preview-title {
+        font-size: 12px;
+    }
+
+    #fullscreenBtn {
+        padding: 6px 8px;
+
+        font-size: 10px;
+    }
+
+    #preview {
+        height: 300px;
+    }
+
+
+    /* ---------- EDITOR ---------- */
+
+    .editor-header {
+        padding: 9px 10px;
+    }
+
+    .editor-title {
+        font-size: 12px;
+    }
+
+    .editor-icon {
+        width: 24px;
+        height: 24px;
+
+        font-size: 10px;
+    }
+
+    .copy-btn {
+        padding: 5px 7px;
+
+        font-size: 10px;
+    }
+
+    .editor textarea {
+        min-height: 270px;
+
+        font-size: 11px;
+
+        line-height: 1.55;
+    }
+
+
+    /* ---------- PROJECT ACTIONS ---------- */
+
+    .project-actions button {
+        min-width: 100%;
+    }
+
+
+    /* ---------- TOAST ---------- */
+
+    .toast {
+        padding: 11px;
+    }
+
+    .toast-title {
+        font-size: 11px;
+    }
+
+    .toast-message {
+        font-size: 10px;
+    }
+}
+
+
+/* =====================================================
+   TOUCH DEVICES
+   ===================================================== */
+
+@media (hover: none) {
+
+    .nav-btn:hover,
+    .save-btn:hover,
+    .run-btn:hover,
+    .github-btn:hover,
+    .logout-btn:hover,
+    .copy-btn:hover,
+    #fullscreenBtn:hover,
+    #backToSavedProjectsFromCompiler:hover,
+    #backToCompilerBtn:hover,
+    .project-card:hover,
+    .project-actions button:hover,
+    .auth-submit:hover {
+        transform: none;
+    }
+}
+
+
+/* =====================================================
+   REDUCED MOTION
+   ===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+
+        animation-iteration-count: 1 !important;
+
+        transition-duration: 0.01ms !important;
+    }
+}
+ /* =====================================================
+    CODEXA — HARD EDITOR LAYOUT RESET
+    FIX HTML / CSS / JS CARD OVERLAP
+    ===================================================== */
+
+.editors {
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr)) !important;
+
+    gap: 24px !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    height: auto !important;
+    min-height: 0 !important;
+
+    position: static !important;
+
+    transform: none !important;
+    perspective: none !important;
+
+    overflow: visible !important;
+}
+
+
+/* =====================================================
+   ALL THREE EDITOR CARDS
+   ===================================================== */
+
+.editors > .editor,
+.editors .html-editor,
+.editors .css-editor,
+.editors .js-editor {
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    position: static !important;
+
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+
+    float: none !important;
+
+    margin: 0 !important;
+
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+
+    height: auto !important;
+    min-height: 420px !important;
+
+    transform: none !important;
+    rotate: none !important;
+    scale: 1 !important;
+    translate: none !important;
+
+    z-index: auto !important;
+
+    grid-column: auto !important;
+    grid-row: auto !important;
+}
+
+
+/* =====================================================
+   REMOVE 3D / POSITIONING FROM EDITOR CONTENT
+   ===================================================== */
+
+.editors .editor *,
+.editors .editor::before,
+.editors .editor::after {
+
+    transform: none !important;
+
+    position: static !important;
+
+    float: none !important;
+}
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.editors .editor-header {
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    position: relative !important;
+
+    width: 100% !important;
+
+    flex-shrink: 0 !important;
+
+    z-index: 5 !important;
+}
+
+
+/* =====================================================
+   TEXTAREA
+   ===================================================== */
+
+.editors .editor textarea {
+
+    display: block !important;
+
+    position: relative !important;
+
+    width: 100% !important;
+
+    min-width: 0 !important;
+
+    height: 360px !important;
+    min-height: 360px !important;
+
+    box-sizing: border-box !important;
+
+    flex: 1 1 auto !important;
+
+    transform: none !important;
+
+    z-index: 2 !important;
+}
+
+
+/* =====================================================
+   HTML
+   ===================================================== */
+
+.editors > .html-editor {
+
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+}
+
+
+/* =====================================================
+   CSS
+   ===================================================== */
+
+.editors > .css-editor {
+
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+}
+
+
+/* =====================================================
+   JAVASCRIPT
+   ===================================================== */
+
+.editors > .js-editor {
+
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+}
+
+
+/* =====================================================
+   TABLET
+   ===================================================== */
+
+@media (max-width: 1000px) {
+
+    .editors {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+
+    }
+
+    .editors > .html-editor {
+
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+
+    }
+
+    .editors > .css-editor {
+
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+
+    }
+
+    .editors > .js-editor {
+
+        grid-column: 1 / -1 !important;
+        grid-row: 2 !important;
+
+    }
+
+}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (max-width: 700px) {
+
+    .editors {
+
+        display: grid !important;
+
+        grid-template-columns:
+            1fr !important;
+
+        gap: 18px !important;
+
+    }
+
+    .editors > .html-editor {
+
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+
+    }
+
+    .editors > .css-editor {
+
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+
+    }
+
+    .editors > .js-editor {
+
+        grid-column: 1 !important;
+        grid-row: 3 !important;
+
+    }
+
+    .editors > .editor {
+
+        min-height: 380px !important;
+
+    }
+
+    .editors .editor textarea {
+
+        height: 320px !important;
+        min-height: 320px !important;
+
+    }
+
+}
