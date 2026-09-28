@@ -1,11 +1,12 @@
 /* =========================================================
-   VOID — CINEMATIC SCROLL JOURNEY
-   PHASE 2
+   VOID — PHASE 2
+   CINEMATIC SCROLL JOURNEY
+   SCRIPT.JS — PART 1/3
    ========================================================= */
 
 
 /* =========================================================
-   DOM
+   DOM REFERENCES
    ========================================================= */
 
 const body = document.body;
@@ -34,21 +35,9 @@ const workItems =
 const overlayLinks =
     document.querySelectorAll(".overlay-nav a");
 
-const hero =
-    document.getElementById("hero");
-
-const work =
-    document.getElementById("work");
-
-const about =
-    document.getElementById("about");
-
-const contact =
-    document.getElementById("contact");
-
 
 /* =========================================================
-   STATE
+   APPLICATION STATE
    ========================================================= */
 
 const state = {
@@ -75,63 +64,59 @@ const state = {
 
 
 /* =========================================================
-   THREE VARIABLES
+   THREE.JS VARIABLES
    ========================================================= */
 
-let scene;
-let camera;
-let renderer;
+let scene = null;
+let camera = null;
+let renderer = null;
 
-let heroObject;
-let innerObject;
+let heroObject = null;
+let innerObject = null;
 
-let particles;
-let particleMaterial;
-let particleGeometry;
+let particles = null;
+let particleMaterial = null;
 
-let clock;
-
-let animationFrame;
+let clock = null;
 
 
 /* =========================================================
-   CINEMATIC WORLD STATE
+   WORLD SETTINGS
    ========================================================= */
 
 const world = {
 
-    targetCameraZ: 7,
-    currentCameraZ: 7,
+    /* Camera */
+
+    cameraX: 0,
+    cameraY: 0,
+    cameraZ: 7,
 
     targetCameraX: 0,
-    currentCameraX: 0,
-
     targetCameraY: 0,
-    currentCameraY: 0,
+    targetCameraZ: 7,
+
+
+    /* Hero */
+
+    heroX: 1.7,
+    heroY: 0.15,
+    heroZ: 0,
 
     targetHeroX: 1.7,
-    currentHeroX: 1.7,
-
     targetHeroY: 0.15,
-    currentHeroY: 0.15,
-
     targetHeroZ: 0,
-    currentHeroZ: 0,
 
+
+    heroScale: 1,
     targetHeroScale: 1,
-    currentHeroScale: 1,
+
+
+    heroRotationX: 0,
+    heroRotationY: 0,
 
     targetHeroRotationX: 0,
-    targetHeroRotationY: 0,
-
-    currentHeroRotationX: 0,
-    currentHeroRotationY: 0,
-
-    workProgress: 0,
-
-    aboutProgress: 0,
-
-    contactProgress: 0
+    targetHeroRotationY: 0
 
 };
 
@@ -148,7 +133,10 @@ function clamp(
 
     return Math.max(
         min,
-        Math.min(max, value)
+        Math.min(
+            max,
+            value
+        )
     );
 
 }
@@ -160,619 +148,129 @@ function lerp(
     amount
 ) {
 
-    return current +
+    return (
+        current +
         (
             target -
             current
         ) *
-        amount;
+        amount
+    );
 
 }
 
 
-/* =========================================================
-   SECTION PROGRESS
-   ========================================================= */
-
-function getSectionProgress(
-    element,
-    startOffset = 0,
-    endOffset = 0
+function easeInOutCubic(
+    value
 ) {
 
-    if (!element) {
-        return 0;
+    value =
+        clamp(
+            value,
+            0,
+            1
+        );
+
+
+    if (value < 0.5) {
+
+        return (
+            4 *
+            value *
+            value *
+            value
+        );
+
     }
 
-    const rect =
-        element.getBoundingClientRect();
 
-    const viewportHeight =
-        window.innerHeight;
-
-    const start =
-        viewportHeight -
-        startOffset;
-
-    const end =
-        -rect.height +
-        endOffset;
-
-    const distance =
-        start - end;
-
-    if (distance === 0) {
-        return 0;
-    }
-
-    return clamp(
-        (start - rect.top) / distance,
-        0,
-        1
+    return (
+        1 -
+        Math.pow(
+            -2 * value + 2,
+            3
+        ) /
+        2
     );
 
 }
 
 
 /* =========================================================
-   GLOBAL SCROLL PROGRESS
+   SCROLL PROGRESS
    ========================================================= */
 
 function calculateScrollProgress() {
 
-    const maxScroll =
-        document.documentElement.scrollHeight -
+    const documentHeight =
+        document.documentElement
+            .scrollHeight;
+
+    const viewportHeight =
         window.innerHeight;
 
-    if (maxScroll <= 0) {
-        return 0;
-    }
 
-    return clamp(
-        state.scrollY / maxScroll,
-        0,
-        1
-    );
+    const maximumScroll =
+        documentHeight -
+        viewportHeight;
 
-}
-
-
-/* =========================================================
-   THREE INITIALIZATION
-   ========================================================= */
-
-function initThree() {
-
-    if (!canvas) {
-        return;
-    }
 
     if (
-        typeof THREE ===
-        "undefined"
+        maximumScroll <= 0
     ) {
 
-        console.warn(
-            "Three.js was not loaded."
-        );
-
-        return;
+        return 0;
 
     }
 
 
-    scene =
-        new THREE.Scene();
-
-
-    camera =
-        new THREE.PerspectiveCamera(
-            42,
-            window.innerWidth /
-            window.innerHeight,
-            0.1,
-            100
-        );
-
-
-    camera.position.set(
+    return clamp(
+        window.scrollY /
+        maximumScroll,
         0,
-        0,
-        7
-    );
-
-
-    renderer =
-        new THREE.WebGLRenderer({
-
-            canvas: canvas,
-
-            antialias: true,
-
-            alpha: true,
-
-            powerPreference:
-                "high-performance"
-
-        });
-
-
-    renderer.setPixelRatio(
-        Math.min(
-            window.devicePixelRatio,
-            2
-        )
-    );
-
-
-    renderer.setSize(
-        window.innerWidth,
-        window.innerHeight
-    );
-
-
-    renderer.outputEncoding =
-        THREE.sRGBEncoding;
-
-
-    clock =
-        new THREE.Clock();
-
-
-    createLights();
-
-    createHeroObject();
-
-    createParticles();
-
-    resizeThree();
-
-}
-
-
-/* =========================================================
-   LIGHTING
-   ========================================================= */
-
-function createLights() {
-
-    const ambient =
-        new THREE.AmbientLight(
-            0xffffff,
-            0.45
-        );
-
-    scene.add(ambient);
-
-
-    const keyLight =
-        new THREE.PointLight(
-            0xffffff,
-            4,
-            30
-        );
-
-    keyLight.position.set(
-        3,
-        4,
-        5
-    );
-
-    scene.add(keyLight);
-
-
-    const purpleLight =
-        new THREE.PointLight(
-            0x8b5cf6,
-            7,
-            25
-        );
-
-    purpleLight.position.set(
-        -4,
-        1,
-        2
-    );
-
-    scene.add(purpleLight);
-
-
-    const cyanLight =
-        new THREE.PointLight(
-            0x22d3ee,
-            5,
-            25
-        );
-
-    cyanLight.position.set(
-        4,
-        -3,
         1
     );
 
-    scene.add(cyanLight);
-
 }
 
 
 /* =========================================================
-   HERO OBJECT
+   SCROLL EVENT
    ========================================================= */
 
-function createHeroObject() {
+function setupScroll() {
 
-    heroObject =
-        new THREE.Group();
+    state.scrollY =
+        window.scrollY;
 
 
-    /* -----------------------------------------------------
-       MAIN BODY
-       ----------------------------------------------------- */
+    state.targetScrollY =
+        window.scrollY;
 
-    const geometry =
-        new THREE.IcosahedronGeometry(
-            1.55,
-            2
-        );
 
+    state.scrollProgress =
+        calculateScrollProgress();
 
-    const material =
-        new THREE.MeshPhysicalMaterial({
 
-            color: 0x101018,
+    state.targetScrollProgress =
+        state.scrollProgress;
 
-            roughness: 0.22,
 
-            metalness: 0.72,
+    window.addEventListener(
+        "scroll",
+        function () {
 
-            transparent: true,
+            state.targetScrollY =
+                window.scrollY;
 
-            opacity: 0.92,
 
-            clearcoat: 1,
+            state.targetScrollProgress =
+                calculateScrollProgress();
 
-            clearcoatRoughness: 0.18
-
-        });
-
-
-    const mesh =
-        new THREE.Mesh(
-            geometry,
-            material
-        );
-
-
-    heroObject.add(mesh);
-
-
-    /* -----------------------------------------------------
-       INNER WIREFRAME
-       ----------------------------------------------------- */
-
-    const innerGeometry =
-        new THREE.IcosahedronGeometry(
-            1.72,
-            1
-        );
-
-
-    const innerMaterial =
-        new THREE.MeshBasicMaterial({
-
-            color: 0x8b5cf6,
-
-            wireframe: true,
-
-            transparent: true,
-
-            opacity: 0.22
-
-        });
-
-
-    innerObject =
-        new THREE.Mesh(
-            innerGeometry,
-            innerMaterial
-        );
-
-
-    heroObject.add(
-        innerObject
-    );
-
-
-    /* -----------------------------------------------------
-       OUTER DETAIL
-       ----------------------------------------------------- */
-
-    const detailGeometry =
-        new THREE.IcosahedronGeometry(
-            1.9,
-            1
-        );
-
-
-    const detailMaterial =
-        new THREE.MeshBasicMaterial({
-
-            color: 0x22d3ee,
-
-            wireframe: true,
-
-            transparent: true,
-
-            opacity: 0.08
-
-        });
-
-
-    const detail =
-        new THREE.Mesh(
-            detailGeometry,
-            detailMaterial
-        );
-
-
-    detail.rotation.x =
-        0.4;
-
-    detail.rotation.y =
-        0.7;
-
-
-    heroObject.add(
-        detail
-    );
-
-
-    /* -----------------------------------------------------
-       ORBIT RINGS
-       ----------------------------------------------------- */
-
-    heroObject.add(
-        createOrbit(
-            2.15,
-            0.012,
-            0x8b5cf6,
-            0.3,
-            0.3
-        )
-    );
-
-
-    heroObject.add(
-        createOrbit(
-            2.45,
-            0.008,
-            0x22d3ee,
-            -0.48,
-            -0.2
-        )
-    );
-
-
-    heroObject.add(
-        createOrbit(
-            2.75,
-            0.005,
-            0xffffff,
-            0.7,
-            0.4
-        )
-    );
-
-
-    heroObject.position.set(
-        1.7,
-        0.15,
-        0
-    );
-
-
-    heroObject.scale.set(
-        1,
-        1,
-        1
-    );
-
-
-    scene.add(
-        heroObject
-    );
-
-}
-
-
-/* =========================================================
-   ORBIT
-   ========================================================= */
-
-function createOrbit(
-    radius,
-    thickness,
-    color,
-    rotationX,
-    rotationY
-) {
-
-    const geometry =
-        new THREE.TorusGeometry(
-            radius,
-            thickness,
-            8,
-            120
-        );
-
-
-    const material =
-        new THREE.MeshBasicMaterial({
-
-            color,
-
-            transparent: true,
-
-            opacity: 0.5
-
-        });
-
-
-    const ring =
-        new THREE.Mesh(
-            geometry,
-            material
-        );
-
-
-    ring.rotation.x =
-        rotationX;
-
-    ring.rotation.y =
-        rotationY;
-
-
-    ring.userData.rotationSpeed =
-        Math.random() *
-            0.0015 +
-        0.0005;
-
-
-    return ring;
-
-}
-
-
-/* =========================================================
-   PARTICLES
-   ========================================================= */
-
-function createParticles() {
-
-    const count =
-        state.isTouch
-            ? 700
-            : 1500;
-
-
-    const positions =
-        new Float32Array(
-            count * 3
-        );
-
-
-    const sizes =
-        new Float32Array(
-            count
-        );
-
-
-    for (
-        let i = 0;
-        i < count;
-        i++
-    ) {
-
-        const radius =
-            3 +
-            Math.random() * 7;
-
-
-        const theta =
-            Math.random() *
-            Math.PI *
-            2;
-
-
-        const phi =
-            Math.acos(
-                2 *
-                Math.random() -
-                1
-            );
-
-
-        positions[
-            i * 3
-        ] =
-            radius *
-            Math.sin(phi) *
-            Math.cos(theta);
-
-
-        positions[
-            i * 3 + 1
-        ] =
-            radius *
-            Math.sin(phi) *
-            Math.sin(theta);
-
-
-        positions[
-            i * 3 + 2
-        ] =
-            radius *
-            Math.cos(phi);
-
-
-        sizes[i] =
-            0.5 +
-            Math.random() *
-            1.5;
-
-    }
-
-
-    particleGeometry =
-        new THREE.BufferGeometry();
-
-
-    particleGeometry.setAttribute(
-        "position",
-        new THREE.BufferAttribute(
-            positions,
-            3
-        )
-    );
-
-
-    particleGeometry.setAttribute(
-        "size",
-        new THREE.BufferAttribute(
-            sizes,
-            1
-        )
-    );
-
-
-    particleMaterial =
-        new THREE.PointsMaterial({
-
-            color: 0xffffff,
-
-            size: 0.025,
-
-            transparent: true,
-
-            opacity: 0.65,
-
-            depthWrite: false,
-
-            blending:
-                THREE.AdditiveBlending
-
-        });
-
-
-    particles =
-        new THREE.Points(
-            particleGeometry,
-            particleMaterial
-        );
-
-
-    scene.add(
-        particles
+        },
+        {
+            passive: true
+        }
     );
 
 }
@@ -837,7 +335,9 @@ function setupTouch() {
                 !event.touches ||
                 !event.touches.length
             ) {
+
                 return;
+
             }
 
 
@@ -874,829 +374,592 @@ function setupTouch() {
 
 
 /* =========================================================
-   SCROLL TRACKING
+   THREE.JS INITIALIZATION
    ========================================================= */
 
-function setupScroll() {
+function initThree() {
 
-    let ticking =
-        false;
+    if (!canvas) {
 
-
-    window.addEventListener(
-        "scroll",
-        function () {
-
-            state.targetScrollY =
-                window.scrollY;
-
-
-            if (!ticking) {
-
-                window.requestAnimationFrame(
-                    function () {
-
-                        state.targetScrollProgress =
-                            calculateScrollProgress();
-
-                        updateScrollState();
-
-                        ticking =
-                            false;
-
-                    }
-                );
-
-
-                ticking =
-                    true;
-
-            }
-
-        },
-        {
-            passive: true
-        }
-    );
-
-
-    state.targetScrollY =
-        window.scrollY;
-
-
-    state.targetScrollProgress =
-        calculateScrollProgress();
-
-}
-
-
-/* =========================================================
-   UPDATE SCROLL STATE
-   ========================================================= */
-
-function updateScrollState() {
-
-    state.scrollY =
-        lerp(
-            state.scrollY,
-            state.targetScrollY,
-            0.085
+        console.warn(
+            "webglCanvas was not found."
         );
 
-
-    state.scrollProgress =
-        lerp(
-            state.scrollProgress,
-            state.targetScrollProgress,
-            0.08
-        );
-
-}
-/* =========================================================
-   CINEMATIC CAMERA JOURNEY
-   ========================================================= */
-
-function updateCinematicCamera() {
-
-    if (!camera) {
         return;
+
     }
-
-    const progress =
-        state.scrollProgress;
-
-
-    /* -----------------------------------------------------
-       HERO → WORK
-       ----------------------------------------------------- */
-
-    const heroProgress =
-        clamp(
-            progress / 0.38,
-            0,
-            1
-        );
-
-
-    const easedHero =
-        easeInOutCubic(
-            heroProgress
-        );
-
-
-    /*
-       Camera gradually moves toward
-       the 3D world as the user scrolls.
-    */
-
-    world.targetCameraZ =
-        7 -
-        easedHero * 2.35;
-
-
-    world.targetCameraX =
-        easedHero * -0.65;
-
-
-    world.targetCameraY =
-        easedHero * 0.25;
-
-
-    /* -----------------------------------------------------
-       WORK → ABOUT
-       ----------------------------------------------------- */
-
-    const aboutStart =
-        0.38;
-
-    const aboutEnd =
-        0.72;
-
-
-    const aboutProgress =
-        clamp(
-            (
-                progress -
-                aboutStart
-            ) /
-            (
-                aboutEnd -
-                aboutStart
-            ),
-            0,
-            1
-        );
-
-
-    world.aboutProgress =
-        easeInOutCubic(
-            aboutProgress
-        );
-
-
-    /*
-       Camera starts moving deeper
-       into the scene.
-    */
-
-    world.targetCameraZ =
-        lerp(
-            world.targetCameraZ,
-            7 -
-            world.aboutProgress *
-            1.25,
-            0.35
-        );
-
-
-    world.targetCameraX =
-        lerp(
-            world.targetCameraX,
-            -0.65 +
-            world.aboutProgress *
-            0.85,
-            0.35
-        );
-
-
-    world.targetCameraY =
-        lerp(
-            world.targetCameraY,
-            0.25 -
-            world.aboutProgress *
-            0.5,
-            0.35
-        );
-
-
-    /* -----------------------------------------------------
-       ABOUT → CONTACT
-       ----------------------------------------------------- */
-
-    const contactStart =
-        0.72;
-
-
-    const contactProgress =
-        clamp(
-            (
-                progress -
-                contactStart
-            ) /
-            0.28,
-            0,
-            1
-        );
-
-
-    world.contactProgress =
-        easeInOutCubic(
-            contactProgress
-        );
 
 
     if (
-        world.contactProgress > 0
+        typeof THREE ===
+        "undefined"
     ) {
 
-        world.targetCameraZ =
-            lerp(
-                world.targetCameraZ,
-                5.5,
-                world.contactProgress
-            );
-
-
-        world.targetCameraX =
-            lerp(
-                world.targetCameraX,
-                0.45,
-                world.contactProgress
-            );
-
-
-        world.targetCameraY =
-            lerp(
-                world.targetCameraY,
-                0.15,
-                world.contactProgress
-            );
-
-    }
-
-
-    /* -----------------------------------------------------
-       SMOOTH CAMERA
-       ----------------------------------------------------- */
-
-    world.currentCameraZ =
-        lerp(
-            world.currentCameraZ,
-            world.targetCameraZ,
-            0.055
+        console.warn(
+            "Three.js was not loaded."
         );
 
-
-    world.currentCameraX =
-        lerp(
-            world.currentCameraX,
-            world.targetCameraX,
-            0.055
-        );
-
-
-    world.currentCameraY =
-        lerp(
-            world.currentCameraY,
-            world.targetCameraY,
-            0.055
-        );
-
-
-    camera.position.z =
-        world.currentCameraZ;
-
-
-    camera.position.x =
-        world.currentCameraX;
-
-
-    camera.position.y =
-        world.currentCameraY;
-
-}
-
-
-/* =========================================================
-   HERO CINEMATIC TRANSFORMATION
-   ========================================================= */
-
-function updateHeroJourney() {
-
-    if (!heroObject) {
         return;
+
     }
 
 
-    const progress =
-        state.scrollProgress;
+    /* -----------------------------------------------------
+       SCENE
+       ----------------------------------------------------- */
+
+    scene =
+        new THREE.Scene();
 
 
     /* -----------------------------------------------------
-       HERO EXIT
+       CAMERA
        ----------------------------------------------------- */
 
-    const heroExit =
-        easeInOutCubic(
-            clamp(
-                progress / 0.42,
-                0,
-                1
-            )
+    camera =
+        new THREE.PerspectiveCamera(
+            42,
+            window.innerWidth /
+            window.innerHeight,
+            0.1,
+            100
         );
 
 
-    /*
-       Object moves deeper and slightly
-       toward the left side.
-    */
-
-    world.targetHeroX =
-        1.7 -
-        heroExit * 1.45;
-
-
-    world.targetHeroY =
-        0.15 +
-        heroExit * 0.65;
-
-
-    world.targetHeroZ =
-        -heroExit * 1.8;
-
-
-    /*
-       Object becomes larger first,
-       then slowly pulls away.
-    */
-
-    const scaleIn =
-        clamp(
-            progress / 0.16,
-            0,
-            1
-        );
-
-
-    const scaleOut =
-        clamp(
-            (
-                progress -
-                0.16
-            ) /
-            0.42,
-            0,
-            1
-        );
-
-
-    world.targetHeroScale =
-        1 +
-        scaleIn * 0.12 -
-        scaleOut * 0.32;
-
-
-    /* -----------------------------------------------------
-       CINEMATIC ROTATION
-       ----------------------------------------------------- */
-
-    world.targetHeroRotationX =
-        progress * 0.75 +
-        state.mouseY * 0.12;
-
-
-    world.targetHeroRotationY =
-        progress * 1.5 +
-        state.mouseX * 0.18;
-
-
-    /* -----------------------------------------------------
-       SMOOTH HERO TRANSFORM
-       ----------------------------------------------------- */
-
-    world.currentHeroX =
-        lerp(
-            world.currentHeroX,
-            world.targetHeroX,
-            0.055
-        );
-
-
-    world.currentHeroY =
-        lerp(
-            world.currentHeroY,
-            world.targetHeroY,
-            0.055
-        );
-
-
-    world.currentHeroZ =
-        lerp(
-            world.currentHeroZ,
-            world.targetHeroZ,
-            0.055
-        );
-
-
-    world.currentHeroScale =
-        lerp(
-            world.currentHeroScale,
-            world.targetHeroScale,
-            0.055
-        );
-
-
-    world.currentHeroRotationX =
-        lerp(
-            world.currentHeroRotationX,
-            world.targetHeroRotationX,
-            0.055
-        );
-
-
-    world.currentHeroRotationY =
-        lerp(
-            world.currentHeroRotationY,
-            world.targetHeroRotationY,
-            0.055
-        );
-
-
-    heroObject.position.x =
-        world.currentHeroX;
-
-
-    heroObject.position.y =
-        world.currentHeroY;
-
-
-    heroObject.position.z =
-        world.currentHeroZ;
-
-
-    heroObject.scale.setScalar(
-        world.currentHeroScale
+    camera.position.set(
+        0,
+        0,
+        7
     );
 
 
-    heroObject.rotation.x =
-        world.currentHeroRotationX;
+    /* -----------------------------------------------------
+       RENDERER
+       ----------------------------------------------------- */
+
+    renderer =
+        new THREE.WebGLRenderer({
+
+            canvas: canvas,
+
+            antialias: true,
+
+            alpha: true,
+
+            powerPreference:
+                "high-performance"
+
+        });
 
 
-    heroObject.rotation.y =
-        world.currentHeroRotationY;
+    renderer.setPixelRatio(
+        Math.min(
+            window.devicePixelRatio,
+            2
+        )
+    );
+
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+
+    if (
+        "outputColorSpace" in renderer &&
+        THREE.SRGBColorSpace
+    ) {
+
+        renderer.outputColorSpace =
+            THREE.SRGBColorSpace;
+
+    } else {
+
+        renderer.outputEncoding =
+            THREE.sRGBEncoding;
+
+    }
+
+
+    /* -----------------------------------------------------
+       CLOCK
+       ----------------------------------------------------- */
+
+    clock =
+        new THREE.Clock();
+
+
+    /* -----------------------------------------------------
+       WORLD
+       ----------------------------------------------------- */
+
+    createLights();
+
+    createHeroObject();
+
+    createParticles();
+
+
+    /* -----------------------------------------------------
+       RESIZE
+       ----------------------------------------------------- */
+
+    resizeThree();
 
 }
 
 
 /* =========================================================
-   PARTICLE JOURNEY
+   LIGHTS
    ========================================================= */
 
-function updateParticleJourney(
-    elapsed
-) {
+function createLights() {
 
-    if (!particles) {
-        return;
-    }
-
-
-    const progress =
-        state.scrollProgress;
+    const ambient =
+        new THREE.AmbientLight(
+            0xffffff,
+            0.5
+        );
 
 
-    /*
-       The particle field moves
-       independently from the camera.
-    */
-
-    particles.rotation.y =
-        elapsed * 0.018 +
-        progress * 0.65;
+    scene.add(
+        ambient
+    );
 
 
-    particles.rotation.x =
-        Math.sin(
-            elapsed * 0.1
-        ) *
-        0.05 +
-        progress * 0.18;
+    const whiteLight =
+        new THREE.PointLight(
+            0xffffff,
+            4,
+            30
+        );
 
 
-    /*
-       Scroll creates depth drift.
-    */
-
-    particles.position.z =
-        -progress * 1.8;
-
-
-    particles.position.x =
-        state.mouseX * 0.18 -
-        progress * 0.35;
+    whiteLight.position.set(
+        3,
+        4,
+        5
+    );
 
 
-    particles.position.y =
-        state.mouseY * 0.12 +
-        progress * 0.15;
+    scene.add(
+        whiteLight
+    );
 
 
-    /*
-       Subtle density/brightness
-       change during the journey.
-    */
+    const purpleLight =
+        new THREE.PointLight(
+            0x8b5cf6,
+            7,
+            25
+        );
 
-    if (particleMaterial) {
 
-        particleMaterial.opacity =
-            0.65 -
-            progress * 0.16;
+    purpleLight.position.set(
+        -4,
+        1,
+        2
+    );
 
-    }
+
+    scene.add(
+        purpleLight
+    );
+
+
+    const cyanLight =
+        new THREE.PointLight(
+            0x22d3ee,
+            5,
+            25
+        );
+
+
+    cyanLight.position.set(
+        4,
+        -3,
+        1
+    );
+
+
+    scene.add(
+        cyanLight
+    );
 
 }
 
 
 /* =========================================================
-   HERO DETAIL MOTION
+   HERO 3D OBJECT
    ========================================================= */
 
-function updateHeroDetails(
-    elapsed
-) {
+function createHeroObject() {
 
-    if (!heroObject) {
-        return;
-    }
+    heroObject =
+        new THREE.Group();
 
 
-    const progress =
-        state.scrollProgress;
+    /* -----------------------------------------------------
+       MAIN GEOMETRY
+       ----------------------------------------------------- */
 
-
-    heroObject.children
-        .forEach(
-            function (
-                child,
-                index
-            ) {
-
-                /*
-                 Inner wireframe
-                */
-
-                if (
-                    child ===
-                    innerObject
-                ) {
-
-                    child.rotation.y -=
-                        0.0035;
-
-
-                    child.rotation.z +=
-                        0.0012;
-
-
-                    child.rotation.x +=
-                        Math.sin(
-                            elapsed * 0.4
-                        ) *
-                        0.0008;
-
-                }
-
-
-                /*
-                 Orbit rings
-                */
-
-                if (
-                    child.userData &&
-                    child.userData.rotationSpeed
-                ) {
-
-                    child.rotation.z +=
-                        child.userData
-                            .rotationSpeed *
-                        (
-                            1 +
-                            progress * 2
-                        );
-
-                }
-
-
-                /*
-                 Outer detail
-                */
-
-                if (
-                    index === 2
-                ) {
-
-                    child.rotation.y +=
-                        0.0018;
-
-
-                    child.rotation.x +=
-                        0.0007;
-
-                }
-
-            }
-        );
-
-}
-
-
-/* =========================================================
-   MOUSE PARALLAX
-   ========================================================= */
-
-function updateMouseParallax() {
-
-    state.mouseX =
-        lerp(
-            state.mouseX,
-            state.targetMouseX,
-            0.08
+    const mainGeometry =
+        new THREE.IcosahedronGeometry(
+            1.55,
+            2
         );
 
 
-    state.mouseY =
-        lerp(
-            state.mouseY,
-            state.targetMouseY,
-            0.08
+    const mainMaterial =
+        new THREE.MeshPhysicalMaterial({
+
+            color: 0x101018,
+
+            roughness: 0.22,
+
+            metalness: 0.72,
+
+            transparent: true,
+
+            opacity: 0.94,
+
+            clearcoat: 1,
+
+            clearcoatRoughness: 0.18
+
+        });
+
+
+    const mainMesh =
+        new THREE.Mesh(
+            mainGeometry,
+            mainMaterial
         );
 
 
-    /*
-       Mouse influence becomes slightly
-       weaker during deep scroll.
-    */
-
-    const strength =
-        1 -
-        state.scrollProgress *
-        0.45;
+    heroObject.add(
+        mainMesh
+    );
 
 
-    if (heroObject) {
+    /* -----------------------------------------------------
+       INNER WIREFRAME
+       ----------------------------------------------------- */
 
-        heroObject.rotation.z =
-            state.mouseX *
-            0.08 *
-            strength;
-
-    }
-
-
-    if (camera) {
-
-        camera.rotation.z =
-            state.mouseX *
-            0.012 *
-            strength;
-
-    }
-
-}
-
-
-/* =========================================================
-   SECTION VISUAL STATE
-   ========================================================= */
-
-function updateSectionState() {
-
-    const progress =
-        state.scrollProgress;
-
-
-    /*
-       Work section
-       */
-
-    if (work) {
-
-        const workProgress =
-            clamp(
-                (
-                    progress -
-                    0.16
-                ) /
-                0.30,
-                0,
-                1
-            );
-
-
-        world.workProgress =
-            easeInOutCubic(
-                workProgress
-            );
-
-    }
-
-
-    /*
-       About section
-       */
-
-    if (about) {
-
-        about.style.setProperty(
-            "--journey-progress",
-            world.aboutProgress
+    const innerGeometry =
+        new THREE.IcosahedronGeometry(
+            1.72,
+            1
         );
 
-    }
+
+    const innerMaterial =
+        new THREE.MeshBasicMaterial({
+
+            color: 0x8b5cf6,
+
+            wireframe: true,
+
+            transparent: true,
+
+            opacity: 0.24
+
+        });
 
 
-    /*
-       Contact section
-       */
-
-    if (contact) {
-
-        contact.style.setProperty(
-            "--journey-progress",
-            world.contactProgress
+    innerObject =
+        new THREE.Mesh(
+            innerGeometry,
+            innerMaterial
         );
 
-    }
 
-}
-
-
-/* =========================================================
-   CINEMATIC LOOK AT
-   ========================================================= */
-
-function updateCameraLook() {
-
-    if (!camera) {
-        return;
-    }
+    heroObject.add(
+        innerObject
+    );
 
 
-    const progress =
-        state.scrollProgress;
+    /* -----------------------------------------------------
+       OUTER WIREFRAME
+       ----------------------------------------------------- */
+
+    const outerGeometry =
+        new THREE.IcosahedronGeometry(
+            1.9,
+            1
+        );
 
 
-    const lookX =
-        state.mouseX *
-        0.25 +
-        progress *
-        0.15;
+    const outerMaterial =
+        new THREE.MeshBasicMaterial({
+
+            color: 0x22d3ee,
+
+            wireframe: true,
+
+            transparent: true,
+
+            opacity: 0.09
+
+        });
 
 
-    const lookY =
-        state.mouseY *
-        0.18 -
-        progress *
-        0.08;
+    const outerObject =
+        new THREE.Mesh(
+            outerGeometry,
+            outerMaterial
+        );
 
 
-    camera.lookAt(
-        lookX,
-        lookY,
+    outerObject.rotation.x =
+        0.4;
+
+
+    outerObject.rotation.y =
+        0.7;
+
+
+    heroObject.add(
+        outerObject
+    );
+
+
+    /* -----------------------------------------------------
+       ORBIT RINGS
+       ----------------------------------------------------- */
+
+    heroObject.add(
+        createOrbit(
+            2.15,
+            0.012,
+            0x8b5cf6,
+            0.3,
+            0.3
+        )
+    );
+
+
+    heroObject.add(
+        createOrbit(
+            2.45,
+            0.008,
+            0x22d3ee,
+            -0.48,
+            -0.2
+        )
+    );
+
+
+    heroObject.add(
+        createOrbit(
+            2.75,
+            0.005,
+            0xffffff,
+            0.7,
+            0.4
+        )
+    );
+
+
+    /* -----------------------------------------------------
+       START POSITION
+       ----------------------------------------------------- */
+
+    heroObject.position.set(
+        1.7,
+        0.15,
         0
     );
 
+
+    heroObject.scale.setScalar(
+        1
+    );
+
+
+    scene.add(
+        heroObject
+    );
+
 }
 
 
 /* =========================================================
-   EASING
+   ORBIT RING
    ========================================================= */
 
-function easeInOutCubic(
-    value
+function createOrbit(
+    radius,
+    thickness,
+    color,
+    rotationX,
+    rotationY
 ) {
 
-    value =
-        clamp(
-            value,
-            0,
-            1
+    const geometry =
+        new THREE.TorusGeometry(
+            radius,
+            thickness,
+            8,
+            120
         );
 
 
-    return value < 0.5
+    const material =
+        new THREE.MeshBasicMaterial({
 
-        ? 4 *
-          value *
-          value *
-          value
+            color: color,
 
-        : 1 -
-          Math.pow(
-              -2 *
-              value +
-              2,
-              3
-          ) /
-          2;
+            transparent: true,
+
+            opacity: 0.5
+
+        });
+
+
+    const ring =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+
+    ring.rotation.x =
+        rotationX;
+
+
+    ring.rotation.y =
+        rotationY;
+
+
+    ring.userData.rotationSpeed =
+        0.0005 +
+        Math.random() *
+        0.001;
+
+
+    return ring;
 
 }
 
 
 /* =========================================================
-   THREE RESIZE
+   PARTICLES
+   ========================================================= */
+
+function createParticles() {
+
+    const particleCount =
+        state.isTouch
+            ? 700
+            : 1500;
+
+
+    const positions =
+        new Float32Array(
+            particleCount * 3
+        );
+
+
+    for (
+        let i = 0;
+        i < particleCount;
+        i++
+    ) {
+
+        const radius =
+            3 +
+            Math.random() * 7;
+
+
+        const theta =
+            Math.random() *
+            Math.PI *
+            2;
+
+
+        const phi =
+            Math.acos(
+                2 *
+                Math.random() -
+                1
+            );
+
+
+        positions[
+            i * 3
+        ] =
+            radius *
+            Math.sin(phi) *
+            Math.cos(theta);
+
+
+        positions[
+            i * 3 + 1
+        ] =
+            radius *
+            Math.sin(phi) *
+            Math.sin(theta);
+
+
+        positions[
+            i * 3 + 2
+        ] =
+            radius *
+            Math.cos(phi);
+
+    }
+
+
+    const geometry =
+        new THREE.BufferGeometry();
+
+
+    geometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(
+            positions,
+            3
+        )
+    );
+
+
+    particleMaterial =
+        new THREE.PointsMaterial({
+
+            color: 0xffffff,
+
+            size: 0.025,
+
+            transparent: true,
+
+            opacity: 0.65,
+
+            depthWrite: false,
+
+            blending:
+                THREE.AdditiveBlending
+
+        });
+
+
+    particles =
+        new THREE.Points(
+            geometry,
+            particleMaterial
+        );
+
+
+    scene.add(
+        particles
+    );
+
+}
+
+
+/* =========================================================
+   RESIZE
    ========================================================= */
 
 function resizeThree() {
@@ -1705,7 +968,9 @@ function resizeThree() {
         !camera ||
         !renderer
     ) {
+
         return;
+
     }
 
 
@@ -1738,8 +1003,797 @@ function resizeThree() {
     );
 
 }
+
+
+window.addEventListener(
+    "resize",
+    resizeThree
+);
 /* =========================================================
-   CURSOR
+   PHASE 2 — PART 2/3
+   CINEMATIC WORLD + SCROLL JOURNEY
+   ========================================================= */
+
+
+/* =========================================================
+   SMOOTH INPUT
+   ========================================================= */
+
+function updateInput() {
+
+    state.mouseX =
+        lerp(
+            state.mouseX,
+            state.targetMouseX,
+            0.08
+        );
+
+
+    state.mouseY =
+        lerp(
+            state.mouseY,
+            state.targetMouseY,
+            0.08
+        );
+
+
+    state.scrollY =
+        lerp(
+            state.scrollY,
+            state.targetScrollY,
+            0.085
+        );
+
+
+    state.scrollProgress =
+        lerp(
+            state.scrollProgress,
+            state.targetScrollProgress,
+            0.075
+        );
+
+}
+
+
+/* =========================================================
+   CINEMATIC CAMERA
+   ========================================================= */
+
+function updateCameraJourney() {
+
+    if (!camera) {
+        return;
+    }
+
+
+    const progress =
+        state.scrollProgress;
+
+
+    /* -----------------------------------------------------
+       HERO
+       ----------------------------------------------------- */
+
+    const heroProgress =
+        easeInOutCubic(
+            clamp(
+                progress / 0.32,
+                0,
+                1
+            )
+        );
+
+
+    /* -----------------------------------------------------
+       HERO → WORK
+       ----------------------------------------------------- */
+
+    const workProgress =
+        easeInOutCubic(
+            clamp(
+                (
+                    progress -
+                    0.12
+                ) /
+                0.34,
+                0,
+                1
+            )
+        );
+
+
+    /* -----------------------------------------------------
+       WORK → ABOUT
+       ----------------------------------------------------- */
+
+    const aboutProgress =
+        easeInOutCubic(
+            clamp(
+                (
+                    progress -
+                    0.38
+                ) /
+                0.30,
+                0,
+                1
+            )
+        );
+
+
+    /* -----------------------------------------------------
+       ABOUT → CONTACT
+       ----------------------------------------------------- */
+
+    const contactProgress =
+        easeInOutCubic(
+            clamp(
+                (
+                    progress -
+                    0.68
+                ) /
+                0.32,
+                0,
+                1
+            )
+        );
+
+
+    /* -----------------------------------------------------
+       CAMERA TARGET
+       ----------------------------------------------------- */
+
+    let cameraX = 0;
+    let cameraY = 0;
+    let cameraZ = 7;
+
+
+    /*
+       Hero begins with subtle mouse-driven
+       camera movement.
+    */
+
+    cameraX +=
+        state.mouseX *
+        0.22;
+
+
+    cameraY +=
+        state.mouseY *
+        0.16;
+
+
+    /*
+       Work transition moves the camera
+       slightly forward and left.
+    */
+
+    cameraZ =
+        lerp(
+            cameraZ,
+            5.4,
+            workProgress
+        );
+
+
+    cameraX =
+        lerp(
+            cameraX,
+            -0.65,
+            workProgress
+        );
+
+
+    cameraY =
+        lerp(
+            cameraY,
+            0.25,
+            workProgress
+        );
+
+
+    /*
+       About pushes the camera deeper.
+    */
+
+    cameraZ =
+        lerp(
+            cameraZ,
+            4.7,
+            aboutProgress
+        );
+
+
+    cameraX =
+        lerp(
+            cameraX,
+            0.25,
+            aboutProgress
+        );
+
+
+    cameraY =
+        lerp(
+            cameraY,
+            -0.25,
+            aboutProgress
+        );
+
+
+    /*
+       Contact slightly pulls the camera
+       back for the final composition.
+    */
+
+    cameraZ =
+        lerp(
+            cameraZ,
+            5.8,
+            contactProgress
+        );
+
+
+    cameraX =
+        lerp(
+            cameraX,
+            0.45,
+            contactProgress
+        );
+
+
+    cameraY =
+        lerp(
+            cameraY,
+            0.1,
+            contactProgress
+        );
+
+
+    /* -----------------------------------------------------
+       SMOOTH CAMERA
+       ----------------------------------------------------- */
+
+    world.targetCameraX =
+        cameraX;
+
+
+    world.targetCameraY =
+        cameraY;
+
+
+    world.targetCameraZ =
+        cameraZ;
+
+
+    world.cameraX =
+        lerp(
+            world.cameraX,
+            world.targetCameraX,
+            0.055
+        );
+
+
+    world.cameraY =
+        lerp(
+            world.cameraY,
+            world.targetCameraY,
+            0.055
+        );
+
+
+    world.cameraZ =
+        lerp(
+            world.cameraZ,
+            world.targetCameraZ,
+            0.055
+        );
+
+
+    camera.position.x =
+        world.cameraX;
+
+
+    camera.position.y =
+        world.cameraY;
+
+
+    camera.position.z =
+        world.cameraZ;
+
+
+    /*
+       Camera continuously looks toward
+       the center of the world.
+    */
+
+    camera.lookAt(
+        state.mouseX * 0.18,
+        state.mouseY * 0.12,
+        0
+    );
+
+}
+
+
+/* =========================================================
+   HERO JOURNEY
+   ========================================================= */
+
+function updateHeroJourney(
+    elapsed
+) {
+
+    if (!heroObject) {
+        return;
+    }
+
+
+    const progress =
+        state.scrollProgress;
+
+
+    /* -----------------------------------------------------
+       HERO EXIT
+       ----------------------------------------------------- */
+
+    const exitProgress =
+        easeInOutCubic(
+            clamp(
+                progress / 0.42,
+                0,
+                1
+            )
+        );
+
+
+    /*
+       Starting position:
+       x = 1.7
+       y = 0.15
+       z = 0
+
+       During scroll:
+       object moves deeper and left.
+    */
+
+    world.targetHeroX =
+        1.7 -
+        exitProgress *
+        1.55;
+
+
+    world.targetHeroY =
+        0.15 +
+        exitProgress *
+        0.45;
+
+
+    world.targetHeroZ =
+        -exitProgress *
+        2.2;
+
+
+    /* -----------------------------------------------------
+       SCALE
+       ----------------------------------------------------- */
+
+    const scaleUp =
+        clamp(
+            progress / 0.12,
+            0,
+            1
+        );
+
+
+    const scaleDown =
+        clamp(
+            (
+                progress -
+                0.12
+            ) /
+            0.40,
+            0,
+            1
+        );
+
+
+    world.targetHeroScale =
+        1 +
+        scaleUp * 0.12 -
+        scaleDown * 0.42;
+
+
+    /* -----------------------------------------------------
+       ROTATION
+       ----------------------------------------------------- */
+
+    world.targetHeroRotationX =
+        state.mouseY *
+        0.15 +
+        progress *
+        0.9;
+
+
+    world.targetHeroRotationY =
+        state.mouseX *
+        0.18 +
+        progress *
+        1.8;
+
+
+    /* -----------------------------------------------------
+       SMOOTH TRANSFORM
+       ----------------------------------------------------- */
+
+    world.heroX =
+        lerp(
+            world.heroX,
+            world.targetHeroX,
+            0.055
+        );
+
+
+    world.heroY =
+        lerp(
+            world.heroY,
+            world.targetHeroY,
+            0.055
+        );
+
+
+    world.heroZ =
+        lerp(
+            world.heroZ,
+            world.targetHeroZ,
+            0.055
+        );
+
+
+    world.heroScale =
+        lerp(
+            world.heroScale,
+            world.targetHeroScale,
+            0.055
+        );
+
+
+    world.heroRotationX =
+        lerp(
+            world.heroRotationX,
+            world.targetHeroRotationX,
+            0.055
+        );
+
+
+    world.heroRotationY =
+        lerp(
+            world.heroRotationY,
+            world.targetHeroRotationY,
+            0.055
+        );
+
+
+    heroObject.position.x =
+        world.heroX;
+
+
+    heroObject.position.y =
+        world.heroY;
+
+
+    heroObject.position.z =
+        world.heroZ;
+
+
+    heroObject.scale.setScalar(
+        world.heroScale
+    );
+
+
+    heroObject.rotation.x =
+        world.heroRotationX;
+
+
+    heroObject.rotation.y =
+        world.heroRotationY;
+
+
+    /*
+       Small floating movement keeps
+       the object alive between scrolls.
+    */
+
+    heroObject.position.y +=
+        Math.sin(
+            elapsed * 0.7
+        ) *
+        0.035;
+
+}
+
+
+/* =========================================================
+   HERO INTERNAL ANIMATION
+   ========================================================= */
+
+function updateHeroDetails(
+    elapsed
+) {
+
+    if (!heroObject) {
+        return;
+    }
+
+
+    const progress =
+        state.scrollProgress;
+
+
+    heroObject.children.forEach(
+        function (
+            child,
+            index
+        ) {
+
+            /* ------------------------------------------------
+               INNER WIREFRAME
+               ------------------------------------------------ */
+
+            if (
+                child ===
+                innerObject
+            ) {
+
+                child.rotation.y -=
+                    0.0035;
+
+
+                child.rotation.z +=
+                    0.0014;
+
+
+                child.rotation.x +=
+                    Math.sin(
+                        elapsed * 0.4
+                    ) *
+                    0.0005;
+
+            }
+
+
+            /* ------------------------------------------------
+               OUTER WIREFRAME
+               ------------------------------------------------ */
+
+            if (
+                index === 2
+            ) {
+
+                child.rotation.y +=
+                    0.0018;
+
+
+                child.rotation.x +=
+                    0.0007;
+
+            }
+
+
+            /* ------------------------------------------------
+               ORBIT RINGS
+               ------------------------------------------------ */
+
+            if (
+                child.userData &&
+                child.userData.rotationSpeed
+            ) {
+
+                child.rotation.z +=
+                    child.userData
+                        .rotationSpeed *
+                    (
+                        1 +
+                        progress * 2
+                    );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   PARTICLE JOURNEY
+   ========================================================= */
+
+function updateParticles(
+    elapsed
+) {
+
+    if (!particles) {
+        return;
+    }
+
+
+    const progress =
+        state.scrollProgress;
+
+
+    /*
+       Base rotation.
+    */
+
+    particles.rotation.y =
+        elapsed * 0.018;
+
+
+    particles.rotation.x =
+        Math.sin(
+            elapsed * 0.1
+        ) *
+        0.05;
+
+
+    /*
+       Scroll transforms the entire
+       particle field.
+    */
+
+    particles.position.z =
+        -progress * 2.4;
+
+
+    particles.position.x =
+        state.mouseX * 0.25 -
+        progress * 0.35;
+
+
+    particles.position.y =
+        state.mouseY * 0.16 +
+        progress * 0.15;
+
+
+    /*
+       Slightly reduce particles
+       during deep sections.
+    */
+
+    if (particleMaterial) {
+
+        particleMaterial.opacity =
+            0.65 -
+            progress * 0.18;
+
+    }
+
+}
+
+
+/* =========================================================
+   3D WORLD DEPTH
+   ========================================================= */
+
+function updateWorldDepth() {
+
+    if (!scene) {
+        return;
+    }
+
+
+    const progress =
+        state.scrollProgress;
+
+
+    /*
+       Very subtle world rotation.
+       This makes the whole environment
+       feel connected instead of static.
+    */
+
+    scene.rotation.y =
+        progress *
+        0.035;
+
+
+    scene.rotation.x =
+        state.mouseY *
+        0.012;
+
+
+    /*
+       Keep movement subtle so the camera
+       remains the main cinematic motion.
+    */
+
+}
+
+
+/* =========================================================
+   SECTION PROGRESS CLASSES
+   ========================================================= */
+
+function updateSectionClasses() {
+
+    const progress =
+        state.scrollProgress;
+
+
+    if (site) {
+
+        site.style.setProperty(
+            "--scroll-progress",
+            progress
+        );
+
+    }
+
+
+    /*
+       Hero state.
+    */
+
+    if (progress > 0.08) {
+
+        body.classList.add(
+            "journey-started"
+        );
+
+    } else {
+
+        body.classList.remove(
+            "journey-started"
+        );
+
+    }
+
+
+    /*
+       Work state.
+    */
+
+    if (progress > 0.18) {
+
+        body.classList.add(
+            "work-journey"
+        );
+
+    } else {
+
+        body.classList.remove(
+            "work-journey"
+        );
+
+    }
+
+
+    /*
+       Deep journey.
+    */
+
+    if (progress > 0.62) {
+
+        body.classList.add(
+            "deep-journey"
+        );
+
+    } else {
+
+        body.classList.remove(
+            "deep-journey"
+        );
+
+    }
+
+}
+/* =========================================================
+   PHASE 2 — PART 3/3
+   INTERACTION + ANIMATION + INITIALIZATION
+   ========================================================= */
+
+
+/* =========================================================
+   CUSTOM CURSOR
    ========================================================= */
 
 function setupCursor() {
@@ -1763,7 +1817,10 @@ function setupCursor() {
         );
 
 
-    if (!dot || !ring) {
+    if (
+        !dot ||
+        !ring
+    ) {
         return;
     }
 
@@ -1795,7 +1852,7 @@ function setupCursor() {
     );
 
 
-    function animateCursor() {
+    function cursorLoop() {
 
         ringX =
             lerp(
@@ -1830,22 +1887,22 @@ function setupCursor() {
 
 
         requestAnimationFrame(
-            animateCursor
+            cursorLoop
         );
 
     }
 
 
-    animateCursor();
+    cursorLoop();
 
 
-    const interactive =
+    const interactiveElements =
         document.querySelectorAll(
             "a, button, .work-item"
         );
 
 
-    interactive.forEach(
+    interactiveElements.forEach(
         function (element) {
 
             element.addEventListener(
@@ -1855,6 +1912,7 @@ function setupCursor() {
                     cursor.classList.add(
                         "is-active"
                     );
+
 
                     if (
                         element.dataset.cursor ===
@@ -1878,6 +1936,7 @@ function setupCursor() {
                     cursor.classList.remove(
                         "is-active"
                     );
+
 
                     cursor.classList.remove(
                         "is-view"
@@ -2101,40 +2160,26 @@ function prefersReducedMotion() {
 }
 
 
-function applyMotionPreference() {
-
-    if (
-        prefersReducedMotion() &&
-        renderer
-    ) {
-
-        renderer.setAnimationLoop(
-            null
-        );
-
-    }
-
-}
-
-
 /* =========================================================
-   MAIN THREE ANIMATION
+   THREE ANIMATION LOOP
    ========================================================= */
 
 function animateThree() {
 
-    animationFrame =
-        requestAnimationFrame(
-            animateThree
-        );
+    requestAnimationFrame(
+        animateThree
+    );
 
 
     if (
         !renderer ||
         !scene ||
-        !camera
+        !camera ||
+        !clock
     ) {
+
         return;
+
     }
 
 
@@ -2143,45 +2188,27 @@ function animateThree() {
 
 
     /* -----------------------------------------------------
-       SMOOTH INPUT
+       INPUT
        ----------------------------------------------------- */
 
-    updateMouseParallax();
+    updateInput();
 
 
     /* -----------------------------------------------------
-       SCROLL
+       CAMERA
        ----------------------------------------------------- */
 
-    updateScrollState();
+    updateCameraJourney();
 
 
     /* -----------------------------------------------------
-       CAMERA JOURNEY
+       HERO
        ----------------------------------------------------- */
 
-    updateCinematicCamera();
-
-
-    /* -----------------------------------------------------
-       HERO JOURNEY
-       ----------------------------------------------------- */
-
-    updateHeroJourney();
-
-
-    /* -----------------------------------------------------
-       PARTICLE JOURNEY
-       ----------------------------------------------------- */
-
-    updateParticleJourney(
+    updateHeroJourney(
         elapsed
     );
 
-
-    /* -----------------------------------------------------
-       HERO DETAILS
-       ----------------------------------------------------- */
 
     updateHeroDetails(
         elapsed
@@ -2189,41 +2216,26 @@ function animateThree() {
 
 
     /* -----------------------------------------------------
-       SECTION STATE
+       PARTICLES
        ----------------------------------------------------- */
 
-    updateSectionState();
+    updateParticles(
+        elapsed
+    );
 
 
     /* -----------------------------------------------------
-       CAMERA LOOK
+       WORLD
        ----------------------------------------------------- */
 
-    updateCameraLook();
+    updateWorldDepth();
 
 
     /* -----------------------------------------------------
-       BASE WORLD ROTATION
+       PAGE STATE
        ----------------------------------------------------- */
 
-    if (heroObject) {
-
-        /*
-           Constant slow movement keeps
-           the hero alive even without scroll.
-        */
-
-        heroObject.rotation.y +=
-            0.0022;
-
-
-        heroObject.rotation.x +=
-            Math.sin(
-                elapsed * 0.45
-            ) *
-            0.00045;
-
-    }
+    updateSectionClasses();
 
 
     /* -----------------------------------------------------
@@ -2239,26 +2251,77 @@ function animateThree() {
 
 
 /* =========================================================
-   RESIZE
+   REDUCED MOTION HANDLING
    ========================================================= */
 
-window.addEventListener(
-    "resize",
-    function () {
+function setupReducedMotion() {
 
-        resizeThree();
+    if (
+        !prefersReducedMotion()
+    ) {
+        return;
+    }
+
+
+    /*
+       Keep the 3D world visible,
+       but remove aggressive movement.
+    */
+
+    if (particleMaterial) {
+
+        particleMaterial.opacity =
+            0.35;
 
     }
-);
+
+}
 
 
 /* =========================================================
-   INITIALIZE
+   PAGE LOAD SAFETY
+   ========================================================= */
+
+function setupPageSafety() {
+
+    window.addEventListener(
+        "pageshow",
+        function () {
+
+            resizeThree();
+
+        }
+    );
+
+
+    window.addEventListener(
+        "orientationchange",
+        function () {
+
+            setTimeout(
+                function () {
+
+                    resizeThree();
+
+                },
+                150
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   MAIN INITIALIZATION
    ========================================================= */
 
 function init() {
 
-    setupCursor();
+    /*
+       Input
+    */
 
     setupMouse();
 
@@ -2266,17 +2329,52 @@ function init() {
 
     setupScroll();
 
+
+    /*
+       UI
+    */
+
+    setupCursor();
+
     setupWorkObserver();
 
     setupMenu();
 
+
+    /*
+       Browser lifecycle
+    */
+
     setupVisibility();
+
+    setupPageSafety();
+
+
+    /*
+       Three.js
+    */
 
     initThree();
 
-    animateThree();
 
-    applyMotionPreference();
+    /*
+       Motion
+    */
+
+    setupReducedMotion();
+
+
+    /*
+       Start renderer
+    */
+
+    if (
+        renderer
+    ) {
+
+        animateThree();
+
+    }
 
 }
 
@@ -2302,4 +2400,4 @@ if (
 
     init();
 
-                }
+    }
