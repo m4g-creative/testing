@@ -1,13 +1,12 @@
 /* =========================================================
    VOID — SCRIPT.JS
-   PART 3
-   INTERACTION + WEBGL FOUNDATION
+   PART 3 — UPDATED / FIXED
    ========================================================= */
 
 
 /* =========================================================
    DOM
-   ========================================================= */
+========================================================= */
 
 const body = document.body;
 
@@ -25,15 +24,22 @@ const menuButton = document.getElementById("menuButton");
 const menuClose = document.getElementById("menuClose");
 const menuOverlay = document.getElementById("menuOverlay");
 
-const overlayLinks = document.querySelectorAll(".overlay-nav a");
-const hoverElements = document.querySelectorAll("[data-cursor]");
+const overlayLinks =
+    document.querySelectorAll(".overlay-nav a");
+
+const cursorElements =
+    document.querySelectorAll("[data-cursor]");
 
 
 /* =========================================================
    STATE
-   ========================================================= */
+========================================================= */
 
 const state = {
+
+    loaded: false,
+
+    menuOpen: false,
 
     mouse: {
         x: 0,
@@ -42,70 +48,90 @@ const state = {
         targetY: 0
     },
 
-    scroll: {
-        current: 0,
-        target: 0,
-        velocity: 0,
-        last: 0
-    },
-
     cursor: {
         x: 0,
         y: 0
     },
 
-    loaded: false,
-
-    menuOpen: false
+    scroll: {
+        current: 0,
+        target: 0,
+        velocity: 0,
+        last: 0
+    }
 
 };
 
 
 /* =========================================================
    DEVICE
-   ========================================================= */
+========================================================= */
 
 const isTouchDevice =
-    "ontouchstart" in window ||
-    navigator.maxTouchPoints > 0;
+    window.matchMedia("(pointer: coarse)").matches ||
+    "ontouchstart" in window;
 
 
 /* =========================================================
    LOADER
-   ========================================================= */
+========================================================= */
 
 let loadingValue = 0;
+let loaderFinished = false;
 
 function runLoader() {
 
-    const interval = setInterval(() => {
+    if (!loader) {
+        finishLoading();
+        return;
+    }
 
-        loadingValue += Math.random() * 8 + 3;
+    const loaderTimer = setInterval(() => {
+
+        loadingValue +=
+            Math.floor(Math.random() * 12) + 5;
+
 
         if (loadingValue >= 100) {
+
             loadingValue = 100;
-        }
 
-        loaderProgress.style.width =
-            `${loadingValue}%`;
-
-        loaderPercent.textContent =
-            `${Math.floor(loadingValue)}%`;
-
-
-        if (loadingValue >= 100) {
-
-            clearInterval(interval);
-
-            setTimeout(() => {
-
-                finishLoading();
-
-            }, 450);
+            clearInterval(loaderTimer);
 
         }
 
-    }, 90);
+
+        if (loaderProgress) {
+
+            loaderProgress.style.width =
+                `${loadingValue}%`;
+
+        }
+
+
+        if (loaderPercent) {
+
+            loaderPercent.textContent =
+                `${loadingValue}%`;
+
+        }
+
+
+        if (
+            loadingValue >= 100 &&
+            !loaderFinished
+        ) {
+
+            loaderFinished = true;
+
+            setTimeout(
+                finishLoading,
+                500
+            );
+
+        }
+
+    }, 120);
 
 }
 
@@ -114,9 +140,13 @@ function finishLoading() {
 
     state.loaded = true;
 
-    site.classList.add("is-visible");
+    if (site) {
+        site.classList.add("is-visible");
+    }
 
-    loader.classList.add("hidden");
+    if (loader) {
+        loader.classList.add("hidden");
+    }
 
     body.classList.remove("loading");
 
@@ -130,7 +160,7 @@ runLoader();
 
 /* =========================================================
    INTRO
-   ========================================================= */
+========================================================= */
 
 function startIntro() {
 
@@ -147,29 +177,31 @@ function startIntro() {
         document.querySelector(".hero-bottom");
 
 
-    if (!heroTitle) return;
+    if (heroTitle) {
 
+        heroTitle.animate(
+            [
+                {
+                    opacity: 0,
+                    transform:
+                        "translateY(60px)"
+                },
 
-    heroTitle.animate(
-        [
+                {
+                    opacity: 1,
+                    transform:
+                        "translateY(0)"
+                }
+            ],
             {
-                opacity: 0,
-                transform:
-                    "translateY(60px)"
-            },
-            {
-                opacity: 1,
-                transform:
-                    "translateY(0)"
+                duration: 1400,
+                easing:
+                    "cubic-bezier(.16,1,.3,1)",
+                fill: "forwards"
             }
-        ],
-        {
-            duration: 1400,
-            easing:
-                "cubic-bezier(.16,1,.3,1)",
-            fill: "forwards"
-        }
-    );
+        );
+
+    }
 
 
     if (heroDescription) {
@@ -181,6 +213,7 @@ function startIntro() {
                     transform:
                         "translateY(30px)"
                 },
+
                 {
                     opacity: 1,
                     transform:
@@ -206,6 +239,7 @@ function startIntro() {
                 {
                     opacity: 0
                 },
+
                 {
                     opacity: 1
                 }
@@ -227,6 +261,7 @@ function startIntro() {
                 {
                     opacity: 0
                 },
+
                 {
                     opacity: 1
                 }
@@ -245,57 +280,25 @@ function startIntro() {
 
 /* =========================================================
    CUSTOM CURSOR
-   ========================================================= */
+========================================================= */
 
-if (!isTouchDevice) {
-
-    window.addEventListener(
-        "mousemove",
-        handleMouseMove,
-        { passive: true }
-    );
-
-
-    function handleMouseMove(event) {
-
-        state.cursor.x = event.clientX;
-        state.cursor.y = event.clientY;
-
-        state.mouse.targetX =
-            (event.clientX / window.innerWidth - 0.5);
-
-        state.mouse.targetY =
-            (event.clientY / window.innerHeight - 0.5);
-
-    }
-
-
-    function updateCursor() {
-
-        state.cursor.x +=
-            (state.mouse.clientX -
-                state.cursor.x) * 0.15;
-
-
-        cursor.style.transform =
-            `translate3d(
-                ${state.cursor.x}px,
-                ${state.cursor.y}px,
-                0
-            )`;
-
-        requestAnimationFrame(updateCursor);
-
-    }
-
-
-    /*
-       Keep cursor position directly responsive.
-    */
+if (!isTouchDevice && cursor) {
 
     window.addEventListener(
         "mousemove",
         event => {
+
+            state.cursor.x = event.clientX;
+            state.cursor.y = event.clientY;
+
+            state.mouse.targetX =
+                (event.clientX /
+                    window.innerWidth) - 0.5;
+
+            state.mouse.targetY =
+                (event.clientY /
+                    window.innerHeight) - 0.5;
+
 
             cursor.style.transform =
                 `translate3d(
@@ -305,30 +308,43 @@ if (!isTouchDevice) {
                 )`;
 
         },
-        { passive: true }
+        {
+            passive: true
+        }
     );
 
 
-    hoverElements.forEach(element => {
+    cursorElements.forEach(element => {
 
         element.addEventListener(
             "mouseenter",
             () => {
 
-                const type =
+                const cursorType =
                     element.dataset.cursor;
+
 
                 cursor.classList.remove(
                     "hover",
                     "view"
                 );
 
-                if (type === "hover") {
-                    cursor.classList.add("hover");
+
+                if (cursorType === "hover") {
+
+                    cursor.classList.add(
+                        "hover"
+                    );
+
                 }
 
-                if (type === "view") {
-                    cursor.classList.add("view");
+
+                if (cursorType === "view") {
+
+                    cursor.classList.add(
+                        "view"
+                    );
+
                 }
 
             }
@@ -354,85 +370,120 @@ if (!isTouchDevice) {
 
 /* =========================================================
    WEBGL CANVAS FOUNDATION
-   ========================================================= */
+========================================================= */
 
-const gl =
-    canvas.getContext("webgl", {
-        antialias: true,
-        alpha: true,
-        powerPreference: "high-performance"
-    });
+let gl = null;
 
 
-if (gl) {
+if (canvas) {
 
-    resizeCanvas();
-
-    window.addEventListener(
-        "resize",
-        resizeCanvas
+    gl = canvas.getContext(
+        "webgl",
+        {
+            antialias: true,
+            alpha: true,
+            powerPreference:
+                "high-performance"
+        }
     );
 
 
-    gl.clearColor(
-        0,
-        0,
-        0,
-        0
-    );
+    if (gl) {
 
+        resizeCanvas();
 
-    function resizeCanvas() {
-
-        const pixelRatio =
-            Math.min(
-                window.devicePixelRatio || 1,
-                2
-            );
-
-        canvas.width =
-            window.innerWidth * pixelRatio;
-
-        canvas.height =
-            window.innerHeight * pixelRatio;
-
-        canvas.style.width =
-            `${window.innerWidth}px`;
-
-        canvas.style.height =
-            `${window.innerHeight}px`;
-
-        gl.viewport(
+        gl.clearColor(
             0,
             0,
-            canvas.width,
-            canvas.height
+            0,
+            0
         );
 
     }
 
+}
 
-    function renderCanvas() {
+
+function resizeCanvas() {
+
+    if (!canvas || !gl) {
+        return;
+    }
+
+
+    const pixelRatio =
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
+
+
+    canvas.width =
+        Math.floor(
+            window.innerWidth *
+            pixelRatio
+        );
+
+
+    canvas.height =
+        Math.floor(
+            window.innerHeight *
+            pixelRatio
+        );
+
+
+    canvas.style.width =
+        `${window.innerWidth}px`;
+
+
+    canvas.style.height =
+        `${window.innerHeight}px`;
+
+
+    gl.viewport(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+}
+
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+
+/* =========================================================
+   WEBGL RENDER LOOP
+========================================================= */
+
+function renderCanvas() {
+
+    if (gl) {
 
         gl.clear(
             gl.COLOR_BUFFER_BIT
         );
 
-        requestAnimationFrame(
-            renderCanvas
-        );
-
     }
 
 
-    renderCanvas();
+    requestAnimationFrame(
+        renderCanvas
+    );
 
 }
 
 
+renderCanvas();
+
+
 /* =========================================================
    MOUSE PARALLAX
-   ========================================================= */
+========================================================= */
 
 function updateMouse() {
 
@@ -454,7 +505,7 @@ function updateMouse() {
 
 /* =========================================================
    SCROLL TRACKING
-   ========================================================= */
+========================================================= */
 
 window.addEventListener(
     "scroll",
@@ -464,7 +515,9 @@ window.addEventListener(
             window.scrollY;
 
     },
-    { passive: true }
+    {
+        passive: true
+    }
 );
 
 
@@ -490,20 +543,32 @@ function updateScroll() {
 
 /* =========================================================
    HERO PARALLAX
-   ========================================================= */
+========================================================= */
 
 function updateHeroParallax() {
 
     const hero =
         document.querySelector(".hero");
 
-    if (!hero) return;
+
+    if (!hero) {
+        return;
+    }
+
+
+    const heroHeight =
+        window.innerHeight;
+
+
+    if (heroHeight <= 0) {
+        return;
+    }
 
 
     const progress =
         Math.min(
             state.scroll.current /
-            window.innerHeight,
+            heroHeight,
             1
         );
 
@@ -520,7 +585,7 @@ function updateHeroParallax() {
 
 /* =========================================================
    SECTION REVEALS
-   ========================================================= */
+========================================================= */
 
 const revealElements =
     document.querySelectorAll(
@@ -528,80 +593,117 @@ const revealElements =
     );
 
 
-const revealObserver =
-    new IntersectionObserver(
-        entries => {
-
-            entries.forEach(entry => {
-
-                if (!entry.isIntersecting) {
-                    return;
-                }
+let revealObserver = null;
 
 
-                entry.target.animate(
-                    [
-                        {
-                            opacity: 0,
-                            transform:
-                                "translateY(70px)"
-                        },
-                        {
-                            opacity: 1,
-                            transform:
-                                "translateY(0)"
+if ("IntersectionObserver" in window) {
+
+    revealObserver =
+        new IntersectionObserver(
+            entries => {
+
+                entries.forEach(
+                    entry => {
+
+                        if (
+                            !entry.isIntersecting
+                        ) {
+                            return;
                         }
-                    ],
-                    {
-                        duration: 1100,
-                        easing:
-                            "cubic-bezier(.16,1,.3,1)",
-                        fill: "forwards"
+
+
+                        entry.target.animate(
+                            [
+                                {
+                                    opacity: 0,
+                                    transform:
+                                        "translateY(70px)"
+                                },
+
+                                {
+                                    opacity: 1,
+                                    transform:
+                                        "translateY(0)"
+                                }
+                            ],
+                            {
+                                duration: 1100,
+                                easing:
+                                    "cubic-bezier(.16,1,.3,1)",
+                                fill: "forwards"
+                            }
+                        );
+
+
+                        revealObserver.unobserve(
+                            entry.target
+                        );
+
                     }
                 );
 
+            },
+            {
+                threshold: 0.12
+            }
+        );
 
-                revealObserver.unobserve(
-                    entry.target
-                );
 
-            });
+    revealElements.forEach(
+        element => {
 
-        },
-        {
-            threshold: 0.12
+            revealObserver.observe(
+                element
+            );
+
         }
     );
 
+} else {
 
-revealElements.forEach(
-    element =>
-        revealObserver.observe(element)
-);
+    revealElements.forEach(
+        element => {
+
+            element.style.opacity = "1";
+
+        }
+    );
+
+}
 
 
 /* =========================================================
    MENU
-   ========================================================= */
+========================================================= */
 
 function openMenu() {
 
+    if (!menuOverlay) {
+        return;
+    }
+
+
     state.menuOpen = true;
 
-    menuOverlay.classList.add("open");
-
-    body.classList.add("loading");
+    menuOverlay.classList.add(
+        "open"
+    );
 
 }
 
 
 function closeMenu() {
 
+    if (!menuOverlay) {
+        return;
+    }
+
+
     state.menuOpen = false;
 
-    menuOverlay.classList.remove("open");
-
-    body.classList.remove("loading");
+    menuOverlay.classList.remove(
+        "open"
+    );
 
 }
 
@@ -626,23 +728,25 @@ if (menuClose) {
 }
 
 
-overlayLinks.forEach(link => {
+overlayLinks.forEach(
+    link => {
 
-    link.addEventListener(
-        "click",
-        () => {
+        link.addEventListener(
+            "click",
+            () => {
 
-            closeMenu();
+                closeMenu();
 
-        }
-    );
+            }
+        );
 
-});
+    }
+);
 
 
 /* =========================================================
    ESCAPE KEY
-   ========================================================= */
+========================================================= */
 
 document.addEventListener(
     "keydown",
@@ -662,46 +766,8 @@ document.addEventListener(
 
 
 /* =========================================================
-   MAIN ANIMATION LOOP
-   ========================================================= */
-
-function animationLoop() {
-
-    updateMouse();
-
-    updateScroll();
-
-    updateHeroParallax();
-
-    requestAnimationFrame(
-        animationLoop
-    );
-
-}
-
-
-animationLoop();
-
-
-/* =========================================================
-   RESIZE
-   ========================================================= */
-
-window.addEventListener(
-    "resize",
-    () => {
-
-        if (state.menuOpen) {
-            closeMenu();
-        }
-
-    }
-);
-
-
-/* =========================================================
-   MOBILE TOUCH PARALLAX
-   ========================================================= */
+   MOBILE DEVICE ORIENTATION
+========================================================= */
 
 if (isTouchDevice) {
 
@@ -746,8 +812,51 @@ if (isTouchDevice) {
 
 
 /* =========================================================
+   MAIN ANIMATION LOOP
+========================================================= */
+
+function animationLoop() {
+
+    updateMouse();
+
+    updateScroll();
+
+    updateHeroParallax();
+
+    requestAnimationFrame(
+        animationLoop
+    );
+
+}
+
+
+animationLoop();
+
+
+/* =========================================================
+   RESIZE MENU SAFETY
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        if (
+            state.menuOpen &&
+            window.innerWidth > 800
+        ) {
+
+            closeMenu();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
    PAGE VISIBILITY
-   ========================================================= */
+========================================================= */
 
 document.addEventListener(
     "visibilitychange",
@@ -755,9 +864,12 @@ document.addEventListener(
 
         if (
             document.visibilityState ===
-            "hidden"
+            "visible"
         ) {
-            return;
+
+            state.scroll.target =
+                window.scrollY;
+
         }
 
     }
