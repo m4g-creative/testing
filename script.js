@@ -1,6 +1,6 @@
 /* =========================================================
-   VOID — IMMERSIVE EXPERIENCE
-   SCRIPT.JS
+   VOID — INTERACTIVE EXPERIENCE
+   JAVASCRIPT
    ========================================================= */
 
 
@@ -8,26 +8,32 @@
    DOM
    ========================================================= */
 
-const body = document.body;
+const body =
+    document.body;
 
-const loader = document.getElementById("loader");
-const loaderProgress = document.getElementById("loaderProgress");
-const loaderPercent = document.getElementById("loaderPercent");
+const site =
+    document.getElementById("site");
 
-const site = document.getElementById("site");
-const canvas = document.getElementById("webglCanvas");
+const canvas =
+    document.getElementById("webglCanvas");
 
-const cursor = document.getElementById("cursor");
+const cursor =
+    document.getElementById("cursor");
 
-const menuButton = document.getElementById("menuButton");
-const menuClose = document.getElementById("menuClose");
-const menuOverlay = document.getElementById("menuOverlay");
+const menuButton =
+    document.getElementById("menuButton");
 
-const overlayLinks =
-    document.querySelectorAll(".overlay-nav a");
+const menuClose =
+    document.getElementById("menuClose");
+
+const menuOverlay =
+    document.getElementById("menuOverlay");
 
 const workItems =
     document.querySelectorAll(".work-item");
+
+const overlayLinks =
+    document.querySelectorAll(".overlay-nav a");
 
 
 /* =========================================================
@@ -35,146 +41,28 @@ const workItems =
    ========================================================= */
 
 const state = {
+
+    mouseX: 0,
+    mouseY: 0,
+
+    targetMouseX: 0,
+    targetMouseY: 0,
+
+    scrollY: 0,
+    targetScrollY: 0,
+
+    width: window.innerWidth,
+    height: window.innerHeight,
+
     loaded: false,
+
     menuOpen: false,
 
-    mouse: {
-        x: 0,
-        y: 0,
-        targetX: 0,
-        targetY: 0
-    },
+    isTouch:
+        "ontouchstart" in window ||
+        navigator.maxTouchPoints > 0
 
-    cursor: {
-        x: 0,
-        y: 0,
-        targetX: 0,
-        targetY: 0
-    },
-
-    scroll: 0,
-    targetScroll: 0
 };
-
-
-/* =========================================================
-   DEVICE
-   ========================================================= */
-
-const isTouchDevice =
-    window.matchMedia("(pointer: coarse)").matches ||
-    "ontouchstart" in window;
-
-
-/* =========================================================
-   LOADER
-   ========================================================= */
-
-let loaderValue = 0;
-let loaderTimer = null;
-let loaderFinished = false;
-
-function updateLoader(value) {
-
-    const safeValue =
-        Math.min(100, Math.max(0, value));
-
-    if (loaderProgress) {
-        loaderProgress.style.width =
-            safeValue + "%";
-    }
-
-    if (loaderPercent) {
-        loaderPercent.textContent =
-            Math.round(safeValue);
-    }
-}
-
-
-function finishLoader() {
-
-    if (loaderFinished) {
-        return;
-    }
-
-    loaderFinished = true;
-
-    if (loaderTimer) {
-        clearInterval(loaderTimer);
-        loaderTimer = null;
-    }
-
-    updateLoader(100);
-
-    setTimeout(() => {
-
-        if (loader) {
-            loader.classList.add("hidden");
-        }
-
-        if (site) {
-            site.classList.add("is-visible");
-        }
-
-        body.classList.remove("loading");
-
-        state.loaded = true;
-
-        startIntro();
-
-    }, 350);
-}
-
-
-function startLoader() {
-
-    /*
-       Loader is completely independent
-       from WebGL and other effects.
-    */
-
-    updateLoader(0);
-
-    loaderTimer = setInterval(() => {
-
-        const remaining =
-            100 - loaderValue;
-
-        const increment =
-            Math.min(
-                remaining,
-                Math.floor(Math.random() * 10) + 5
-            );
-
-        loaderValue += increment;
-
-        updateLoader(loaderValue);
-
-        if (loaderValue >= 100) {
-            finishLoader();
-        }
-
-    }, 90);
-}
-
-
-/* =========================================================
-   START LOADER AFTER DOM
-   ========================================================= */
-
-if (document.readyState === "loading") {
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        startLoader,
-        { once: true }
-    );
-
-} else {
-
-    startLoader();
-
-}
 
 
 /* =========================================================
@@ -183,96 +71,180 @@ if (document.readyState === "loading") {
 
 function startIntro() {
 
-    document.body.classList.add("intro-complete");
+    if (!site) {
+        return;
+    }
 
-    requestAnimationFrame(() => {
+    state.loaded = true;
 
-        document.querySelectorAll(
-            ".hero-top, .hero-bottom"
-        ).forEach((element, index) => {
+    site.classList.add("is-visible");
 
-            element.animate(
-                [
-                    {
-                        opacity: 0,
-                        transform: "translateY(20px)"
-                    },
-                    {
-                        opacity: 1,
-                        transform: "translateY(0)"
-                    }
-                ],
-                {
-                    duration: 900,
-                    delay: 250 + index * 100,
-                    easing: "cubic-bezier(.22,1,.36,1)",
-                    fill: "forwards"
-                }
-            );
-
-        });
-
-    });
 }
 
 
 /* =========================================================
-   CURSOR
+   CUSTOM CURSOR
    ========================================================= */
 
-if (!isTouchDevice && cursor) {
+function setupCursor() {
+
+    if (!cursor) {
+        return;
+    }
+
+    if (state.isTouch) {
+
+        cursor.style.display = "none";
+
+        return;
+    }
+
+
+    const dot =
+        cursor.querySelector(".cursor-dot");
+
+    const ring =
+        cursor.querySelector(".cursor-ring");
+
+
+    let cursorX =
+        window.innerWidth / 2;
+
+    let cursorY =
+        window.innerHeight / 2;
+
+
+    let targetX =
+        cursorX;
+
+    let targetY =
+        cursorY;
+
 
     window.addEventListener(
-        "pointermove",
-        (event) => {
+        "mousemove",
+        function (event) {
 
-            state.cursor.targetX =
+            targetX =
                 event.clientX;
 
-            state.cursor.targetY =
+            targetY =
                 event.clientY;
 
-            state.mouse.targetX =
-                (event.clientX / window.innerWidth) * 2 - 1;
-
-            state.mouse.targetY =
-                -(event.clientY / window.innerHeight) * 2 + 1;
-
         },
-        { passive: true }
+        {
+            passive: true
+        }
     );
 
 
     function animateCursor() {
 
-        state.cursor.x +=
-            (state.cursor.targetX - state.cursor.x) *
-            0.18;
+        cursorX +=
+            (targetX - cursorX) * 0.18;
 
-        state.cursor.y +=
-            (state.cursor.targetY - state.cursor.y) *
-            0.18;
+        cursorY +=
+            (targetY - cursorY) * 0.18;
 
-        cursor.style.transform =
-            `translate3d(${state.cursor.x}px, ${state.cursor.y}px, 0)`;
 
-        requestAnimationFrame(animateCursor);
+        if (dot) {
+
+            dot.style.transform =
+                `translate3d(
+                    ${targetX}px,
+                    ${targetY}px,
+                    0
+                )`;
+
+        }
+
+
+        if (ring) {
+
+            ring.style.transform =
+                `translate3d(
+                    ${cursorX}px,
+                    ${cursorY}px,
+                    0
+                )`;
+
+        }
+
+
+        requestAnimationFrame(
+            animateCursor
+        );
+
     }
+
 
     animateCursor();
 
 
-    workItems.forEach((item) => {
+    const interactiveElements =
+        document.querySelectorAll(
+            "a, button, .work-item"
+        );
 
-        item.addEventListener("mouseenter", () => {
-            cursor.classList.add("view");
-        });
 
-        item.addEventListener("mouseleave", () => {
-            cursor.classList.remove("view");
-        });
+    interactiveElements.forEach(
+        function (element) {
 
-    });
+            element.addEventListener(
+                "mouseenter",
+                function () {
+
+                    cursor.classList.add(
+                        "cursor-active"
+                    );
+
+                }
+            );
+
+
+            element.addEventListener(
+                "mouseleave",
+                function () {
+
+                    cursor.classList.remove(
+                        "cursor-active"
+                    );
+
+                }
+            );
+
+        }
+    );
+
+
+    workItems.forEach(
+        function (item) {
+
+            item.addEventListener(
+                "mouseenter",
+                function () {
+
+                    cursor.classList.add(
+                        "cursor-view"
+                    );
+
+                }
+            );
+
+
+            item.addEventListener(
+                "mouseleave",
+                function () {
+
+                    cursor.classList.remove(
+                        "cursor-view"
+                    );
+
+                }
+            );
+
+        }
+    );
 
 }
 
@@ -282,7 +254,271 @@ if (!isTouchDevice && cursor) {
    ========================================================= */
 
 let gl = null;
-let webglSupported = false;
+
+
+/* WebGL animation state */
+
+const webglState = {
+
+    initialized: false,
+
+    time: 0,
+
+    program: null,
+
+    positionBuffer: null
+
+};
+
+
+/* =========================================================
+   WEBGL SHADERS
+   ========================================================= */
+
+const vertexShaderSource = `
+
+    attribute vec2 aPosition;
+
+    void main() {
+
+        gl_Position =
+            vec4(
+                aPosition,
+                0.0,
+                1.0
+            );
+
+    }
+
+`;
+
+
+const fragmentShaderSource = `
+
+    precision highp float;
+
+    uniform float uTime;
+    uniform vec2 uResolution;
+    uniform vec2 uMouse;
+
+    void main() {
+
+        vec2 uv =
+            gl_FragCoord.xy /
+            uResolution.xy;
+
+        vec2 centered =
+            uv - 0.5;
+
+        centered.x *=
+            uResolution.x /
+            uResolution.y;
+
+
+        float distanceFromCenter =
+            length(centered);
+
+
+        float mouseDistance =
+            distance(
+                centered,
+                uMouse
+            );
+
+
+        float glow =
+            0.035 /
+            max(
+                mouseDistance,
+                0.02
+            );
+
+
+        float pulse =
+            sin(
+                uTime * 0.4 +
+                distanceFromCenter * 4.0
+            ) * 0.005;
+
+
+        float vignette =
+            1.0 -
+            smoothstep(
+                0.15,
+                0.85,
+                distanceFromCenter
+            );
+
+
+        vec3 background =
+            vec3(
+                0.018,
+                0.018,
+                0.022
+            );
+
+
+        vec3 light =
+            vec3(
+                0.10,
+                0.07,
+                0.15
+            );
+
+
+        vec3 finalColor =
+            background;
+
+
+        finalColor +=
+            light *
+            glow *
+            vignette;
+
+
+        finalColor +=
+            pulse *
+            vec3(
+                0.5,
+                0.3,
+                0.8
+            );
+
+
+        gl_FragColor =
+            vec4(
+                finalColor,
+                1.0
+            );
+
+    }
+
+`;
+
+
+/* =========================================================
+   WEBGL HELPERS
+   ========================================================= */
+
+function createShader(
+    context,
+    type,
+    source
+) {
+
+    const shader =
+        context.createShader(type);
+
+    context.shaderSource(
+        shader,
+        source
+    );
+
+    context.compileShader(
+        shader
+    );
+
+
+    if (
+        !context.getShaderParameter(
+            shader,
+            context.COMPILE_STATUS
+        )
+    ) {
+
+        console.warn(
+            "WebGL shader error:",
+            context.getShaderInfoLog(shader)
+        );
+
+        context.deleteShader(shader);
+
+        return null;
+
+    }
+
+
+    return shader;
+
+}
+
+
+function createProgram(
+    context,
+    vertexSource,
+    fragmentSource
+) {
+
+    const vertexShader =
+        createShader(
+            context,
+            context.VERTEX_SHADER,
+            vertexSource
+        );
+
+
+    const fragmentShader =
+        createShader(
+            context,
+            context.FRAGMENT_SHADER,
+            fragmentSource
+        );
+
+
+    if (
+        !vertexShader ||
+        !fragmentShader
+    ) {
+
+        return null;
+
+    }
+
+
+    const program =
+        context.createProgram();
+
+
+    context.attachShader(
+        program,
+        vertexShader
+    );
+
+    context.attachShader(
+        program,
+        fragmentShader
+    );
+
+    context.linkProgram(
+        program
+    );
+
+
+    if (
+        !context.getProgramParameter(
+            program,
+            context.LINK_STATUS
+        )
+    ) {
+
+        console.warn(
+            "WebGL program error:",
+            context.getProgramInfoLog(program)
+        );
+
+        return null;
+
+    }
+
+
+    return program;
+
+}
+
+
+/* =========================================================
+   WEBGL SETUP
+   ========================================================= */
 
 function setupWebGL() {
 
@@ -290,56 +526,135 @@ function setupWebGL() {
         return;
     }
 
-    try {
 
-        gl =
-            canvas.getContext("webgl", {
+    gl =
+        canvas.getContext(
+            "webgl",
+            {
+                alpha: false,
                 antialias: true,
-                alpha: true,
                 powerPreference: "high-performance"
-            }) ||
-            canvas.getContext("experimental-webgl");
+            }
+        );
 
-        if (!gl) {
-            return;
-        }
 
-        webglSupported = true;
+    if (!gl) {
 
-        resizeCanvas();
+        console.warn(
+            "WebGL is not available."
+        );
 
-    } catch (error) {
-
-        /*
-           WebGL failure must never stop
-           the rest of the website.
-        */
-
-        webglSupported = false;
+        return;
 
     }
+
+
+    const program =
+        createProgram(
+            gl,
+            vertexShaderSource,
+            fragmentShaderSource
+        );
+
+
+    if (!program) {
+        return;
+    }
+
+
+    webglState.program =
+        program;
+
+
+    const positionBuffer =
+        gl.createBuffer();
+
+
+    webglState.positionBuffer =
+        positionBuffer;
+
+
+    gl.bindBuffer(
+        gl.ARRAY_BUFFER,
+        positionBuffer
+    );
+
+
+    const positions =
+        new Float32Array([
+
+            -1, -1,
+             1, -1,
+            -1,  1,
+
+            -1,  1,
+             1, -1,
+             1,  1
+
+        ]);
+
+
+    gl.bufferData(
+        gl.ARRAY_BUFFER,
+        positions,
+        gl.STATIC_DRAW
+    );
+
+
+    webglState.initialized =
+        true;
+
+
+    resizeWebGL();
 
 }
 
 
-function resizeCanvas() {
+/* =========================================================
+   WEBGL RESIZE
+   ========================================================= */
+
+function resizeWebGL() {
 
     if (!canvas || !gl) {
         return;
     }
 
+
     const pixelRatio =
-        Math.min(window.devicePixelRatio || 1, 2);
-
-    canvas.width =
-        Math.floor(
-            window.innerWidth * pixelRatio
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
         );
 
-    canvas.height =
+
+    const width =
         Math.floor(
-            window.innerHeight * pixelRatio
+            window.innerWidth *
+            pixelRatio
         );
+
+
+    const height =
+        Math.floor(
+            window.innerHeight *
+            pixelRatio
+        );
+
+
+    if (
+        canvas.width !== width ||
+        canvas.height !== height
+    ) {
+
+        canvas.width =
+            width;
+
+        canvas.height =
+            height;
+
+    }
+
 
     canvas.style.width =
         window.innerWidth + "px";
@@ -347,60 +662,127 @@ function resizeCanvas() {
     canvas.style.height =
         window.innerHeight + "px";
 
+
     gl.viewport(
         0,
         0,
         canvas.width,
         canvas.height
     );
+
 }
 
 
-setupWebGL();
-
-
 /* =========================================================
-   SIMPLE WEBGL BACKGROUND
+   WEBGL RENDER
    ========================================================= */
 
 function renderWebGL() {
 
-    if (!webglSupported || !gl) {
+    if (
+        !gl ||
+        !webglState.initialized ||
+        !webglState.program
+    ) {
+
         return;
+
     }
 
-    const time =
-        performance.now() * 0.00015;
 
-    const mouseX =
-        state.mouse.x * 0.02;
+    webglState.time +=
+        0.016;
 
-    const mouseY =
-        state.mouse.y * 0.02;
 
-    const red =
-        0.012 +
-        Math.sin(time) * 0.004 +
-        mouseX;
+    const program =
+        webglState.program;
 
-    const green =
-        0.012 +
-        Math.cos(time * 1.3) * 0.004 +
-        mouseY;
 
-    const blue =
-        0.018 +
-        Math.sin(time * 0.7) * 0.005;
-
-    gl.clearColor(
-        Math.max(0, red),
-        Math.max(0, green),
-        Math.max(0, blue),
-        1
+    gl.useProgram(
+        program
     );
 
-    gl.clear(
-        gl.COLOR_BUFFER_BIT
+
+    gl.bindBuffer(
+        gl.ARRAY_BUFFER,
+        webglState.positionBuffer
+    );
+
+
+    const positionLocation =
+        gl.getAttribLocation(
+            program,
+            "aPosition"
+        );
+
+
+    gl.enableVertexAttribArray(
+        positionLocation
+    );
+
+
+    gl.vertexAttribPointer(
+        positionLocation,
+        2,
+        gl.FLOAT,
+        false,
+        0,
+        0
+    );
+
+
+    const timeLocation =
+        gl.getUniformLocation(
+            program,
+            "uTime"
+        );
+
+
+    const resolutionLocation =
+        gl.getUniformLocation(
+            program,
+            "uResolution"
+        );
+
+
+    const mouseLocation =
+        gl.getUniformLocation(
+            program,
+            "uMouse"
+        );
+
+
+    gl.uniform1f(
+        timeLocation,
+        webglState.time
+    );
+
+
+    gl.uniform2f(
+        resolutionLocation,
+        canvas.width,
+        canvas.height
+    );
+
+
+    const mouseX =
+        state.mouseX * 0.5;
+
+    const mouseY =
+        -state.mouseY * 0.5;
+
+
+    gl.uniform2f(
+        mouseLocation,
+        mouseX,
+        mouseY
+    );
+
+
+    gl.drawArrays(
+        gl.TRIANGLES,
+        0,
+        6
     );
 
 }
@@ -410,15 +792,35 @@ function renderWebGL() {
    MOUSE PARALLAX
    ========================================================= */
 
-function updateMouse() {
+function setupMouse() {
 
-    state.mouse.x +=
-        (state.mouse.targetX - state.mouse.x) *
-        0.035;
+    if (state.isTouch) {
+        return;
+    }
 
-    state.mouse.y +=
-        (state.mouse.targetY - state.mouse.y) *
-        0.035;
+
+    window.addEventListener(
+        "mousemove",
+        function (event) {
+
+            state.targetMouseX =
+                (
+                    event.clientX /
+                    window.innerWidth
+                ) - 0.5;
+
+
+            state.targetMouseY =
+                (
+                    event.clientY /
+                    window.innerHeight
+                ) - 0.5;
+
+        },
+        {
+            passive: true
+        }
+    );
 
 }
 
@@ -427,77 +829,73 @@ function updateMouse() {
    SCROLL
    ========================================================= */
 
-window.addEventListener(
-    "scroll",
-    () => {
+function setupScroll() {
 
-        state.targetScroll =
-            window.scrollY || window.pageYOffset;
+    window.addEventListener(
+        "scroll",
+        function () {
 
-    },
-    { passive: true }
-);
+            state.targetScrollY =
+                window.scrollY;
 
-
-function updateScroll() {
-
-    state.scroll +=
-        (state.targetScroll - state.scroll) *
-        0.08;
-
-    const hero =
-        document.getElementById("hero");
-
-    if (hero && state.loaded) {
-
-        const offset =
-            Math.min(state.scroll * 0.16, 180);
-
-        hero.style.transform =
-            `translate3d(0, ${offset}px, 0)`;
-
-    }
+        },
+        {
+            passive: true
+        }
+    );
 
 }
 
 
 /* =========================================================
-   INTERSECTION OBSERVER
+   WORK INTERSECTION
    ========================================================= */
 
-const revealObserver =
-    new IntersectionObserver(
-        (entries) => {
+function setupWorkObserver() {
 
-            entries.forEach((entry) => {
+    if (!workItems.length) {
+        return;
+    }
 
-                if (entry.isIntersecting) {
 
-                    entry.target.classList.add(
-                        "visible"
-                    );
+    const observer =
+        new IntersectionObserver(
+            function (entries) {
 
-                    revealObserver.unobserve(
-                        entry.target
-                    );
+                entries.forEach(
+                    function (entry) {
 
-                }
+                        if (
+                            entry.isIntersecting
+                        ) {
 
-            });
+                            entry.target.classList.add(
+                                "is-visible"
+                            );
 
-        },
-        {
-            threshold: 0.12,
-            rootMargin: "0px 0px -8% 0px"
+                        }
+
+                    }
+                );
+
+            },
+            {
+                threshold: 0.15
+            }
+        );
+
+
+    workItems.forEach(
+        function (item) {
+
+            observer.observe(
+                item
+            );
+
         }
     );
 
-
-workItems.forEach((item) => {
-
-    revealObserver.observe(item);
-
-});
+}
 
 
 /* =========================================================
@@ -510,25 +908,28 @@ function openMenu() {
         return;
     }
 
-    state.menuOpen = true;
 
-    menuOverlay.classList.add("open");
+    state.menuOpen =
+        true;
 
-    menuOverlay.setAttribute(
-        "aria-hidden",
-        "false"
+
+    menuOverlay.classList.add(
+        "is-open"
     );
+
+
+    body.classList.add(
+        "menu-open"
+    );
+
 
     if (menuButton) {
 
-        menuButton.setAttribute(
-            "aria-expanded",
-            "true"
+        menuButton.classList.add(
+            "is-active"
         );
 
     }
-
-    body.style.overflow = "hidden";
 
 }
 
@@ -539,163 +940,308 @@ function closeMenu() {
         return;
     }
 
-    state.menuOpen = false;
 
-    menuOverlay.classList.remove("open");
+    state.menuOpen =
+        false;
 
-    menuOverlay.setAttribute(
-        "aria-hidden",
-        "true"
+
+    menuOverlay.classList.remove(
+        "is-open"
     );
+
+
+    body.classList.remove(
+        "menu-open"
+    );
+
 
     if (menuButton) {
 
-        menuButton.setAttribute(
-            "aria-expanded",
-            "false"
+        menuButton.classList.remove(
+            "is-active"
         );
 
     }
 
-    if (!body.classList.contains("loading")) {
-        body.style.overflow = "";
+}
+
+
+function setupMenu() {
+
+    if (menuButton) {
+
+        menuButton.addEventListener(
+            "click",
+            function () {
+
+                if (state.menuOpen) {
+
+                    closeMenu();
+
+                } else {
+
+                    openMenu();
+
+                }
+
+            }
+        );
+
     }
 
-}
+
+    if (menuClose) {
+
+        menuClose.addEventListener(
+            "click",
+            closeMenu
+        );
+
+    }
 
 
-if (menuButton) {
+    overlayLinks.forEach(
+        function (link) {
 
-    menuButton.addEventListener(
-        "click",
-        openMenu
+            link.addEventListener(
+                "click",
+                function () {
+
+                    closeMenu();
+
+                }
+            );
+
+        }
+    );
+
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (
+                event.key === "Escape" &&
+                state.menuOpen
+            ) {
+
+                closeMenu();
+
+            }
+
+        }
     );
 
 }
-
-
-if (menuClose) {
-
-    menuClose.addEventListener(
-        "click",
-        closeMenu
-    );
-
-}
-
-
-overlayLinks.forEach((link) => {
-
-    link.addEventListener(
-        "click",
-        closeMenu
-    );
-
-});
 
 
 /* =========================================================
-   ESCAPE
+   TOUCH
    ========================================================= */
 
-document.addEventListener(
-    "keydown",
-    (event) => {
+function setupTouch() {
 
-        if (
-            event.key === "Escape" &&
-            state.menuOpen
-        ) {
+    if (!state.isTouch) {
+        return;
+    }
 
-            closeMenu();
+
+    let touchStartY =
+        0;
+
+
+    window.addEventListener(
+        "touchstart",
+        function (event) {
+
+            if (
+                event.touches &&
+                event.touches.length
+            ) {
+
+                touchStartY =
+                    event.touches[0].clientY;
+
+            }
+
+        },
+        {
+            passive: true
+        }
+    );
+
+
+    window.addEventListener(
+        "touchmove",
+        function (event) {
+
+            if (
+                !event.touches ||
+                !event.touches.length
+            ) {
+
+                return;
+
+            }
+
+
+            const currentY =
+                event.touches[0].clientY;
+
+
+            const difference =
+                currentY -
+                touchStartY;
+
+
+            state.targetMouseY =
+                difference * 0.001;
+
+        },
+        {
+            passive: true
+        }
+    );
+
+}
+
+
+/* =========================================================
+   VISIBILITY
+   ========================================================= */
+
+function setupVisibility() {
+
+    document.addEventListener(
+        "visibilitychange",
+        function () {
+
+            if (
+                document.hidden
+            ) {
+
+                return;
+
+            }
+
+            resizeWebGL();
 
         }
+    );
 
-    }
-);
+}
 
 
 /* =========================================================
    RESIZE
    ========================================================= */
 
-window.addEventListener(
-    "resize",
-    () => {
+function setupResize() {
 
-        resizeCanvas();
+    window.addEventListener(
+        "resize",
+        function () {
 
-    },
-    { passive: true }
-);
+            state.width =
+                window.innerWidth;
+
+            state.height =
+                window.innerHeight;
 
 
-/* =========================================================
-   PAGE VISIBILITY
-   ========================================================= */
+            resizeWebGL();
 
-document.addEventListener(
-    "visibilitychange",
-    () => {
-
-        if (document.hidden) {
-            return;
         }
+    );
 
-        resizeCanvas();
-
-    }
-);
+}
 
 
 /* =========================================================
    MAIN ANIMATION LOOP
    ========================================================= */
 
-function animationLoop() {
+function animate() {
 
-    updateMouse();
+    state.mouseX +=
+        (
+            state.targetMouseX -
+            state.mouseX
+        ) * 0.06;
 
-    updateScroll();
+
+    state.mouseY +=
+        (
+            state.targetMouseY -
+            state.mouseY
+        ) * 0.06;
+
+
+    state.scrollY +=
+        (
+            state.targetScrollY -
+            state.scrollY
+        ) * 0.08;
+
 
     renderWebGL();
 
+
     requestAnimationFrame(
-        animationLoop
-    );
-
-}
-
-
-animationLoop();
-
-
-/* =========================================================
-   TOUCH SUPPORT
-   ========================================================= */
-
-if (isTouchDevice) {
-
-    document.documentElement.classList.add(
-        "touch-device"
+        animate
     );
 
 }
 
 
 /* =========================================================
-   SAFETY FALLBACK
+   INITIALIZATION
    ========================================================= */
 
-/*
-   If something unexpected prevents the normal loader
-   from completing, never leave the user stuck at 0%.
-*/
+function init() {
 
-setTimeout(() => {
+    setupCursor();
 
-    if (!loaderFinished) {
-        finishLoader();
-    }
+    setupMouse();
 
-}, 5000);
+    setupScroll();
+
+    setupWorkObserver();
+
+    setupMenu();
+
+    setupTouch();
+
+    setupVisibility();
+
+    setupResize();
+
+    setupWebGL();
+
+    animate();
+
+}
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        init,
+        {
+            once: true
+        }
+    );
+
+} else {
+
+    init();
+
+}
