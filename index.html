@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
 
     <meta
@@ -15,11 +17,14 @@
 
     <title>VOID — Interactive Experience</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
 
     <link
         rel="preconnect"
-        href="https://fonts.gstatic.com"
+        href="https://fonts.googleapis.com"
         crossorigin
     >
 
@@ -32,9 +37,12 @@
         rel="stylesheet"
         href="./style.css"
     >
+
 </head>
 
+
 <body class="loading">
+
 
     <!-- =====================================================
          LOADER
@@ -44,12 +52,17 @@
         class="loader"
         id="loader"
     >
+
         <div class="loader-inner">
 
             <div class="loader-top">
+
                 <span>VOID</span>
+
                 <span>EXPERIENCE</span>
+
             </div>
+
 
             <div class="loader-center">
 
@@ -62,6 +75,7 @@
 
             </div>
 
+
             <div class="loader-bottom">
 
                 <div class="loader-track">
@@ -73,14 +87,23 @@
 
                 </div>
 
+
                 <div class="loader-status">
-                    <span>INITIALIZING</span>
-                    <span>2026</span>
+
+                    <span>
+                        INITIALIZING
+                    </span>
+
+                    <span>
+                        2026
+                    </span>
+
                 </div>
 
             </div>
 
         </div>
+
     </div>
 
 
@@ -101,8 +124,11 @@
         class="cursor"
         id="cursor"
     >
+
         <div class="cursor-dot"></div>
+
         <div class="cursor-ring"></div>
+
     </div>
 
 
@@ -115,7 +141,10 @@
         id="site"
     >
 
-        <!-- ==================== NAVBAR ==================== -->
+
+        <!-- =================================================
+             NAVBAR
+             ================================================= -->
 
         <header class="navbar">
 
@@ -125,6 +154,7 @@
             >
                 VOID<span>.</span>
             </a>
+
 
             <nav class="desktop-nav">
 
@@ -142,20 +172,26 @@
 
             </nav>
 
+
             <button
                 class="menu-button"
                 id="menuButton"
                 type="button"
                 aria-label="Open menu"
             >
+
                 <span></span>
+
                 <span></span>
+
             </button>
 
         </header>
 
 
-        <!-- ==================== HERO ==================== -->
+        <!-- =================================================
+             HERO
+             ================================================= -->
 
         <section
             class="hero"
@@ -175,23 +211,35 @@
             </div>
 
 
-            <div class="hero-content">
+            <!-- hero-content kept + hero-center added
+                 for CSS compatibility -->
+
+            <div
+                class="hero-content hero-center"
+            >
 
                 <h1 class="hero-title">
 
-                    <span>WE</span>
+                    <span class="hero-title-line">
+                        WE
+                    </span>
 
-                    <span>CREATE</span>
+                    <span class="hero-title-line">
+                        CREATE
+                    </span>
 
-                    <span>IMMERSIVE</span>
+                    <span class="hero-title-line">
+                        IMMERSIVE
+                    </span>
 
                 </h1>
 
 
                 <p class="hero-description">
 
-                    Digital experiences built at the intersection
-                    of technology, design and imagination.
+                    Digital experiences built at the
+                    intersection of technology, design
+                    and imagination.
 
                 </p>
 
@@ -201,8 +249,11 @@
             <div class="hero-bottom">
 
                 <div class="hero-location">
+
                     WORLDWIDE / 2026
+
                 </div>
+
 
                 <div class="scroll-indicator">
 
@@ -219,7 +270,9 @@
         </section>
 
 
-        <!-- ==================== WORK ==================== -->
+        <!-- =================================================
+             WORK
+             ================================================= -->
 
         <section
             class="work"
@@ -241,12 +294,17 @@
 
             <div class="work-list">
 
+
+                <!-- WORK 01 -->
+
                 <article
                     class="work-item"
                     data-cursor="view"
                 >
 
-                    <div class="work-visual work-visual-01">
+                    <div
+                        class="work-visual work-image work-visual-01"
+                    >
 
                         <div class="work-glow"></div>
 
@@ -281,12 +339,16 @@
                 </article>
 
 
+                <!-- WORK 02 -->
+
                 <article
                     class="work-item"
                     data-cursor="view"
                 >
 
-                    <div class="work-visual work-visual-02">
+                    <div
+                        class="work-visual work-image work-visual-02"
+                    >
 
                         <div class="work-glow"></div>
 
@@ -321,12 +383,16 @@
                 </article>
 
 
+                <!-- WORK 03 -->
+
                 <article
                     class="work-item"
                     data-cursor="view"
                 >
 
-                    <div class="work-visual work-visual-03">
+                    <div
+                        class="work-visual work-image work-visual-03"
+                    >
 
                         <div class="work-glow"></div>
 
@@ -365,7 +431,9 @@
         </section>
 
 
-        <!-- ==================== ABOUT ==================== -->
+        <!-- =================================================
+             ABOUT
+             ================================================= -->
 
         <section
             class="about"
@@ -387,12 +455,15 @@
 
             <div class="about-content">
 
-                <h2>
+                <h2 class="about-title">
 
                     WE BUILD
+
                     <br>
 
-                    <span>WORLDS</span>
+                    <span>
+                        WORLDS
+                    </span>
 
                     <br>
 
@@ -404,15 +475,16 @@
                 <div class="about-text">
 
                     <p>
-                        VOID is an experimental digital studio
-                        exploring the space between technology,
-                        art and human interaction.
+                        VOID is an experimental digital
+                        studio exploring the space between
+                        technology, art and human interaction.
                     </p>
 
 
                     <p>
-                        We create immersive experiences that
-                        turn screens into places worth exploring.
+                        We create immersive experiences
+                        that turn screens into places worth
+                        exploring.
                     </p>
 
                 </div>
@@ -422,7 +494,9 @@
         </section>
 
 
-        <!-- ==================== CONTACT ==================== -->
+        <!-- =================================================
+             CONTACT
+             ================================================= -->
 
         <section
             class="contact"
@@ -444,7 +518,7 @@
 
             <div class="contact-content">
 
-                <p>
+                <p class="contact-label">
                     HAVE AN IDEA?
                 </p>
 
@@ -453,8 +527,13 @@
                     href="mailto:hello@void.example"
                     class="contact-link"
                 >
+
                     LET'S TALK
-                    <span>↗</span>
+
+                    <span>
+                        ↗
+                    </span>
+
                 </a>
 
             </div>
@@ -462,7 +541,9 @@
         </section>
 
 
-        <!-- ==================== FOOTER ==================== -->
+        <!-- =================================================
+             FOOTER
+             ================================================= -->
 
         <footer class="footer">
 
@@ -538,10 +619,11 @@
 
 
     <!-- =====================================================
-         LOADER
+         LOADER SCRIPT
          ===================================================== -->
 
     <script>
+
         (function () {
 
             const loader =
@@ -558,37 +640,57 @@
 
             let value = 0;
 
+
             function updateLoader() {
 
                 value += 4;
+
 
                 if (value > 100) {
                     value = 100;
                 }
 
+
                 if (progress) {
+
                     progress.style.width =
                         value + "%";
+
                 }
 
+
                 if (percent) {
+
                     percent.textContent =
                         value + "%";
+
                 }
+
 
                 if (value >= 100) {
 
                     clearInterval(timer);
 
+
                     setTimeout(function () {
 
                         if (loader) {
-                            loader.classList.add("hidden");
+
+                            loader.classList.add(
+                                "hidden"
+                            );
+
                         }
 
+
                         if (site) {
-                            site.classList.add("is-visible");
+
+                            site.classList.add(
+                                "is-visible"
+                            );
+
                         }
+
 
                         document.body.classList.remove(
                             "loading"
@@ -600,6 +702,7 @@
 
             }
 
+
             const timer =
                 setInterval(
                     updateLoader,
@@ -607,6 +710,7 @@
                 );
 
         })();
+
     </script>
 
 
@@ -626,4 +730,5 @@
     <script src="./script.js"></script>
 
 </body>
+
 </html>
