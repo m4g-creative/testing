@@ -61,16 +61,30 @@ a {
 #webglCanvas {
     position: fixed;
     inset: 0;
+
     width: 100%;
     height: 100%;
+
     display: block;
+
     z-index: 0;
+
     pointer-events: none;
+
     opacity: 0;
-    transition: opacity 1.5s ease;
+
+    transition:
+        opacity 1.5s ease;
 }
 
-.site.is-visible ~ #webglCanvas {
+
+/*
+   IMPORTANT:
+   Canvas comes BEFORE .site in HTML,
+   therefore "~" selector cannot be used.
+*/
+
+body:not(.loading) #webglCanvas {
     opacity: 1;
 }
 
@@ -82,14 +96,19 @@ a {
 .loader {
     position: fixed;
     inset: 0;
+
     z-index: 9999;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     background: #050505;
     color: #ffffff;
+
     opacity: 1;
     visibility: visible;
+
     transition:
         opacity 0.8s ease,
         visibility 0.8s ease;
@@ -107,8 +126,12 @@ a {
 
 .loader-brand {
     margin-bottom: 45px;
-    font-size: clamp(34px, 5vw, 72px);
+
+    font-size:
+        clamp(34px, 5vw, 72px);
+
     font-weight: 700;
+
     letter-spacing: -0.07em;
 }
 
@@ -116,35 +139,50 @@ a {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
+
     gap: 30px;
+
     margin-bottom: 12px;
 }
 
 .loader-status {
     font-size: 10px;
+
     font-weight: 500;
+
     letter-spacing: 0.18em;
-    color: rgba(255, 255, 255, 0.48);
+
+    color:
+        rgba(255, 255, 255, 0.48);
 }
 
 .loader-number {
     font-size: 12px;
+
     letter-spacing: 0.08em;
-    color: rgba(255, 255, 255, 0.7);
+
+    color:
+        rgba(255, 255, 255, 0.7);
 }
 
 .loader-track {
     width: 100%;
     height: 1px;
-    background: rgba(255, 255, 255, 0.16);
+
+    background:
+        rgba(255, 255, 255, 0.16);
+
     overflow: hidden;
 }
 
 .loader-progress {
     width: 0%;
     height: 100%;
+
     background: #ffffff;
-    transform-origin: left center;
+
+    transform-origin:
+        left center;
 }
 
 
@@ -154,11 +192,16 @@ a {
 
 .site {
     position: relative;
+
     z-index: 2;
+
     width: 100%;
+
     min-height: 100vh;
+
     opacity: 0;
     visibility: hidden;
+
     transition:
         opacity 1.2s ease,
         visibility 1.2s ease;
@@ -176,8 +219,10 @@ a {
 
 .navbar {
     position: fixed;
+
     top: 0;
     left: 0;
+
     width: 100%;
     height: 90px;
 
@@ -194,9 +239,13 @@ a {
 
 .brand {
     font-size: 18px;
+
     font-weight: 700;
+
     letter-spacing: -0.06em;
-    transition: opacity 0.3s ease;
+
+    transition:
+        opacity 0.3s ease;
 }
 
 .brand:hover {
@@ -206,19 +255,25 @@ a {
 .desktop-nav {
     display: flex;
     align-items: center;
+
     gap: 42px;
 }
 
 .desktop-nav a {
     position: relative;
+
     font-size: 10px;
+
     font-weight: 500;
+
     letter-spacing: 0.18em;
 }
 
 .desktop-nav a::after {
     content: "";
+
     position: absolute;
+
     left: 0;
     bottom: -7px;
 
@@ -227,15 +282,22 @@ a {
 
     background: #ffffff;
 
-    transform: scaleX(0);
-    transform-origin: right;
+    transform:
+        scaleX(0);
 
-    transition: transform 0.4s ease;
+    transform-origin:
+        right;
+
+    transition:
+        transform 0.4s ease;
 }
 
 .desktop-nav a:hover::after {
-    transform: scaleX(1);
-    transform-origin: left;
+    transform:
+        scaleX(1);
+
+    transform-origin:
+        left;
 }
 
 .menu-button {
@@ -243,9 +305,13 @@ a {
     height: 42px;
 
     display: none;
+
     flex-direction: column;
+
     align-items: flex-end;
+
     justify-content: center;
+
     gap: 6px;
 
     cursor: pointer;
@@ -253,8 +319,11 @@ a {
 
 .menu-button span {
     display: block;
+
     height: 1px;
+
     background: #ffffff;
+
     transition:
         width 0.3s ease,
         transform 0.3s ease;
@@ -279,14 +348,19 @@ a {
 
 .hero {
     position: relative;
+
     min-height: 100svh;
+
     width: 100%;
 
     display: flex;
+
     flex-direction: column;
+
     justify-content: space-between;
 
-    padding: 130px 4vw 45px;
+    padding:
+        130px 4vw 45px;
 
     overflow: hidden;
 }
@@ -294,46 +368,94 @@ a {
 .hero-top,
 .hero-bottom {
     position: relative;
+
     z-index: 3;
 
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
     font-size: 9px;
+
     font-weight: 500;
+
     letter-spacing: 0.18em;
 
-    color: rgba(255, 255, 255, 0.58);
+    color:
+        rgba(255, 255, 255, 0.58);
 }
 
-.hero-center {
+
+/* =========================================================
+   HERO CONTENT
+   ========================================================= */
+
+.hero-content {
     position: relative;
+
     z-index: 3;
 
     width: 100%;
+
     margin: auto 0;
 
-    transform: translateY(3vh);
+    transform:
+        translateY(3vh);
 }
 
+
+/*
+   Keep hero-center compatibility
+*/
+
+.hero-center {
+    position: relative;
+
+    z-index: 3;
+
+    width: 100%;
+
+    margin: auto 0;
+
+    transform:
+        translateY(3vh);
+}
+
+
 .hero-title {
-    font-size: clamp(76px, 15vw, 230px);
+    font-size:
+        clamp(76px, 15vw, 230px);
+
     font-weight: 700;
+
     line-height: 0.78;
+
     letter-spacing: -0.085em;
+
     text-transform: uppercase;
+
     overflow: hidden;
 }
+
+
+/*
+   HTML now uses these classes.
+*/
 
 .hero-title-line {
     display: block;
 
     opacity: 0;
-    transform: translateY(110%);
+
+    transform:
+        translateY(110%);
 
     animation:
-        heroLineIn 1.2s cubic-bezier(0.77, 0, 0.175, 1)
+        heroLineIn
+        1.2s
+        cubic-bezier(0.77, 0, 0.175, 1)
         forwards;
 }
 
@@ -341,59 +463,98 @@ a {
     animation-delay: 0.1s;
 }
 
-@keyframes heroLineIn {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.hero-title-line:nth-child(3) {
+    animation-delay: 0.2s;
 }
 
+
+@keyframes heroLineIn {
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+
+    }
+
+}
+
+
 .hero-description {
-    width: min(390px, 80vw);
+    width:
+        min(390px, 80vw);
 
     margin-top: 55px;
+
     margin-left: 34vw;
 
     font-size: 13px;
+
     line-height: 1.65;
 
-    color: rgba(255, 255, 255, 0.58);
+    color:
+        rgba(255, 255, 255, 0.58);
 
     opacity: 0;
-    transform: translateY(25px);
+
+    transform:
+        translateY(25px);
 
     animation:
-        fadeUp 1s ease 0.65s forwards;
+        fadeUp
+        1s
+        ease
+        0.65s
+        forwards;
 }
 
+
 @keyframes fadeUp {
+
     to {
+
         opacity: 1;
-        transform: translateY(0);
+
+        transform:
+            translateY(0);
+
     }
+
 }
+
 
 .scroll-indicator {
     display: flex;
+
     align-items: center;
+
     gap: 18px;
 }
 
 .scroll-indicator > span {
     font-size: 9px;
+
     letter-spacing: 0.17em;
 }
 
 .scroll-line {
     position: relative;
+
     width: 65px;
+
     height: 1px;
-    background: rgba(255, 255, 255, 0.22);
+
+    background:
+        rgba(255, 255, 255, 0.22);
+
     overflow: hidden;
 }
 
 .scroll-line span {
     position: absolute;
+
     left: -100%;
     top: 0;
 
@@ -402,10 +563,15 @@ a {
 
     background: #ffffff;
 
-    animation: scrollLine 2s ease-in-out infinite;
+    animation:
+        scrollLine
+        2s
+        ease-in-out
+        infinite;
 }
 
 @keyframes scrollLine {
+
     0% {
         left: -100%;
     }
@@ -417,6 +583,7 @@ a {
     100% {
         left: 100%;
     }
+
 }
 
 
@@ -426,29 +593,42 @@ a {
 
 .section {
     position: relative;
+
     width: 100%;
-    padding: 15vw 4vw;
+
+    padding:
+        15vw 4vw;
 }
 
 .section-header {
     display: grid;
-    grid-template-columns: 80px 1fr;
+
+    grid-template-columns:
+        80px 1fr;
+
     align-items: start;
 
     padding-bottom: 35px;
 
-    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+    border-bottom:
+        1px solid
+        rgba(255, 255, 255, 0.16);
 }
 
 .section-index {
     font-size: 9px;
+
     letter-spacing: 0.18em;
-    color: rgba(255, 255, 255, 0.4);
+
+    color:
+        rgba(255, 255, 255, 0.4);
 }
 
 .section-header h2 {
     font-size: 11px;
+
     font-weight: 500;
+
     letter-spacing: 0.18em;
 }
 
@@ -457,28 +637,61 @@ a {
    WORK
    ========================================================= */
 
+.work {
+    position: relative;
+
+    width: 100%;
+
+    padding:
+        15vw 4vw;
+}
+
 .work-list {
     width: 100%;
 }
 
 .work-item {
     position: relative;
+
     padding: 9vw 0;
 
     cursor: none;
 
     opacity: 0;
-    transform: translateY(70px);
+
+    transform:
+        translateY(70px);
 
     transition:
         opacity 1s ease,
-        transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+        transform 1s
+        cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+
+/*
+   JS uses .is-visible
+*/
+
+.work-item.is-visible {
+    opacity: 1;
+
+    transform:
+        translateY(0);
+}
+
+
+/*
+   Keep old class compatible too
+*/
 
 .work-item.visible {
     opacity: 1;
-    transform: translateY(0);
+
+    transform:
+        translateY(0);
 }
+
 
 .work-item:nth-child(2) {
     padding-left: 12vw;
@@ -488,37 +701,40 @@ a {
     padding-left: 4vw;
 }
 
+
+/* =========================================================
+   WORK VISUAL
+   ========================================================= */
+
+.work-visual,
 .work-image {
     position: relative;
 
-    width: min(67vw, 1000px);
-    height: min(44vw, 650px);
+    width:
+        min(67vw, 1000px);
+
+    height:
+        min(44vw, 650px);
 
     overflow: hidden;
+
     background: #0d0d0d;
 }
 
+.work-item:nth-child(2) .work-visual,
 .work-item:nth-child(2) .work-image {
-    width: min(55vw, 820px);
+    width:
+        min(55vw, 820px);
 }
 
+.work-item:nth-child(3) .work-visual,
 .work-item:nth-child(3) .work-image {
-    width: min(72vw, 1080px);
+    width:
+        min(72vw, 1080px);
 }
 
-.work-image-inner {
-    position: absolute;
-    inset: -5%;
 
-    transition:
-        transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.work-item:hover .work-image-inner {
-    transform: scale(1.06);
-}
-
-.work-one {
+.work-visual-01 {
     background:
         radial-gradient(
             circle at 50% 50%,
@@ -538,7 +754,8 @@ a {
         );
 }
 
-.work-two {
+
+.work-visual-02 {
     background:
         radial-gradient(
             circle at 70% 35%,
@@ -553,7 +770,8 @@ a {
         );
 }
 
-.work-three {
+
+.work-visual-03 {
     background:
         radial-gradient(
             ellipse at 45% 60%,
@@ -568,43 +786,76 @@ a {
         );
 }
 
+
+/* =========================================================
+   WORK INFO
+   ========================================================= */
+
 .work-info {
-    width: min(67vw, 1000px);
+    width:
+        min(67vw, 1000px);
 
     display: flex;
+
     align-items: flex-start;
+
     justify-content: space-between;
 
     padding-top: 18px;
 }
 
 .work-item:nth-child(2) .work-info {
-    width: min(55vw, 820px);
+    width:
+        min(55vw, 820px);
 }
 
 .work-item:nth-child(3) .work-info {
-    width: min(72vw, 1080px);
+    width:
+        min(72vw, 1080px);
 }
 
+.work-info h2,
 .work-info h3 {
-    font-size: clamp(18px, 2vw, 28px);
+    font-size:
+        clamp(18px, 2vw, 28px);
+
     font-weight: 500;
+
     letter-spacing: -0.045em;
+}
+
+.work-number,
+.work-category {
+    font-size: 9px;
+
+    letter-spacing: 0.12em;
+
+    color:
+        rgba(255, 255, 255, 0.4);
+}
+
+.work-category {
+    padding-top: 4px;
 }
 
 .work-info p {
     margin-top: 7px;
 
     font-size: 9px;
+
     letter-spacing: 0.14em;
 
-    color: rgba(255, 255, 255, 0.4);
+    color:
+        rgba(255, 255, 255, 0.4);
 }
 
 .work-info > span {
     font-size: 9px;
+
     letter-spacing: 0.12em;
-    color: rgba(255, 255, 255, 0.4);
+
+    color:
+        rgba(255, 255, 255, 0.4);
 }
 
 
@@ -613,27 +864,43 @@ a {
    ========================================================= */
 
 .about {
+    position: relative;
+
+    width: 100%;
+
     min-height: 100vh;
+
+    padding:
+        15vw 4vw;
 }
 
 .about-content {
     display: grid;
-    grid-template-columns: 1.5fr 0.7fr;
+
+    grid-template-columns:
+        1.5fr 0.7fr;
+
     gap: 10vw;
 
     padding-top: 12vw;
 }
 
 .about-title {
-    font-size: clamp(48px, 8vw, 125px);
+    font-size:
+        clamp(48px, 8vw, 125px);
+
     font-weight: 500;
+
     line-height: 0.92;
+
     letter-spacing: -0.075em;
 }
 
 .about-title span {
     display: block;
-    color: rgba(255, 255, 255, 0.38);
+
+    color:
+        rgba(255, 255, 255, 0.38);
 }
 
 .about-text {
@@ -646,9 +913,11 @@ a {
     margin-bottom: 30px;
 
     font-size: 13px;
+
     line-height: 1.7;
 
-    color: rgba(255, 255, 255, 0.52);
+    color:
+        rgba(255, 255, 255, 0.52);
 }
 
 
@@ -657,11 +926,20 @@ a {
    ========================================================= */
 
 .contact {
+    position: relative;
+
+    width: 100%;
+
     min-height: 80vh;
 
     display: flex;
+
     flex-direction: column;
+
     justify-content: space-between;
+
+    padding:
+        15vw 4vw;
 }
 
 .contact-content {
@@ -672,27 +950,36 @@ a {
     margin-bottom: 30px;
 
     font-size: 10px;
+
     letter-spacing: 0.18em;
 
-    color: rgba(255, 255, 255, 0.42);
+    color:
+        rgba(255, 255, 255, 0.42);
 }
 
 .contact-link {
     display: inline-block;
 
-    font-size: clamp(54px, 10vw, 150px);
+    font-size:
+        clamp(54px, 10vw, 150px);
+
     font-weight: 500;
+
     line-height: 0.85;
+
     letter-spacing: -0.085em;
 
     transition:
         opacity 0.4s ease,
-        transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        transform 0.5s
+        cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .contact-link:hover {
     opacity: 0.45;
-    transform: translateX(15px);
+
+    transform:
+        translateX(15px);
 }
 
 
@@ -704,23 +991,30 @@ a {
     width: 100%;
 
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
 
-    padding: 35px 4vw;
+    grid-template-columns:
+        1fr 1fr 1fr;
 
-    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    padding:
+        35px 4vw;
+
+    border-top:
+        1px solid
+        rgba(255, 255, 255, 0.14);
 
     font-size: 9px;
+
     letter-spacing: 0.14em;
 
-    color: rgba(255, 255, 255, 0.4);
+    color:
+        rgba(255, 255, 255, 0.4);
 }
 
-.footer div:nth-child(2) {
+.footer span:nth-child(2) {
     text-align: center;
 }
 
-.footer div:last-child {
+.footer span:last-child {
     text-align: right;
 }
 
@@ -731,41 +1025,71 @@ a {
 
 .menu-overlay {
     position: fixed;
+
     inset: 0;
 
     z-index: 500;
 
     display: flex;
+
     align-items: center;
+
     justify-content: center;
 
     background: #050505;
 
     opacity: 0;
+
     visibility: hidden;
 
-    transform: translateY(-100%);
+    transform:
+        translateY(-100%);
 
     transition:
         opacity 0.6s ease,
         visibility 0.6s ease,
-        transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+        transform 0.8s
+        cubic-bezier(0.77, 0, 0.175, 1);
 }
+
+
+/*
+   JS uses .is-open
+*/
+
+.menu-overlay.is-open {
+    opacity: 1;
+
+    visibility: visible;
+
+    transform:
+        translateY(0);
+}
+
+
+/*
+   Keep old class compatible
+*/
 
 .menu-overlay.open {
     opacity: 1;
+
     visibility: visible;
-    transform: translateY(0);
+
+    transform:
+        translateY(0);
 }
 
 .menu-close {
     position: absolute;
+
     top: 30px;
     right: 4vw;
 
     color: #ffffff;
 
     font-size: 10px;
+
     letter-spacing: 0.18em;
 
     cursor: pointer;
@@ -773,26 +1097,35 @@ a {
 
 .overlay-nav {
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
 
     gap: 15px;
 }
 
 .overlay-nav a {
-    font-size: clamp(45px, 10vw, 110px);
+    font-size:
+        clamp(45px, 10vw, 110px);
+
     font-weight: 500;
+
     line-height: 0.9;
+
     letter-spacing: -0.075em;
 
     transition:
         opacity 0.3s ease,
-        transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        transform 0.5s
+        cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .overlay-nav a:hover {
     opacity: 0.4;
-    transform: translateX(15px);
+
+    transform:
+        translateX(15px);
 }
 
 
@@ -802,6 +1135,7 @@ a {
 
 .cursor {
     position: fixed;
+
     top: 0;
     left: 0;
 
@@ -824,7 +1158,9 @@ a {
     left: -19px;
     top: -19px;
 
-    border: 1px solid #ffffff;
+    border:
+        1px solid #ffffff;
+
     border-radius: 50%;
 
     transition:
@@ -845,8 +1181,31 @@ a {
     top: -2.5px;
 
     border-radius: 50%;
+
     background: #ffffff;
 }
+
+
+/*
+   JS uses .is-view
+*/
+
+.cursor.is-view .cursor-ring {
+    width: 75px;
+    height: 75px;
+
+    left: -37.5px;
+    top: -37.5px;
+}
+
+.cursor.is-view .cursor-dot {
+    opacity: 0;
+}
+
+
+/*
+   Keep old class compatible
+*/
 
 .cursor.view .cursor-ring {
     width: 75px;
@@ -894,6 +1253,7 @@ a {
 
     .about-content {
         grid-template-columns: 1fr;
+
         gap: 60px;
     }
 
@@ -902,8 +1262,11 @@ a {
         padding-left: 0;
     }
 
+    .work-visual,
     .work-image,
+    .work-item:nth-child(2) .work-visual,
     .work-item:nth-child(2) .work-image,
+    .work-item:nth-child(3) .work-visual,
     .work-item:nth-child(3) .work-image {
         width: 80vw;
         height: 52vw;
@@ -914,6 +1277,7 @@ a {
     .work-item:nth-child(3) .work-info {
         width: 80vw;
     }
+
 }
 
 
@@ -925,7 +1289,9 @@ a {
 
     .navbar {
         height: 75px;
-        padding: 0 6vw;
+
+        padding:
+            0 6vw;
     }
 
     .desktop-nav {
@@ -938,7 +1304,9 @@ a {
 
     .hero {
         min-height: 100svh;
-        padding: 105px 6vw 30px;
+
+        padding:
+            105px 6vw 30px;
     }
 
     .hero-top,
@@ -951,13 +1319,17 @@ a {
     }
 
     .hero-title {
-        font-size: clamp(58px, 18vw, 110px);
+        font-size:
+            clamp(58px, 18vw, 110px);
+
         line-height: 0.82;
     }
 
     .hero-description {
         width: 75%;
+
         margin-top: 35px;
+
         margin-left: 18vw;
 
         font-size: 12px;
@@ -976,20 +1348,34 @@ a {
     }
 
     .section {
-        padding: 28vw 6vw;
+        padding:
+            28vw 6vw;
+    }
+
+    .work,
+    .about,
+    .contact {
+        padding:
+            28vw 6vw;
     }
 
     .section-header {
-        grid-template-columns: 45px 1fr;
+        grid-template-columns:
+            45px 1fr;
+
         padding-bottom: 25px;
     }
 
     .work-item {
-        padding: 18vw 0;
+        padding:
+            18vw 0;
     }
 
+    .work-visual,
     .work-image,
+    .work-item:nth-child(2) .work-visual,
     .work-item:nth-child(2) .work-image,
+    .work-item:nth-child(3) .work-visual,
     .work-item:nth-child(3) .work-image {
         width: 88vw;
         height: 62vw;
@@ -1001,6 +1387,7 @@ a {
         width: 88vw;
     }
 
+    .work-info h2,
     .work-info h3 {
         font-size: 17px;
     }
@@ -1014,7 +1401,8 @@ a {
     }
 
     .about-title {
-        font-size: clamp(43px, 13vw, 75px);
+        font-size:
+            clamp(43px, 13vw, 75px);
     }
 
     .about-text {
@@ -1037,24 +1425,35 @@ a {
         font-size: 17vw;
     }
 
+   /* =========================================================
+   FOOTER — MOBILE CONTINUATION
+   ========================================================= */
+
     .footer {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns:
+            1fr 1fr;
+
         row-gap: 20px;
-        padding: 28px 6vw;
+
+        padding:
+            28px 6vw;
     }
 
-    .footer div:nth-child(2) {
+    .footer span:nth-child(2) {
         text-align: right;
     }
 
-    .footer div:last-child {
-        grid-column: 1 / -1;
+    .footer span:last-child {
+        grid-column:
+            1 / -1;
+
         text-align: left;
     }
 
     .cursor {
         display: none;
     }
+
 }
 
 
@@ -1070,6 +1469,7 @@ a {
 
     .hero-description {
         width: 82%;
+
         margin-left: 8vw;
     }
 
@@ -1088,6 +1488,7 @@ a {
     .overlay-nav a {
         font-size: 18vw;
     }
+
 }
 
 
@@ -1104,18 +1505,27 @@ a {
     *,
     *::before,
     *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+        animation-duration:
+            0.01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        transition-duration:
+            0.01ms !important;
     }
 
     .hero-title-line {
         opacity: 1;
+
         transform: none;
     }
 
     .hero-description {
         opacity: 1;
+
         transform: none;
     }
-   }
+
+}
+     
