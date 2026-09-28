@@ -1,1229 +1,764 @@
 /* =========================================================
-   RAIN FOREST — SCRIPT.JS
-   PART 1
-   SETUP + NAVIGATION + YEAR
+   VOID — SCRIPT.JS
+   PART 3
+   INTERACTION + WEBGL FOUNDATION
    ========================================================= */
 
-document.addEventListener("DOMContentLoaded", () => {
 
-    /* =====================================================
-       GSAP SETUP
-       ===================================================== */
+/* =========================================================
+   DOM
+   ========================================================= */
 
-    if (typeof gsap !== "undefined") {
+const body = document.body;
 
-        if (typeof ScrollTrigger !== "undefined") {
-            gsap.registerPlugin(ScrollTrigger);
+const site = document.getElementById("site");
+
+const loader = document.getElementById("loader");
+const loaderProgress = document.getElementById("loaderProgress");
+const loaderPercent = document.getElementById("loaderPercent");
+
+const canvas = document.getElementById("webglCanvas");
+
+const cursor = document.getElementById("cursor");
+
+const menuButton = document.getElementById("menuButton");
+const menuClose = document.getElementById("menuClose");
+const menuOverlay = document.getElementById("menuOverlay");
+
+const overlayLinks = document.querySelectorAll(".overlay-nav a");
+const hoverElements = document.querySelectorAll("[data-cursor]");
+
+
+/* =========================================================
+   STATE
+   ========================================================= */
+
+const state = {
+
+    mouse: {
+        x: 0,
+        y: 0,
+        targetX: 0,
+        targetY: 0
+    },
+
+    scroll: {
+        current: 0,
+        target: 0,
+        velocity: 0,
+        last: 0
+    },
+
+    cursor: {
+        x: 0,
+        y: 0
+    },
+
+    loaded: false,
+
+    menuOpen: false
+
+};
+
+
+/* =========================================================
+   DEVICE
+   ========================================================= */
+
+const isTouchDevice =
+    "ontouchstart" in window ||
+    navigator.maxTouchPoints > 0;
+
+
+/* =========================================================
+   LOADER
+   ========================================================= */
+
+let loadingValue = 0;
+
+function runLoader() {
+
+    const interval = setInterval(() => {
+
+        loadingValue += Math.random() * 8 + 3;
+
+        if (loadingValue >= 100) {
+            loadingValue = 100;
         }
 
-    }
+        loaderProgress.style.width =
+            `${loadingValue}%`;
 
+        loaderPercent.textContent =
+            `${Math.floor(loadingValue)}%`;
 
-    /* =====================================================
-       CURRENT YEAR
-       ===================================================== */
 
-    const currentYear =
-        document.getElementById("currentYear");
+        if (loadingValue >= 100) {
 
-    if (currentYear) {
-        currentYear.textContent =
-            new Date().getFullYear();
-    }
-
-
-    /* =====================================================
-       MOBILE NAVIGATION
-       ===================================================== */
-
-    const navButton =
-        document.getElementById("navMenuButton");
-
-    const navLinks =
-        document.querySelector(".nav-links");
-
-
-    if (navButton && navLinks) {
-
-        navButton.addEventListener("click", () => {
-
-            const isOpen =
-                navButton.classList.toggle("is-open");
-
-            navLinks.classList.toggle(
-                "is-open",
-                isOpen
-            );
-
-            navButton.setAttribute(
-                "aria-expanded",
-                String(isOpen)
-            );
-
-        });
-
-
-        /* Close navigation after selecting a link */
-
-        navLinks
-            .querySelectorAll("a")
-            .forEach((link) => {
-
-                link.addEventListener("click", () => {
-
-                    navButton.classList.remove(
-                        "is-open"
-                    );
-
-                    navLinks.classList.remove(
-                        "is-open"
-                    );
-
-                    navButton.setAttribute(
-                        "aria-expanded",
-                        "false"
-                    );
-
-                });
-
-            });
-
-    }
-
-
-    /* =====================================================
-       SMOOTH ANCHOR SCROLL
-       ===================================================== */
-
-    document
-        .querySelectorAll('a[href^="#"]')
-        .forEach((link) => {
-
-            link.addEventListener("click", (event) => {
-
-                const targetId =
-                    link.getAttribute("href");
-
-                if (!targetId || targetId === "#") {
-                    return;
-                }
-
-                const target =
-                    document.querySelector(targetId);
-
-                if (!target) {
-                    return;
-                }
-
-                event.preventDefault();
-
-                target.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                });
-
-            });
-
-        });
-
-
-    /* =====================================================
-       GSAP AVAILABLE?
-       ===================================================== */
-
-    if (typeof gsap === "undefined") {
-        console.warn(
-            "Rain Forest: GSAP was not loaded."
-        );
-
-        return;
-    }
-
-
-    /* =====================================================
-       HERO INTRO
-       ===================================================== */
-
-    const heroTimeline =
-        gsap.timeline({
-            defaults: {
-                ease: "power3.out"
-            }
-        });
-
-
-    heroTimeline
-        .to(".hero-eyebrow", {
-            opacity: 1,
-            y: 0,
-            duration: 0.7
-        })
-        .to(".hero-title-line", {
-            opacity: 1,
-            y: 0,
-            rotateX: 0,
-            duration: 1.05,
-            stagger: 0.13
-        }, "-=0.35")
-        .to(".hero-description", {
-            opacity: 1,
-            y: 0,
-            duration: 0.8
-        }, "-=0.45")
-        .to(".hero-actions", {
-            opacity: 1,
-            y: 0,
-            duration: 0.7
-        }, "-=0.45")
-        .to(".hero-water-orb", {
-            opacity: 1,
-            duration: 1.2,
-            ease: "power2.out"
-        }, "-=1")
-        .to(".hero-droplet", {
-            opacity: 1,
-            duration: 0.7,
-            stagger: 0.12
-        }, "-=0.8");
-
-
-    /* =====================================================
-       PAGE READY
-       ===================================================== */
-
-    document.body.classList.add(
-        "rainforest-ready"
-    );
-
-});
-/* =========================================================
-   RAIN FOREST — SCRIPT.JS
-   PART 2
-   SCROLL REVEALS + JOURNEY FLOW
-   ========================================================= */
-
-
-/* =========================================================
-   GSAP SCROLL EFFECTS
-   ========================================================= */
-
-if (
-    typeof gsap !== "undefined" &&
-    typeof ScrollTrigger !== "undefined"
-) {
-
-    gsap.registerPlugin(ScrollTrigger);
-
-
-    /* =====================================================
-       GENERAL REVEALS
-       ===================================================== */
-
-    document
-        .querySelectorAll(".reveal")
-        .forEach((element) => {
-
-            gsap.fromTo(
-                element,
-
-                {
-                    opacity: 0,
-                    y: 45
-                },
-
-                {
-                    opacity: 1,
-                    y: 0,
-
-                    duration: 1,
-
-                    ease: "power3.out",
-
-                    scrollTrigger: {
-                        trigger: element,
-
-                        start: "top 84%",
-
-                        toggleActions:
-                            "play none none reverse",
-
-                        invalidateOnRefresh: true
-                    }
-                }
-            );
-
-        });
-
-
-    /* =====================================================
-       SECTION HEADINGS
-       ===================================================== */
-
-    document
-        .querySelectorAll(
-            ".section-heading h2, .journey-intro h2"
-        )
-        .forEach((heading) => {
-
-            gsap.fromTo(
-                heading,
-
-                {
-                    opacity: 0,
-                    y: 35
-                },
-
-                {
-                    opacity: 1,
-                    y: 0,
-
-                    duration: 1,
-
-                    ease: "power3.out",
-
-                    scrollTrigger: {
-                        trigger: heading,
-
-                        start: "top 82%",
-
-                        toggleActions:
-                            "play none none reverse",
-
-                        invalidateOnRefresh: true
-                    }
-                }
-            );
-
-        });
-
-
-    /* =====================================================
-       JOURNEY
-       ===================================================== */
-
-    const journeyTrack =
-        document.querySelector(
-            ".journey-track"
-        );
-
-    const journeyProgress =
-        document.querySelector(
-            ".journey-progress"
-        );
-
-    const journeyItems =
-        document.querySelectorAll(
-            ".journey-item"
-        );
-
-
-    if (
-        journeyTrack &&
-        journeyProgress
-    ) {
-
-
-        /* ================================================
-           JOURNEY PROGRESS LINE
-           ================================================ */
-
-        gsap.fromTo(
-            journeyProgress,
-
-            {
-                height: "0%"
-            },
-
-            {
-                height: "100%",
-
-                ease: "none",
-
-                scrollTrigger: {
-                    trigger: journeyTrack,
-
-                    start: "top 72%",
-
-                    end: "bottom 58%",
-
-                    scrub: 1,
-
-                    invalidateOnRefresh: true
-                }
-            }
-        );
-
-
-        /* ================================================
-           JOURNEY ITEMS
-           ================================================ */
-
-        journeyItems.forEach((item) => {
-
-            gsap.fromTo(
-                item,
-
-                {
-                    opacity: 0,
-                    x: -45
-                },
-
-                {
-                    opacity: 1,
-                    x: 0,
-
-                    duration: 0.9,
-
-                    ease: "power3.out",
-
-                    scrollTrigger: {
-                        trigger: item,
-
-                        start: "top 82%",
-
-                        toggleActions:
-                            "play none none reverse",
-
-                        invalidateOnRefresh: true
-                    }
-                }
-            );
-
-
-            /* ============================================
-               JOURNEY NUMBER
-               ============================================ */
-
-            const number =
-                item.querySelector(
-                    ".journey-number"
-                );
-
-
-            if (number) {
-
-                gsap.fromTo(
-                    number,
-
-                    {
-                        scale: 0.65,
-                        opacity: 0.3
-                    },
-
-                    {
-                        scale: 1,
-                        opacity: 1,
-
-                        duration: 0.6,
-
-                        ease: "back.out(2)",
-
-                        scrollTrigger: {
-                            trigger: item,
-
-                            start: "top 82%",
-
-                            toggleActions:
-                                "play none none reverse",
-
-                            invalidateOnRefresh: true
-                        }
-                    }
-                );
-
-            }
-
-        });
-
-    }
-
-
-    /* =====================================================
-       ABOUT CARD FLOAT
-       ===================================================== */
-
-    const aboutCard =
-        document.querySelector(
-            ".about-card"
-        );
-
-
-    if (aboutCard) {
-
-        gsap.to(
-            aboutCard,
-
-            {
-                y: -12,
-
-                rotation: -1,
-
-                duration: 3.5,
-
-                ease: "sine.inOut",
-
-                repeat: -1,
-
-                yoyo: true
-            }
-        );
-
-    }
-
-
-    /* =====================================================
-       CONTACT WATER PARALLAX
-       ===================================================== */
-
-    const contactWater =
-        document.querySelector(
-            ".contact-water"
-        );
-
-
-    if (contactWater) {
-
-        gsap.to(
-            contactWater,
-
-            {
-                x: -35,
-                y: 25,
-
-                ease: "none",
-
-                scrollTrigger: {
-                    trigger: ".contact",
-
-                    start: "top bottom",
-
-                    end: "bottom top",
-
-                    scrub: 1.5,
-
-                    invalidateOnRefresh: true
-                }
-            }
-        );
-
-    }
-
-
-    /* =====================================================
-       PROJECT WATER PARALLAX
-       ===================================================== */
-
-    document
-        .querySelectorAll(".project-card")
-        .forEach((card) => {
-
-            const water =
-                card.querySelector(
-                    ".project-water"
-                );
-
-
-            if (!water) {
-                return;
-            }
-
-
-            gsap.to(
-                water,
-
-                {
-                    y: -35,
-
-                    ease: "none",
-
-                    scrollTrigger: {
-                        trigger: card,
-
-                        start: "top bottom",
-
-                        end: "bottom top",
-
-                        scrub: 1.2,
-
-                        invalidateOnRefresh: true
-                    }
-                }
-            );
-
-        });
-
-
-    /* =====================================================
-       REFRESH SCROLLTRIGGER
-       ===================================================== */
-
-    window.addEventListener(
-        "load",
-        () => {
+            clearInterval(interval);
 
             setTimeout(() => {
 
-                ScrollTrigger.refresh();
+                finishLoading();
 
-            }, 400);
+            }, 450);
 
         }
-    );
+
+    }, 90);
 
 }
-/* =========================================================
-   RAIN FOREST — SCRIPT.JS
-   PART 3
-   WATER CURSOR + LIQUID INTERACTIONS
-   ========================================================= */
+
+
+function finishLoading() {
+
+    state.loaded = true;
+
+    site.classList.add("is-visible");
+
+    loader.classList.add("hidden");
+
+    body.classList.remove("loading");
+
+    startIntro();
+
+}
+
+
+runLoader();
 
 
 /* =========================================================
-   WATER CURSOR
+   INTRO
    ========================================================= */
 
-const waterCursor =
-    document.getElementById("waterCursor");
+function startIntro() {
 
-const canUsePointer =
-    window.matchMedia(
-        "(hover: hover) and (pointer: fine)"
-    ).matches;
+    const heroTitle =
+        document.querySelector(".hero-title");
 
+    const heroDescription =
+        document.querySelector(".hero-description");
 
-if (waterCursor && canUsePointer) {
+    const heroTop =
+        document.querySelector(".hero-top");
 
-    document.body.classList.add(
-        "cursor-active"
-    );
-
-
-    let cursorX = window.innerWidth / 2;
-    let cursorY = window.innerHeight / 2;
-
-    let targetX = cursorX;
-    let targetY = cursorY;
+    const heroBottom =
+        document.querySelector(".hero-bottom");
 
 
-    /* Track pointer */
+    if (!heroTitle) return;
 
-    window.addEventListener(
-        "pointermove",
-        (event) => {
 
-            targetX = event.clientX;
-            targetY = event.clientY;
-
-        },
+    heroTitle.animate(
+        [
+            {
+                opacity: 0,
+                transform:
+                    "translateY(60px)"
+            },
+            {
+                opacity: 1,
+                transform:
+                    "translateY(0)"
+            }
+        ],
         {
-            passive: true
+            duration: 1400,
+            easing:
+                "cubic-bezier(.16,1,.3,1)",
+            fill: "forwards"
         }
     );
 
 
-    /* Smooth cursor movement */
+    if (heroDescription) {
 
-    function animateCursor() {
+        heroDescription.animate(
+            [
+                {
+                    opacity: 0,
+                    transform:
+                        "translateY(30px)"
+                },
+                {
+                    opacity: 1,
+                    transform:
+                        "translateY(0)"
+                }
+            ],
+            {
+                duration: 1000,
+                delay: 350,
+                easing:
+                    "cubic-bezier(.16,1,.3,1)",
+                fill: "forwards"
+            }
+        );
 
-        cursorX +=
-            (targetX - cursorX) * 0.16;
-
-        cursorY +=
-            (targetY - cursorY) * 0.16;
+    }
 
 
-        waterCursor.style.transform =
+    if (heroTop) {
+
+        heroTop.animate(
+            [
+                {
+                    opacity: 0
+                },
+                {
+                    opacity: 1
+                }
+            ],
+            {
+                duration: 800,
+                delay: 500,
+                fill: "forwards"
+            }
+        );
+
+    }
+
+
+    if (heroBottom) {
+
+        heroBottom.animate(
+            [
+                {
+                    opacity: 0
+                },
+                {
+                    opacity: 1
+                }
+            ],
+            {
+                duration: 800,
+                delay: 700,
+                fill: "forwards"
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CUSTOM CURSOR
+   ========================================================= */
+
+if (!isTouchDevice) {
+
+    window.addEventListener(
+        "mousemove",
+        handleMouseMove,
+        { passive: true }
+    );
+
+
+    function handleMouseMove(event) {
+
+        state.cursor.x = event.clientX;
+        state.cursor.y = event.clientY;
+
+        state.mouse.targetX =
+            (event.clientX / window.innerWidth - 0.5);
+
+        state.mouse.targetY =
+            (event.clientY / window.innerHeight - 0.5);
+
+    }
+
+
+    function updateCursor() {
+
+        state.cursor.x +=
+            (state.mouse.clientX -
+                state.cursor.x) * 0.15;
+
+
+        cursor.style.transform =
             `translate3d(
-                ${cursorX}px,
-                ${cursorY}px,
+                ${state.cursor.x}px,
+                ${state.cursor.y}px,
                 0
-            ) translate(-50%, -50%)`;
+            )`;
 
+        requestAnimationFrame(updateCursor);
+
+    }
+
+
+    /*
+       Keep cursor position directly responsive.
+    */
+
+    window.addEventListener(
+        "mousemove",
+        event => {
+
+            cursor.style.transform =
+                `translate3d(
+                    ${event.clientX}px,
+                    ${event.clientY}px,
+                    0
+                )`;
+
+        },
+        { passive: true }
+    );
+
+
+    hoverElements.forEach(element => {
+
+        element.addEventListener(
+            "mouseenter",
+            () => {
+
+                const type =
+                    element.dataset.cursor;
+
+                cursor.classList.remove(
+                    "hover",
+                    "view"
+                );
+
+                if (type === "hover") {
+                    cursor.classList.add("hover");
+                }
+
+                if (type === "view") {
+                    cursor.classList.add("view");
+                }
+
+            }
+        );
+
+
+        element.addEventListener(
+            "mouseleave",
+            () => {
+
+                cursor.classList.remove(
+                    "hover",
+                    "view"
+                );
+
+            }
+        );
+
+    });
+
+}
+
+
+/* =========================================================
+   WEBGL CANVAS FOUNDATION
+   ========================================================= */
+
+const gl =
+    canvas.getContext("webgl", {
+        antialias: true,
+        alpha: true,
+        powerPreference: "high-performance"
+    });
+
+
+if (gl) {
+
+    resizeCanvas();
+
+    window.addEventListener(
+        "resize",
+        resizeCanvas
+    );
+
+
+    gl.clearColor(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    function resizeCanvas() {
+
+        const pixelRatio =
+            Math.min(
+                window.devicePixelRatio || 1,
+                2
+            );
+
+        canvas.width =
+            window.innerWidth * pixelRatio;
+
+        canvas.height =
+            window.innerHeight * pixelRatio;
+
+        canvas.style.width =
+            `${window.innerWidth}px`;
+
+        canvas.style.height =
+            `${window.innerHeight}px`;
+
+        gl.viewport(
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+    }
+
+
+    function renderCanvas() {
+
+        gl.clear(
+            gl.COLOR_BUFFER_BIT
+        );
 
         requestAnimationFrame(
-            animateCursor
+            renderCanvas
         );
 
     }
 
-    animateCursor();
 
-
-    /* Hover detection */
-
-    const interactiveElements =
-        document.querySelectorAll(
-            "a, button, input, textarea, .project-card"
-        );
-
-
-    interactiveElements.forEach((element) => {
-
-        element.addEventListener(
-            "pointerenter",
-            () => {
-
-                document.body.classList.add(
-                    "cursor-hover"
-                );
-
-            }
-        );
-
-
-        element.addEventListener(
-            "pointerleave",
-            () => {
-
-                document.body.classList.remove(
-                    "cursor-hover"
-                );
-
-            }
-        );
-
-    });
+    renderCanvas();
 
 }
 
 
 /* =========================================================
-   LIQUID BUTTON POINTER POSITION
+   MOUSE PARALLAX
    ========================================================= */
 
-document
-    .querySelectorAll(".liquid-button")
-    .forEach((button) => {
-
-        button.addEventListener(
-            "pointermove",
-            (event) => {
-
-                const rect =
-                    button.getBoundingClientRect();
-
-
-                const x =
-                    ((event.clientX - rect.left)
-                    / rect.width) * 100;
-
-
-                const y =
-                    ((event.clientY - rect.top)
-                    / rect.height) * 100;
-
-
-                button.style.setProperty(
-                    "--liquid-x",
-                    `${x}%`
-                );
-
-                button.style.setProperty(
-                    "--liquid-y",
-                    `${y}%`
-                );
-
-            },
-            {
-                passive: true
-            }
-        );
-
-
-        /* Small water response on touch */
-
-        button.addEventListener(
-            "pointerdown",
-            () => {
-
-                button.classList.add(
-                    "liquid-pressed"
-                );
-
-            }
-        );
-
-
-        button.addEventListener(
-            "pointerup",
-            () => {
-
-                button.classList.remove(
-                    "liquid-pressed"
-                );
-
-            }
-        );
-
-
-        button.addEventListener(
-            "pointercancel",
-            () => {
-
-                button.classList.remove(
-                    "liquid-pressed"
-                );
-
-            }
-        );
-
-    });
-
-
-/* =========================================================
-   PROJECT CARD POINTER EFFECT
-   ========================================================= */
-
-document
-    .querySelectorAll(".project-card")
-    .forEach((card) => {
-
-        card.addEventListener(
-            "pointermove",
-            (event) => {
-
-                if (
-                    event.pointerType === "touch"
-                ) {
-                    return;
-                }
-
-
-                const rect =
-                    card.getBoundingClientRect();
-
-
-                const x =
-                    (event.clientX - rect.left)
-                    / rect.width;
-
-
-                const y =
-                    (event.clientY - rect.top)
-                    / rect.height;
-
-
-                const rotateX =
-                    (0.5 - y) * 3;
-
-
-                const rotateY =
-                    (x - 0.5) * 3;
-
-
-                card.style.transform =
-                    `translateY(-6px)
-                     rotateX(${rotateX}deg)
-                     rotateY(${rotateY}deg)`;
-
-            },
-            {
-                passive: true
-            }
-        );
-
-
-        card.addEventListener(
-            "pointerleave",
-            () => {
-
-                card.style.transform = "";
-
-            }
-        );
-
-    });
-
-
-/* =========================================================
-   DROPLET CLICK / TOUCH RESPONSE
-   ========================================================= */
-
-document
-    .querySelectorAll(".hero-droplet")
-    .forEach((droplet) => {
-
-        droplet.addEventListener(
-            "pointerdown",
-            () => {
-
-                if (
-                    typeof gsap === "undefined"
-                ) {
-                    return;
-                }
-
-
-                gsap.fromTo(
-                    droplet,
-
-                    {
-                        scale: 1
-                    },
-
-                    {
-                        scale: 1.35,
-
-                        duration: 0.18,
-
-                        yoyo: true,
-
-                        repeat: 1,
-
-                        ease: "power2.out"
-                    }
-                );
-
-            }
-        );
-
-    });
-           /* =========================================================
-   RAIN FOREST — SCRIPT.JS
-   PART 4
-   FORM + MOBILE NAV + FINAL POLISH
-   ========================================================= */
-
-
-/* =========================================================
-   CONTACT FORM
-   ========================================================= */
-
-const contactForm =
-    document.getElementById("contactForm");
-
-
-if (contactForm) {
-
-    contactForm.addEventListener(
-        "submit",
-        (event) => {
-
-            event.preventDefault();
-
-
-            const name =
-                document.getElementById("name");
-
-            const email =
-                document.getElementById("email");
-
-            const message =
-                document.getElementById("message");
-
-
-            if (
-                !name ||
-                !email ||
-                !message
-            ) {
-                return;
-            }
-
-
-            if (
-                !name.value.trim() ||
-                !email.value.trim() ||
-                !message.value.trim()
-            ) {
-                return;
-            }
-
-
-            const submitButton =
-                contactForm.querySelector(
-                    ".submit-button"
-                );
-
-
-            if (submitButton) {
-
-                const originalHTML =
-                    submitButton.innerHTML;
-
-
-                submitButton.innerHTML =
-                    "<span>Message Ready</span>";
-
-
-                submitButton.disabled = true;
-
-
-                setTimeout(() => {
-
-                    submitButton.innerHTML =
-                        originalHTML;
-
-                    submitButton.disabled =
-                        false;
-
-                    contactForm.reset();
-
-                }, 2200);
-
-            }
-
-        }
-    );
+function updateMouse() {
+
+    state.mouse.x +=
+        (
+            state.mouse.targetX -
+            state.mouse.x
+        ) * 0.055;
+
+
+    state.mouse.y +=
+        (
+            state.mouse.targetY -
+            state.mouse.y
+        ) * 0.055;
 
 }
 
 
 /* =========================================================
-   MOBILE NAV ANIMATION
-   ========================================================= */
-
-const mobileNavButton =
-    document.getElementById(
-        "navMenuButton"
-    );
-
-const mobileNav =
-    document.querySelector(
-        ".nav-links"
-    );
-
-
-if (
-    mobileNavButton &&
-    mobileNav
-) {
-
-    const mobileQuery =
-        window.matchMedia(
-            "(max-width: 900px)"
-        );
-
-
-    function updateMobileNav() {
-
-        if (!mobileQuery.matches) {
-
-            mobileNav.style.removeProperty(
-                "display"
-            );
-
-            mobileNav.style.removeProperty(
-                "opacity"
-            );
-
-            mobileNav.style.removeProperty(
-                "transform"
-            );
-
-            return;
-
-        }
-
-
-        if (
-            !mobileNav.classList.contains(
-                "is-open"
-            )
-        ) {
-
-            mobileNav.style.display =
-                "none";
-
-            return;
-
-        }
-
-
-        mobileNav.style.display =
-            "flex";
-
-        mobileNav.style.opacity =
-            "1";
-
-        mobileNav.style.transform =
-            "translateY(0)";
-
-    }
-
-
-    mobileQuery.addEventListener(
-        "change",
-        updateMobileNav
-    );
-
-
-    mobileNavButton.addEventListener(
-        "click",
-        () => {
-
-            if (!mobileQuery.matches) {
-                return;
-            }
-
-
-            const isOpen =
-                mobileNav.classList.contains(
-                    "is-open"
-                );
-
-
-            if (isOpen) {
-
-                mobileNav.style.display =
-                    "flex";
-
-                mobileNav.style.opacity =
-                    "1";
-
-                mobileNav.style.transform =
-                    "translateY(0)";
-
-            } else {
-
-                mobileNav.style.display =
-                    "none";
-
-            }
-
-        }
-    );
-
-
-    updateMobileNav();
-
-}
-
-
-/* =========================================================
-   NAVBAR SCROLL RESPONSE
-   ========================================================= */
-
-const header =
-    document.querySelector(
-        ".site-header"
-    );
-
-
-if (header) {
-
-    let lastScroll = 0;
-
-
-    window.addEventListener(
-        "scroll",
-        () => {
-
-            const currentScroll =
-                window.scrollY;
-
-
-            if (currentScroll > 30) {
-
-                header.classList.add(
-                    "header-scrolled"
-                );
-
-            } else {
-
-                header.classList.remove(
-                    "header-scrolled"
-                );
-
-            }
-
-
-            lastScroll =
-                currentScroll;
-
-        },
-        {
-            passive: true
-        }
-    );
-
-}
-
-
-/* =========================================================
-   RIPPLE EFFECT FOR TOUCH
-   ========================================================= */
-
-document
-    .querySelectorAll(
-        ".liquid-button, .project-card"
-    )
-    .forEach((element) => {
-
-        element.addEventListener(
-            "pointerdown",
-            (event) => {
-
-                if (
-                    event.pointerType !== "touch"
-                ) {
-                    return;
-                }
-
-
-                const ripple =
-                    document.createElement(
-                        "span"
-                    );
-
-
-                ripple.className =
-                    "touch-ripple";
-
-
-                const rect =
-                    element.getBoundingClientRect();
-
-
-                ripple.style.left =
-                    `${event.clientX - rect.left}px`;
-
-
-                ripple.style.top =
-                    `${event.clientY - rect.top}px`;
-
-
-                element.appendChild(
-                    ripple
-                );
-
-
-                setTimeout(() => {
-
-                    ripple.remove();
-
-                }, 700);
-
-            }
-        );
-
-    });
-
-
-/* =========================================================
-   CLEANUP ON PAGE EXIT
+   SCROLL TRACKING
    ========================================================= */
 
 window.addEventListener(
-    "pagehide",
+    "scroll",
     () => {
 
-        document.body.classList.remove(
-            "cursor-hover"
+        state.scroll.target =
+            window.scrollY;
+
+    },
+    { passive: true }
+);
+
+
+function updateScroll() {
+
+    state.scroll.current +=
+        (
+            state.scroll.target -
+            state.scroll.current
+        ) * 0.08;
+
+
+    state.scroll.velocity =
+        state.scroll.current -
+        state.scroll.last;
+
+
+    state.scroll.last =
+        state.scroll.current;
+
+}
+
+
+/* =========================================================
+   HERO PARALLAX
+   ========================================================= */
+
+function updateHeroParallax() {
+
+    const hero =
+        document.querySelector(".hero");
+
+    if (!hero) return;
+
+
+    const progress =
+        Math.min(
+            state.scroll.current /
+            window.innerHeight,
+            1
         );
 
-        document.body.classList.remove(
-            "cursor-active"
-        );
+
+    hero.style.transform =
+        `translate3d(
+            0,
+            ${progress * -45}px,
+            0
+        )`;
+
+}
+
+
+/* =========================================================
+   SECTION REVEALS
+   ========================================================= */
+
+const revealElements =
+    document.querySelectorAll(
+        ".work-item, .about-content, .contact-content"
+    );
+
+
+const revealObserver =
+    new IntersectionObserver(
+        entries => {
+
+            entries.forEach(entry => {
+
+                if (!entry.isIntersecting) {
+                    return;
+                }
+
+
+                entry.target.animate(
+                    [
+                        {
+                            opacity: 0,
+                            transform:
+                                "translateY(70px)"
+                        },
+                        {
+                            opacity: 1,
+                            transform:
+                                "translateY(0)"
+                        }
+                    ],
+                    {
+                        duration: 1100,
+                        easing:
+                            "cubic-bezier(.16,1,.3,1)",
+                        fill: "forwards"
+                    }
+                );
+
+
+                revealObserver.unobserve(
+                    entry.target
+                );
+
+            });
+
+        },
+        {
+            threshold: 0.12
+        }
+    );
+
+
+revealElements.forEach(
+    element =>
+        revealObserver.observe(element)
+);
+
+
+/* =========================================================
+   MENU
+   ========================================================= */
+
+function openMenu() {
+
+    state.menuOpen = true;
+
+    menuOverlay.classList.add("open");
+
+    body.classList.add("loading");
+
+}
+
+
+function closeMenu() {
+
+    state.menuOpen = false;
+
+    menuOverlay.classList.remove("open");
+
+    body.classList.remove("loading");
+
+}
+
+
+if (menuButton) {
+
+    menuButton.addEventListener(
+        "click",
+        openMenu
+    );
+
+}
+
+
+if (menuClose) {
+
+    menuClose.addEventListener(
+        "click",
+        closeMenu
+    );
+
+}
+
+
+overlayLinks.forEach(link => {
+
+    link.addEventListener(
+        "click",
+        () => {
+
+            closeMenu();
+
+        }
+    );
+
+});
+
+
+/* =========================================================
+   ESCAPE KEY
+   ========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape" &&
+            state.menuOpen
+        ) {
+
+            closeMenu();
+
+        }
 
     }
 );
 
 
 /* =========================================================
-   FINAL CONSOLE MESSAGE
+   MAIN ANIMATION LOOP
    ========================================================= */
 
-console.log(
-    "Rain Forest — experience initialized."
+function animationLoop() {
+
+    updateMouse();
+
+    updateScroll();
+
+    updateHeroParallax();
+
+    requestAnimationFrame(
+        animationLoop
+    );
+
+}
+
+
+animationLoop();
+
+
+/* =========================================================
+   RESIZE
+   ========================================================= */
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        if (state.menuOpen) {
+            closeMenu();
+        }
+
+    }
+);
+
+
+/* =========================================================
+   MOBILE TOUCH PARALLAX
+   ========================================================= */
+
+if (isTouchDevice) {
+
+    window.addEventListener(
+        "deviceorientation",
+        event => {
+
+            if (
+                event.gamma === null ||
+                event.beta === null
+            ) {
+                return;
+            }
+
+
+            state.mouse.targetX =
+                Math.max(
+                    -1,
+                    Math.min(
+                        1,
+                        event.gamma / 35
+                    )
+                );
+
+
+            state.mouse.targetY =
+                Math.max(
+                    -1,
+                    Math.min(
+                        1,
+                        (event.beta - 45) / 35
+                    )
+                );
+
+        },
+        {
+            passive: true
+        }
+    );
+
+}
+
+
+/* =========================================================
+   PAGE VISIBILITY
+   ========================================================= */
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+
+        if (
+            document.visibilityState ===
+            "hidden"
+        ) {
+            return;
+        }
+
+    }
 );
