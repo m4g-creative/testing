@@ -2,162 +2,172 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#050505"
     >
 
     <title>VOID — Interactive Experience</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
 
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
         rel="stylesheet"
     >
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="./style.css"
+    >
 </head>
 
-<body>
+<body class="loading">
 
     <!-- =====================================================
          LOADER
-    ====================================================== -->
+         ===================================================== -->
 
-    <div class="loader" id="loader">
-        <div class="loader-inner">
-            <span class="loader-label">LOADING</span>
+    <div
+        class="loader"
+        id="loader"
+        aria-hidden="true"
+    >
 
-            <div class="loader-line">
-                <div class="loader-progress" id="loaderProgress"></div>
+        <div class="loader-content">
+
+            <div class="loader-brand">
+                VOID.
             </div>
 
-            <span class="loader-percent" id="loaderPercent">0%</span>
+            <div class="loader-bottom">
+
+                <div class="loader-status">
+                    INITIALIZING EXPERIENCE
+                </div>
+
+                <div class="loader-number">
+                    <span id="loaderPercent">0</span>%
+                </div>
+
+            </div>
+
+            <div class="loader-track">
+                <div
+                    class="loader-progress"
+                    id="loaderProgress"
+                ></div>
+            </div>
+
         </div>
+
     </div>
 
 
     <!-- =====================================================
          WEBGL BACKGROUND
-    ====================================================== -->
+         ===================================================== -->
 
-    <canvas id="webglCanvas"></canvas>
+    <canvas
+        id="webglCanvas"
+        aria-hidden="true"
+    ></canvas>
 
 
     <!-- =====================================================
          CUSTOM CURSOR
-    ====================================================== -->
+         ===================================================== -->
 
-    <div class="cursor" id="cursor">
-        <div class="cursor-dot"></div>
+    <div
+        class="cursor"
+        id="cursor"
+        aria-hidden="true"
+    >
         <div class="cursor-ring"></div>
+        <div class="cursor-dot"></div>
     </div>
 
 
     <!-- =====================================================
-         SITE
-    ====================================================== -->
+         MAIN SITE
+         ===================================================== -->
 
-    <main class="site" id="site">
+    <main
+        class="site"
+        id="site"
+    >
 
-        <!-- ==================== NAVBAR ==================== -->
+        <!-- ================= NAVIGATION ================= -->
 
-        <header class="navbar">
+        <nav class="navbar">
 
-            <a href="#" class="brand" data-cursor="hover">
-                VOID<span>.</span>
+            <a
+                href="#hero"
+                class="brand"
+                aria-label="VOID home"
+            >
+                VOID.
             </a>
 
-            <nav class="desktop-nav">
+            <div class="desktop-nav">
 
-                <a href="#work" data-cursor="hover">
+                <a href="#work">
                     WORK
                 </a>
 
-                <a href="#about" data-cursor="hover">
+                <a href="#about">
                     ABOUT
                 </a>
 
-                <a href="#contact" data-cursor="hover">
+                <a href="#contact">
                     CONTACT
                 </a>
 
-            </nav>
+            </div>
 
             <button
                 class="menu-button"
                 id="menuButton"
-                data-cursor="hover"
+                type="button"
                 aria-label="Open menu"
+                aria-expanded="false"
             >
+
                 <span></span>
                 <span></span>
+
             </button>
 
-        </header>
+        </nav>
 
 
-        <!-- ==================== HERO ==================== -->
+        <!-- ================= HERO ================= -->
 
-        <section class="hero" id="hero">
+        <section
+            class="hero"
+            id="hero"
+        >
 
             <div class="hero-top">
 
-                <span class="eyebrow">
-                    DIGITAL EXPERIENCE / 01
-                </span>
-
-                <span class="hero-location">
-                    LA — NYC — WORLD
-                </span>
-
-            </div>
-
-
-            <div class="hero-content">
-
-                <div class="hero-title-wrap">
-
-                    <h1 class="hero-title">
-                        WE CREATE
-                        <span>WORLDS.</span>
-                    </h1>
-
-                </div>
-
-                <div class="hero-description">
-
-                    <p>
-                        Digital experiences built at the
-                        intersection of technology, design
-                        and imagination.
-                    </p>
-
-                    <a
-                        href="#work"
-                        class="explore-link"
-                        data-cursor="hover"
-                    >
-                        <span>EXPLORE</span>
-                        <span class="arrow">↘</span>
-                    </a>
-
-                </div>
-
-            </div>
-
-
-            <div class="hero-bottom">
-
                 <span>
-                    SCROLL TO ENTER
+                    CREATIVE TECHNOLOGY
                 </span>
-
-                <div class="scroll-line">
-                    <span></span>
-                </div>
 
                 <span>
                     2026
@@ -165,24 +175,68 @@
 
             </div>
 
+
+            <div class="hero-center">
+
+                <h1 class="hero-title">
+
+                    <span class="hero-title-line">
+                        ENTER
+                    </span>
+
+                    <span class="hero-title-line">
+                        THE VOID
+                    </span>
+
+                </h1>
+
+                <p class="hero-description">
+                    Digital experiences built at the
+                    intersection of technology,
+                    design and imagination.
+                </p>
+
+            </div>
+
+
+            <div class="hero-bottom">
+
+                <div class="hero-location">
+                    GLOBAL / REMOTE
+                </div>
+
+                <div class="scroll-indicator">
+
+                    <span>
+                        SCROLL TO EXPLORE
+                    </span>
+
+                    <div class="scroll-line">
+                        <span></span>
+                    </div>
+
+                </div>
+
+            </div>
+
         </section>
 
 
-        <!-- =================================================
-             WORK
-        ================================================== -->
+        <!-- ================= WORK ================= -->
 
-        <section class="work-section" id="work">
+        <section
+            class="work section"
+            id="work"
+        >
 
-            <div class="section-heading">
+            <div class="section-header">
 
-                <span class="section-number">
-                    02
+                <span class="section-index">
+                    01
                 </span>
 
                 <h2>
-                    SELECTED
-                    <span>WORK.</span>
+                    SELECTED WORK
                 </h2>
 
             </div>
@@ -195,18 +249,25 @@
                     data-cursor="view"
                 >
 
-                    <div class="work-image image-one">
-                        <div class="image-glow"></div>
+                    <div class="work-image">
+                        <div class="work-image-inner work-one"></div>
                     </div>
 
                     <div class="work-info">
 
                         <div>
-                            <span>01 / EXPERIENCE</span>
-                            <h3>UNKNOWN<br>MATTER</h3>
+                            <h3>
+                                DIGITAL WORLDS
+                            </h3>
+
+                            <p>
+                                Interactive / WebGL
+                            </p>
                         </div>
 
-                        <span class="work-arrow">↗</span>
+                        <span>
+                            01
+                        </span>
 
                     </div>
 
@@ -218,18 +279,25 @@
                     data-cursor="view"
                 >
 
-                    <div class="work-image image-two">
-                        <div class="image-glow"></div>
+                    <div class="work-image">
+                        <div class="work-image-inner work-two"></div>
                     </div>
 
                     <div class="work-info">
 
                         <div>
-                            <span>02 / DIGITAL</span>
-                            <h3>DEEP<br>SPACE</h3>
+                            <h3>
+                                NEW DIMENSIONS
+                            </h3>
+
+                            <p>
+                                Experience / Technology
+                            </p>
                         </div>
 
-                        <span class="work-arrow">↗</span>
+                        <span>
+                            02
+                        </span>
 
                     </div>
 
@@ -241,18 +309,25 @@
                     data-cursor="view"
                 >
 
-                    <div class="work-image image-three">
-                        <div class="image-glow"></div>
+                    <div class="work-image">
+                        <div class="work-image-inner work-three"></div>
                     </div>
 
                     <div class="work-info">
 
                         <div>
-                            <span>03 / INTERACTIVE</span>
-                            <h3>LIQUID<br>MEMORY</h3>
+                            <h3>
+                                FUTURE FORMS
+                            </h3>
+
+                            <p>
+                                Art Direction / Digital
+                            </p>
                         </div>
 
-                        <span class="work-arrow">↗</span>
+                        <span>
+                            03
+                        </span>
 
                     </div>
 
@@ -263,67 +338,87 @@
         </section>
 
 
-        <!-- =================================================
-             ABOUT
-        ================================================== -->
+        <!-- ================= ABOUT ================= -->
 
-        <section class="about-section" id="about">
+        <section
+            class="about section"
+            id="about"
+        >
 
-            <div class="about-number">
-                03
+            <div class="section-header">
+
+                <span class="section-index">
+                    02
+                </span>
+
+                <h2>
+                    ABOUT
+                </h2>
+
             </div>
+
 
             <div class="about-content">
 
-                <span class="eyebrow">
-                    WHO WE ARE
-                </span>
-
-                <h2>
-                    WE TURN
-                    <span>IDEAS</span>
-                    INTO EXPERIENCES.
+                <h2 class="about-title">
+                    WE CREATE
+                    <span>EXPERIENCES</span>
+                    THAT FEEL
+                    <span>ALIVE.</span>
                 </h2>
 
-                <p>
-                    We build immersive digital experiences
-                    that blur the line between technology
-                    and imagination.
-                </p>
+                <div class="about-text">
+
+                    <p>
+                        VOID is an experimental digital
+                        studio exploring the space between
+                        technology, motion and visual culture.
+                    </p>
+
+                    <p>
+                        We build immersive experiences
+                        designed to make people stop,
+                        interact and explore.
+                    </p>
+
+                </div>
 
             </div>
 
         </section>
 
 
-        <!-- =================================================
-             CONTACT
-        ================================================== -->
+        <!-- ================= CONTACT ================= -->
 
-        <section class="contact-section" id="contact">
+        <section
+            class="contact section"
+            id="contact"
+        >
 
-            <div class="contact-number">
-                04
-            </div>
+            <div class="section-header">
 
-            <div class="contact-content">
-
-                <span class="eyebrow">
-                    HAVE AN IDEA?
+                <span class="section-index">
+                    03
                 </span>
 
                 <h2>
-                    LET'S MAKE
-                    <span>SOMETHING.</span>
+                    CONTACT
                 </h2>
+
+            </div>
+
+
+            <div class="contact-content">
+
+                <p class="contact-label">
+                    HAVE AN IDEA?
+                </p>
 
                 <a
                     href="mailto:hello@example.com"
                     class="contact-link"
-                    data-cursor="hover"
                 >
-                    START A CONVERSATION
-                    <span>↗</span>
+                    LET'S TALK
                 </a>
 
             </div>
@@ -331,23 +426,21 @@
         </section>
 
 
-        <!-- =================================================
-             FOOTER
-        ================================================== -->
+        <!-- ================= FOOTER ================= -->
 
         <footer class="footer">
 
-            <span>
-                VOID STUDIO
-            </span>
+            <div>
+                VOID.
+            </div>
 
-            <span>
+            <div>
                 © 2026
-            </span>
+            </div>
 
-            <span>
+            <div>
                 DIGITAL EXPERIENCES
-            </span>
+            </div>
 
         </footer>
 
@@ -356,36 +449,52 @@
 
     <!-- =====================================================
          MENU OVERLAY
-    ====================================================== -->
+         ===================================================== -->
 
-    <div class="menu-overlay" id="menuOverlay">
+    <div
+        class="menu-overlay"
+        id="menuOverlay"
+        aria-hidden="true"
+    >
 
         <button
             class="menu-close"
             id="menuClose"
-            data-cursor="hover"
+            type="button"
+            aria-label="Close menu"
         >
             CLOSE
         </button>
 
-        <nav class="overlay-nav">
 
-            <a href="#hero">HOME</a>
-            <a href="#work">WORK</a>
-            <a href="#about">ABOUT</a>
-            <a href="#contact">CONTACT</a>
+        <div class="overlay-nav">
 
-        </nav>
+            <a href="#hero">
+                HOME
+            </a>
 
-        <div class="overlay-footer">
-            <span>CREATIVE TECHNOLOGY</span>
-            <span>2026</span>
+            <a href="#work">
+                WORK
+            </a>
+
+            <a href="#about">
+                ABOUT
+            </a>
+
+            <a href="#contact">
+                CONTACT
+            </a>
+
         </div>
 
     </div>
 
 
-    <script src="script.js"></script>
+    <!-- =====================================================
+         JAVASCRIPT
+         ===================================================== -->
+
+    <script src="./script.js"></script>
 
 </body>
 </html>
