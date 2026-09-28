@@ -1,21 +1,20 @@
 /* =========================================================
-   VOID — SCRIPT.JS
-   PART 3 — UPDATED / FIXED
+   VOID — IMMERSIVE EXPERIENCE
+   SCRIPT.JS
    ========================================================= */
 
 
 /* =========================================================
    DOM
-========================================================= */
+   ========================================================= */
 
 const body = document.body;
-
-const site = document.getElementById("site");
 
 const loader = document.getElementById("loader");
 const loaderProgress = document.getElementById("loaderProgress");
 const loaderPercent = document.getElementById("loaderPercent");
 
+const site = document.getElementById("site");
 const canvas = document.getElementById("webglCanvas");
 
 const cursor = document.getElementById("cursor");
@@ -27,18 +26,16 @@ const menuOverlay = document.getElementById("menuOverlay");
 const overlayLinks =
     document.querySelectorAll(".overlay-nav a");
 
-const cursorElements =
-    document.querySelectorAll("[data-cursor]");
+const workItems =
+    document.querySelectorAll(".work-item");
 
 
 /* =========================================================
    STATE
-========================================================= */
+   ========================================================= */
 
 const state = {
-
     loaded: false,
-
     menuOpen: false,
 
     mouse: {
@@ -50,22 +47,19 @@ const state = {
 
     cursor: {
         x: 0,
-        y: 0
+        y: 0,
+        targetX: 0,
+        targetY: 0
     },
 
-    scroll: {
-        current: 0,
-        target: 0,
-        velocity: 0,
-        last: 0
-    }
-
+    scroll: 0,
+    targetScroll: 0
 };
 
 
 /* =========================================================
    DEVICE
-========================================================= */
+   ========================================================= */
 
 const isTouchDevice =
     window.matchMedia("(pointer: coarse)").matches ||
@@ -74,294 +68,209 @@ const isTouchDevice =
 
 /* =========================================================
    LOADER
-========================================================= */
+   ========================================================= */
 
-let loadingValue = 0;
+let loaderValue = 0;
+let loaderTimer = null;
 let loaderFinished = false;
 
-function runLoader() {
+function updateLoader(value) {
 
-    if (!loader) {
-        finishLoading();
+    const safeValue =
+        Math.min(100, Math.max(0, value));
+
+    if (loaderProgress) {
+        loaderProgress.style.width =
+            safeValue + "%";
+    }
+
+    if (loaderPercent) {
+        loaderPercent.textContent =
+            Math.round(safeValue);
+    }
+}
+
+
+function finishLoader() {
+
+    if (loaderFinished) {
         return;
     }
 
-    const loaderTimer = setInterval(() => {
+    loaderFinished = true;
 
-        loadingValue +=
-            Math.floor(Math.random() * 12) + 5;
+    if (loaderTimer) {
+        clearInterval(loaderTimer);
+        loaderTimer = null;
+    }
 
+    updateLoader(100);
 
-        if (loadingValue >= 100) {
+    setTimeout(() => {
 
-            loadingValue = 100;
-
-            clearInterval(loaderTimer);
-
+        if (loader) {
+            loader.classList.add("hidden");
         }
 
-
-        if (loaderProgress) {
-
-            loaderProgress.style.width =
-                `${loadingValue}%`;
-
+        if (site) {
+            site.classList.add("is-visible");
         }
 
+        body.classList.remove("loading");
 
-        if (loaderPercent) {
+        state.loaded = true;
 
-            loaderPercent.textContent =
-                `${loadingValue}%`;
+        startIntro();
 
-        }
+    }, 350);
+}
 
 
-        if (
-            loadingValue >= 100 &&
-            !loaderFinished
-        ) {
+function startLoader() {
 
-            loaderFinished = true;
+    /*
+       Loader is completely independent
+       from WebGL and other effects.
+    */
 
-            setTimeout(
-                finishLoading,
-                500
+    updateLoader(0);
+
+    loaderTimer = setInterval(() => {
+
+        const remaining =
+            100 - loaderValue;
+
+        const increment =
+            Math.min(
+                remaining,
+                Math.floor(Math.random() * 10) + 5
             );
 
+        loaderValue += increment;
+
+        updateLoader(loaderValue);
+
+        if (loaderValue >= 100) {
+            finishLoader();
         }
 
-    }, 120);
-
+    }, 90);
 }
 
 
-function finishLoading() {
+/* =========================================================
+   START LOADER AFTER DOM
+   ========================================================= */
 
-    state.loaded = true;
+if (document.readyState === "loading") {
 
-    if (site) {
-        site.classList.add("is-visible");
-    }
+    document.addEventListener(
+        "DOMContentLoaded",
+        startLoader,
+        { once: true }
+    );
 
-    if (loader) {
-        loader.classList.add("hidden");
-    }
+} else {
 
-    body.classList.remove("loading");
-
-    startIntro();
+    startLoader();
 
 }
-
-
-runLoader();
 
 
 /* =========================================================
    INTRO
-========================================================= */
+   ========================================================= */
 
 function startIntro() {
 
-    const heroTitle =
-        document.querySelector(".hero-title");
+    document.body.classList.add("intro-complete");
 
-    const heroDescription =
-        document.querySelector(".hero-description");
+    requestAnimationFrame(() => {
 
-    const heroTop =
-        document.querySelector(".hero-top");
+        document.querySelectorAll(
+            ".hero-top, .hero-bottom"
+        ).forEach((element, index) => {
 
-    const heroBottom =
-        document.querySelector(".hero-bottom");
-
-
-    if (heroTitle) {
-
-        heroTitle.animate(
-            [
+            element.animate(
+                [
+                    {
+                        opacity: 0,
+                        transform: "translateY(20px)"
+                    },
+                    {
+                        opacity: 1,
+                        transform: "translateY(0)"
+                    }
+                ],
                 {
-                    opacity: 0,
-                    transform:
-                        "translateY(60px)"
-                },
-
-                {
-                    opacity: 1,
-                    transform:
-                        "translateY(0)"
+                    duration: 900,
+                    delay: 250 + index * 100,
+                    easing: "cubic-bezier(.22,1,.36,1)",
+                    fill: "forwards"
                 }
-            ],
-            {
-                duration: 1400,
-                easing:
-                    "cubic-bezier(.16,1,.3,1)",
-                fill: "forwards"
-            }
-        );
+            );
 
-    }
+        });
 
-
-    if (heroDescription) {
-
-        heroDescription.animate(
-            [
-                {
-                    opacity: 0,
-                    transform:
-                        "translateY(30px)"
-                },
-
-                {
-                    opacity: 1,
-                    transform:
-                        "translateY(0)"
-                }
-            ],
-            {
-                duration: 1000,
-                delay: 350,
-                easing:
-                    "cubic-bezier(.16,1,.3,1)",
-                fill: "forwards"
-            }
-        );
-
-    }
-
-
-    if (heroTop) {
-
-        heroTop.animate(
-            [
-                {
-                    opacity: 0
-                },
-
-                {
-                    opacity: 1
-                }
-            ],
-            {
-                duration: 800,
-                delay: 500,
-                fill: "forwards"
-            }
-        );
-
-    }
-
-
-    if (heroBottom) {
-
-        heroBottom.animate(
-            [
-                {
-                    opacity: 0
-                },
-
-                {
-                    opacity: 1
-                }
-            ],
-            {
-                duration: 800,
-                delay: 700,
-                fill: "forwards"
-            }
-        );
-
-    }
-
+    });
 }
 
 
 /* =========================================================
-   CUSTOM CURSOR
-========================================================= */
+   CURSOR
+   ========================================================= */
 
 if (!isTouchDevice && cursor) {
 
     window.addEventListener(
-        "mousemove",
-        event => {
+        "pointermove",
+        (event) => {
 
-            state.cursor.x = event.clientX;
-            state.cursor.y = event.clientY;
+            state.cursor.targetX =
+                event.clientX;
+
+            state.cursor.targetY =
+                event.clientY;
 
             state.mouse.targetX =
-                (event.clientX /
-                    window.innerWidth) - 0.5;
+                (event.clientX / window.innerWidth) * 2 - 1;
 
             state.mouse.targetY =
-                (event.clientY /
-                    window.innerHeight) - 0.5;
-
-
-            cursor.style.transform =
-                `translate3d(
-                    ${event.clientX}px,
-                    ${event.clientY}px,
-                    0
-                )`;
+                -(event.clientY / window.innerHeight) * 2 + 1;
 
         },
-        {
-            passive: true
-        }
+        { passive: true }
     );
 
 
-    cursorElements.forEach(element => {
+    function animateCursor() {
 
-        element.addEventListener(
-            "mouseenter",
-            () => {
+        state.cursor.x +=
+            (state.cursor.targetX - state.cursor.x) *
+            0.18;
 
-                const cursorType =
-                    element.dataset.cursor;
+        state.cursor.y +=
+            (state.cursor.targetY - state.cursor.y) *
+            0.18;
 
+        cursor.style.transform =
+            `translate3d(${state.cursor.x}px, ${state.cursor.y}px, 0)`;
 
-                cursor.classList.remove(
-                    "hover",
-                    "view"
-                );
+        requestAnimationFrame(animateCursor);
+    }
 
-
-                if (cursorType === "hover") {
-
-                    cursor.classList.add(
-                        "hover"
-                    );
-
-                }
+    animateCursor();
 
 
-                if (cursorType === "view") {
+    workItems.forEach((item) => {
 
-                    cursor.classList.add(
-                        "view"
-                    );
+        item.addEventListener("mouseenter", () => {
+            cursor.classList.add("view");
+        });
 
-                }
-
-            }
-        );
-
-
-        element.addEventListener(
-            "mouseleave",
-            () => {
-
-                cursor.classList.remove(
-                    "hover",
-                    "view"
-                );
-
-            }
-        );
+        item.addEventListener("mouseleave", () => {
+            cursor.classList.remove("view");
+        });
 
     });
 
@@ -369,35 +278,44 @@ if (!isTouchDevice && cursor) {
 
 
 /* =========================================================
-   WEBGL CANVAS FOUNDATION
-========================================================= */
+   WEBGL
+   ========================================================= */
 
 let gl = null;
+let webglSupported = false;
 
+function setupWebGL() {
 
-if (canvas) {
+    if (!canvas) {
+        return;
+    }
 
-    gl = canvas.getContext(
-        "webgl",
-        {
-            antialias: true,
-            alpha: true,
-            powerPreference:
-                "high-performance"
+    try {
+
+        gl =
+            canvas.getContext("webgl", {
+                antialias: true,
+                alpha: true,
+                powerPreference: "high-performance"
+            }) ||
+            canvas.getContext("experimental-webgl");
+
+        if (!gl) {
+            return;
         }
-    );
 
-
-    if (gl) {
+        webglSupported = true;
 
         resizeCanvas();
 
-        gl.clearColor(
-            0,
-            0,
-            0,
-            0
-        );
+    } catch (error) {
+
+        /*
+           WebGL failure must never stop
+           the rest of the website.
+        */
+
+        webglSupported = false;
 
     }
 
@@ -410,35 +328,24 @@ function resizeCanvas() {
         return;
     }
 
-
     const pixelRatio =
-        Math.min(
-            window.devicePixelRatio || 1,
-            2
-        );
-
+        Math.min(window.devicePixelRatio || 1, 2);
 
     canvas.width =
         Math.floor(
-            window.innerWidth *
-            pixelRatio
+            window.innerWidth * pixelRatio
         );
-
 
     canvas.height =
         Math.floor(
-            window.innerHeight *
-            pixelRatio
+            window.innerHeight * pixelRatio
         );
 
-
     canvas.style.width =
-        `${window.innerWidth}px`;
-
+        window.innerWidth + "px";
 
     canvas.style.height =
-        `${window.innerHeight}px`;
-
+        window.innerHeight + "px";
 
     gl.viewport(
         0,
@@ -446,235 +353,156 @@ function resizeCanvas() {
         canvas.width,
         canvas.height
     );
-
 }
 
 
-window.addEventListener(
-    "resize",
-    resizeCanvas
-);
+setupWebGL();
 
 
 /* =========================================================
-   WEBGL RENDER LOOP
-========================================================= */
+   SIMPLE WEBGL BACKGROUND
+   ========================================================= */
 
-function renderCanvas() {
+function renderWebGL() {
 
-    if (gl) {
-
-        gl.clear(
-            gl.COLOR_BUFFER_BIT
-        );
-
+    if (!webglSupported || !gl) {
+        return;
     }
 
+    const time =
+        performance.now() * 0.00015;
 
-    requestAnimationFrame(
-        renderCanvas
+    const mouseX =
+        state.mouse.x * 0.02;
+
+    const mouseY =
+        state.mouse.y * 0.02;
+
+    const red =
+        0.012 +
+        Math.sin(time) * 0.004 +
+        mouseX;
+
+    const green =
+        0.012 +
+        Math.cos(time * 1.3) * 0.004 +
+        mouseY;
+
+    const blue =
+        0.018 +
+        Math.sin(time * 0.7) * 0.005;
+
+    gl.clearColor(
+        Math.max(0, red),
+        Math.max(0, green),
+        Math.max(0, blue),
+        1
+    );
+
+    gl.clear(
+        gl.COLOR_BUFFER_BIT
     );
 
 }
 
 
-renderCanvas();
-
-
 /* =========================================================
    MOUSE PARALLAX
-========================================================= */
+   ========================================================= */
 
 function updateMouse() {
 
     state.mouse.x +=
-        (
-            state.mouse.targetX -
-            state.mouse.x
-        ) * 0.055;
-
+        (state.mouse.targetX - state.mouse.x) *
+        0.035;
 
     state.mouse.y +=
-        (
-            state.mouse.targetY -
-            state.mouse.y
-        ) * 0.055;
+        (state.mouse.targetY - state.mouse.y) *
+        0.035;
 
 }
 
 
 /* =========================================================
-   SCROLL TRACKING
-========================================================= */
+   SCROLL
+   ========================================================= */
 
 window.addEventListener(
     "scroll",
     () => {
 
-        state.scroll.target =
-            window.scrollY;
+        state.targetScroll =
+            window.scrollY || window.pageYOffset;
 
     },
-    {
-        passive: true
-    }
+    { passive: true }
 );
 
 
 function updateScroll() {
 
-    state.scroll.current +=
-        (
-            state.scroll.target -
-            state.scroll.current
-        ) * 0.08;
-
-
-    state.scroll.velocity =
-        state.scroll.current -
-        state.scroll.last;
-
-
-    state.scroll.last =
-        state.scroll.current;
-
-}
-
-
-/* =========================================================
-   HERO PARALLAX
-========================================================= */
-
-function updateHeroParallax() {
+    state.scroll +=
+        (state.targetScroll - state.scroll) *
+        0.08;
 
     const hero =
-        document.querySelector(".hero");
+        document.getElementById("hero");
 
+    if (hero && state.loaded) {
 
-    if (!hero) {
-        return;
+        const offset =
+            Math.min(state.scroll * 0.16, 180);
+
+        hero.style.transform =
+            `translate3d(0, ${offset}px, 0)`;
+
     }
-
-
-    const heroHeight =
-        window.innerHeight;
-
-
-    if (heroHeight <= 0) {
-        return;
-    }
-
-
-    const progress =
-        Math.min(
-            state.scroll.current /
-            heroHeight,
-            1
-        );
-
-
-    hero.style.transform =
-        `translate3d(
-            0,
-            ${progress * -45}px,
-            0
-        )`;
 
 }
 
 
 /* =========================================================
-   SECTION REVEALS
-========================================================= */
+   INTERSECTION OBSERVER
+   ========================================================= */
 
-const revealElements =
-    document.querySelectorAll(
-        ".work-item, .about-content, .contact-content"
-    );
+const revealObserver =
+    new IntersectionObserver(
+        (entries) => {
 
+            entries.forEach((entry) => {
 
-let revealObserver = null;
+                if (entry.isIntersecting) {
 
+                    entry.target.classList.add(
+                        "visible"
+                    );
 
-if ("IntersectionObserver" in window) {
+                    revealObserver.unobserve(
+                        entry.target
+                    );
 
-    revealObserver =
-        new IntersectionObserver(
-            entries => {
+                }
 
-                entries.forEach(
-                    entry => {
+            });
 
-                        if (
-                            !entry.isIntersecting
-                        ) {
-                            return;
-                        }
-
-
-                        entry.target.animate(
-                            [
-                                {
-                                    opacity: 0,
-                                    transform:
-                                        "translateY(70px)"
-                                },
-
-                                {
-                                    opacity: 1,
-                                    transform:
-                                        "translateY(0)"
-                                }
-                            ],
-                            {
-                                duration: 1100,
-                                easing:
-                                    "cubic-bezier(.16,1,.3,1)",
-                                fill: "forwards"
-                            }
-                        );
-
-
-                        revealObserver.unobserve(
-                            entry.target
-                        );
-
-                    }
-                );
-
-            },
-            {
-                threshold: 0.12
-            }
-        );
-
-
-    revealElements.forEach(
-        element => {
-
-            revealObserver.observe(
-                element
-            );
-
+        },
+        {
+            threshold: 0.12,
+            rootMargin: "0px 0px -8% 0px"
         }
     );
 
-} else {
 
-    revealElements.forEach(
-        element => {
+workItems.forEach((item) => {
 
-            element.style.opacity = "1";
+    revealObserver.observe(item);
 
-        }
-    );
-
-}
+});
 
 
 /* =========================================================
    MENU
-========================================================= */
+   ========================================================= */
 
 function openMenu() {
 
@@ -682,12 +510,25 @@ function openMenu() {
         return;
     }
 
-
     state.menuOpen = true;
 
-    menuOverlay.classList.add(
-        "open"
+    menuOverlay.classList.add("open");
+
+    menuOverlay.setAttribute(
+        "aria-hidden",
+        "false"
     );
+
+    if (menuButton) {
+
+        menuButton.setAttribute(
+            "aria-expanded",
+            "true"
+        );
+
+    }
+
+    body.style.overflow = "hidden";
 
 }
 
@@ -698,12 +539,27 @@ function closeMenu() {
         return;
     }
 
-
     state.menuOpen = false;
 
-    menuOverlay.classList.remove(
-        "open"
+    menuOverlay.classList.remove("open");
+
+    menuOverlay.setAttribute(
+        "aria-hidden",
+        "true"
     );
+
+    if (menuButton) {
+
+        menuButton.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+    }
+
+    if (!body.classList.contains("loading")) {
+        body.style.overflow = "";
+    }
 
 }
 
@@ -728,29 +584,23 @@ if (menuClose) {
 }
 
 
-overlayLinks.forEach(
-    link => {
+overlayLinks.forEach((link) => {
 
-        link.addEventListener(
-            "click",
-            () => {
+    link.addEventListener(
+        "click",
+        closeMenu
+    );
 
-                closeMenu();
-
-            }
-        );
-
-    }
-);
+});
 
 
 /* =========================================================
-   ESCAPE KEY
-========================================================= */
+   ESCAPE
+   ========================================================= */
 
 document.addEventListener(
     "keydown",
-    event => {
+    (event) => {
 
         if (
             event.key === "Escape" &&
@@ -766,54 +616,41 @@ document.addEventListener(
 
 
 /* =========================================================
-   MOBILE DEVICE ORIENTATION
-========================================================= */
+   RESIZE
+   ========================================================= */
 
-if (isTouchDevice) {
+window.addEventListener(
+    "resize",
+    () => {
 
-    window.addEventListener(
-        "deviceorientation",
-        event => {
+        resizeCanvas();
 
-            if (
-                event.gamma === null ||
-                event.beta === null
-            ) {
-                return;
-            }
+    },
+    { passive: true }
+);
 
 
-            state.mouse.targetX =
-                Math.max(
-                    -1,
-                    Math.min(
-                        1,
-                        event.gamma / 35
-                    )
-                );
+/* =========================================================
+   PAGE VISIBILITY
+   ========================================================= */
 
+document.addEventListener(
+    "visibilitychange",
+    () => {
 
-            state.mouse.targetY =
-                Math.max(
-                    -1,
-                    Math.min(
-                        1,
-                        (event.beta - 45) / 35
-                    )
-                );
-
-        },
-        {
-            passive: true
+        if (document.hidden) {
+            return;
         }
-    );
 
-}
+        resizeCanvas();
+
+    }
+);
 
 
 /* =========================================================
    MAIN ANIMATION LOOP
-========================================================= */
+   ========================================================= */
 
 function animationLoop() {
 
@@ -821,7 +658,7 @@ function animationLoop() {
 
     updateScroll();
 
-    updateHeroParallax();
+    renderWebGL();
 
     requestAnimationFrame(
         animationLoop
@@ -834,43 +671,31 @@ animationLoop();
 
 
 /* =========================================================
-   RESIZE MENU SAFETY
-========================================================= */
+   TOUCH SUPPORT
+   ========================================================= */
 
-window.addEventListener(
-    "resize",
-    () => {
+if (isTouchDevice) {
 
-        if (
-            state.menuOpen &&
-            window.innerWidth > 800
-        ) {
+    document.documentElement.classList.add(
+        "touch-device"
+    );
 
-            closeMenu();
-
-        }
-
-    }
-);
+}
 
 
 /* =========================================================
-   PAGE VISIBILITY
-========================================================= */
+   SAFETY FALLBACK
+   ========================================================= */
 
-document.addEventListener(
-    "visibilitychange",
-    () => {
+/*
+   If something unexpected prevents the normal loader
+   from completing, never leave the user stuck at 0%.
+*/
 
-        if (
-            document.visibilityState ===
-            "visible"
-        ) {
+setTimeout(() => {
 
-            state.scroll.target =
-                window.scrollY;
-
-        }
-
+    if (!loaderFinished) {
+        finishLoader();
     }
-);
+
+}, 5000);
