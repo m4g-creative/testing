@@ -1,12 +1,12 @@
 /* =========================================================
    VOID — PHASE 2
    CINEMATIC SCROLL JOURNEY
-   SCRIPT.JS — PART 1/3
+   SCRIPT.JS — PART 1/4
    ========================================================= */
 
 
 /* =========================================================
-   DOM REFERENCES
+   DOM
    ========================================================= */
 
 const body = document.body;
@@ -37,7 +37,7 @@ const overlayLinks =
 
 
 /* =========================================================
-   APPLICATION STATE
+   STATE
    ========================================================= */
 
 const state = {
@@ -51,9 +51,6 @@ const state = {
     scrollY: 0,
     targetScrollY: 0,
 
-    scrollProgress: 0,
-    targetScrollProgress: 0,
-
     menuOpen: false,
 
     isTouch:
@@ -64,7 +61,7 @@ const state = {
 
 
 /* =========================================================
-   THREE.JS VARIABLES
+   THREE
    ========================================================= */
 
 let scene = null;
@@ -73,7 +70,6 @@ let renderer = null;
 
 let heroObject = null;
 let innerObject = null;
-
 let particles = null;
 let particleMaterial = null;
 
@@ -81,12 +77,10 @@ let clock = null;
 
 
 /* =========================================================
-   WORLD SETTINGS
+   WORLD
    ========================================================= */
 
 const world = {
-
-    /* Camera */
 
     cameraX: 0,
     cameraY: 0,
@@ -96,9 +90,6 @@ const world = {
     targetCameraY: 0,
     targetCameraZ: 7,
 
-
-    /* Hero */
-
     heroX: 1.7,
     heroY: 0.15,
     heroZ: 0,
@@ -107,22 +98,20 @@ const world = {
     targetHeroY: 0.15,
     targetHeroZ: 0,
 
-
     heroScale: 1,
     targetHeroScale: 1,
 
+    rotationX: 0,
+    rotationY: 0,
 
-    heroRotationX: 0,
-    heroRotationY: 0,
-
-    targetHeroRotationX: 0,
-    targetHeroRotationY: 0
+    targetRotationX: 0,
+    targetRotationY: 0
 
 };
 
 
 /* =========================================================
-   UTILITY
+   UTILITIES
    ========================================================= */
 
 function clamp(
@@ -150,17 +139,14 @@ function lerp(
 
     return (
         current +
-        (
-            target -
-            current
-        ) *
+        (target - current) *
         amount
     );
 
 }
 
 
-function easeInOutCubic(
+function ease(
     value
 ) {
 
@@ -172,105 +158,10 @@ function easeInOutCubic(
         );
 
 
-    if (value < 0.5) {
-
-        return (
-            4 *
-            value *
-            value *
-            value
-        );
-
-    }
-
-
     return (
-        1 -
-        Math.pow(
-            -2 * value + 2,
-            3
-        ) /
-        2
-    );
-
-}
-
-
-/* =========================================================
-   SCROLL PROGRESS
-   ========================================================= */
-
-function calculateScrollProgress() {
-
-    const documentHeight =
-        document.documentElement
-            .scrollHeight;
-
-    const viewportHeight =
-        window.innerHeight;
-
-
-    const maximumScroll =
-        documentHeight -
-        viewportHeight;
-
-
-    if (
-        maximumScroll <= 0
-    ) {
-
-        return 0;
-
-    }
-
-
-    return clamp(
-        window.scrollY /
-        maximumScroll,
-        0,
-        1
-    );
-
-}
-
-
-/* =========================================================
-   SCROLL EVENT
-   ========================================================= */
-
-function setupScroll() {
-
-    state.scrollY =
-        window.scrollY;
-
-
-    state.targetScrollY =
-        window.scrollY;
-
-
-    state.scrollProgress =
-        calculateScrollProgress();
-
-
-    state.targetScrollProgress =
-        state.scrollProgress;
-
-
-    window.addEventListener(
-        "scroll",
-        function () {
-
-            state.targetScrollY =
-                window.scrollY;
-
-
-            state.targetScrollProgress =
-                calculateScrollProgress();
-
-        },
-        {
-            passive: true
-        }
+        value *
+        value *
+        (3 - 2 * value)
     );
 
 }
@@ -295,9 +186,7 @@ function setupMouse() {
                 (
                     event.clientX /
                     window.innerWidth
-                ) *
-                2 -
-                1;
+                ) * 2 - 1;
 
 
             state.targetMouseY =
@@ -305,9 +194,7 @@ function setupMouse() {
                     (
                         event.clientY /
                         window.innerHeight
-                    ) *
-                    2 -
-                    1
+                    ) * 2 - 1
                 );
 
         }
@@ -335,9 +222,7 @@ function setupTouch() {
                 !event.touches ||
                 !event.touches.length
             ) {
-
                 return;
-
             }
 
 
@@ -349,9 +234,7 @@ function setupTouch() {
                 (
                     touch.clientX /
                     window.innerWidth
-                ) *
-                2 -
-                1;
+                ) * 2 - 1;
 
 
             state.targetMouseY =
@@ -359,9 +242,7 @@ function setupTouch() {
                     (
                         touch.clientY /
                         window.innerHeight
-                    ) *
-                    2 -
-                    1
+                    ) * 2 - 1
                 );
 
         },
@@ -374,19 +255,13 @@ function setupTouch() {
 
 
 /* =========================================================
-   THREE.JS INITIALIZATION
+   THREE INITIALIZATION
    ========================================================= */
 
 function initThree() {
 
     if (!canvas) {
-
-        console.warn(
-            "webglCanvas was not found."
-        );
-
         return;
-
     }
 
 
@@ -396,7 +271,7 @@ function initThree() {
     ) {
 
         console.warn(
-            "Three.js was not loaded."
+            "Three.js not loaded."
         );
 
         return;
@@ -404,17 +279,9 @@ function initThree() {
     }
 
 
-    /* -----------------------------------------------------
-       SCENE
-       ----------------------------------------------------- */
-
     scene =
         new THREE.Scene();
 
-
-    /* -----------------------------------------------------
-       CAMERA
-       ----------------------------------------------------- */
 
     camera =
         new THREE.PerspectiveCamera(
@@ -432,10 +299,6 @@ function initThree() {
         7
     );
 
-
-    /* -----------------------------------------------------
-       RENDERER
-       ----------------------------------------------------- */
 
     renderer =
         new THREE.WebGLRenderer({
@@ -466,44 +329,19 @@ function initThree() {
     );
 
 
-    if (
-        "outputColorSpace" in renderer &&
-        THREE.SRGBColorSpace
-    ) {
+    renderer.outputEncoding =
+        THREE.sRGBEncoding;
 
-        renderer.outputColorSpace =
-            THREE.SRGBColorSpace;
-
-    } else {
-
-        renderer.outputEncoding =
-            THREE.sRGBEncoding;
-
-    }
-
-
-    /* -----------------------------------------------------
-       CLOCK
-       ----------------------------------------------------- */
 
     clock =
         new THREE.Clock();
 
 
-    /* -----------------------------------------------------
-       WORLD
-       ----------------------------------------------------- */
-
     createLights();
 
-    createHeroObject();
+    createHero();
 
     createParticles();
-
-
-    /* -----------------------------------------------------
-       RESIZE
-       ----------------------------------------------------- */
 
     resizeThree();
 
@@ -528,7 +366,7 @@ function createLights() {
     );
 
 
-    const whiteLight =
+    const white =
         new THREE.PointLight(
             0xffffff,
             4,
@@ -536,7 +374,7 @@ function createLights() {
         );
 
 
-    whiteLight.position.set(
+    white.position.set(
         3,
         4,
         5
@@ -544,11 +382,11 @@ function createLights() {
 
 
     scene.add(
-        whiteLight
+        white
     );
 
 
-    const purpleLight =
+    const purple =
         new THREE.PointLight(
             0x8b5cf6,
             7,
@@ -556,7 +394,7 @@ function createLights() {
         );
 
 
-    purpleLight.position.set(
+    purple.position.set(
         -4,
         1,
         2
@@ -564,11 +402,11 @@ function createLights() {
 
 
     scene.add(
-        purpleLight
+        purple
     );
 
 
-    const cyanLight =
+    const cyan =
         new THREE.PointLight(
             0x22d3ee,
             5,
@@ -576,7 +414,7 @@ function createLights() {
         );
 
 
-    cyanLight.position.set(
+    cyan.position.set(
         4,
         -3,
         1
@@ -584,34 +422,30 @@ function createLights() {
 
 
     scene.add(
-        cyanLight
+        cyan
     );
 
 }
 
 
 /* =========================================================
-   HERO 3D OBJECT
+   HERO
    ========================================================= */
 
-function createHeroObject() {
+function createHero() {
 
     heroObject =
         new THREE.Group();
 
 
-    /* -----------------------------------------------------
-       MAIN GEOMETRY
-       ----------------------------------------------------- */
-
-    const mainGeometry =
+    const geometry =
         new THREE.IcosahedronGeometry(
             1.55,
             2
         );
 
 
-    const mainMaterial =
+    const material =
         new THREE.MeshPhysicalMaterial({
 
             color: 0x101018,
@@ -631,21 +465,17 @@ function createHeroObject() {
         });
 
 
-    const mainMesh =
+    const main =
         new THREE.Mesh(
-            mainGeometry,
-            mainMaterial
+            geometry,
+            material
         );
 
 
     heroObject.add(
-        mainMesh
+        main
     );
 
-
-    /* -----------------------------------------------------
-       INNER WIREFRAME
-       ----------------------------------------------------- */
 
     const innerGeometry =
         new THREE.IcosahedronGeometry(
@@ -680,54 +510,41 @@ function createHeroObject() {
     );
 
 
-    /* -----------------------------------------------------
-       OUTER WIREFRAME
-       ----------------------------------------------------- */
-
-    const outerGeometry =
-        new THREE.IcosahedronGeometry(
-            1.9,
-            1
-        );
-
-
-    const outerMaterial =
-        new THREE.MeshBasicMaterial({
-
-            color: 0x22d3ee,
-
-            wireframe: true,
-
-            transparent: true,
-
-            opacity: 0.09
-
-        });
-
-
-    const outerObject =
+    const outer =
         new THREE.Mesh(
-            outerGeometry,
-            outerMaterial
+
+            new THREE.IcosahedronGeometry(
+                1.9,
+                1
+            ),
+
+            new THREE.MeshBasicMaterial({
+
+                color: 0x22d3ee,
+
+                wireframe: true,
+
+                transparent: true,
+
+                opacity: 0.09
+
+            })
+
         );
 
 
-    outerObject.rotation.x =
+    outer.rotation.x =
         0.4;
 
 
-    outerObject.rotation.y =
+    outer.rotation.y =
         0.7;
 
 
     heroObject.add(
-        outerObject
+        outer
     );
 
-
-    /* -----------------------------------------------------
-       ORBIT RINGS
-       ----------------------------------------------------- */
 
     heroObject.add(
         createOrbit(
@@ -762,19 +579,10 @@ function createHeroObject() {
     );
 
 
-    /* -----------------------------------------------------
-       START POSITION
-       ----------------------------------------------------- */
-
     heroObject.position.set(
         1.7,
         0.15,
         0
-    );
-
-
-    heroObject.scale.setScalar(
-        1
     );
 
 
@@ -783,6 +591,11 @@ function createHeroObject() {
     );
 
 }
+/* =========================================================
+   VOID — PHASE 2
+   SCRIPT.JS — PART 2/4
+   CINEMATIC SCROLL JOURNEY
+   ========================================================= */
 
 
 /* =========================================================
@@ -833,10 +646,9 @@ function createOrbit(
         rotationY;
 
 
-    ring.userData.rotationSpeed =
+    ring.userData.speed =
         0.0005 +
-        Math.random() *
-        0.001;
+        Math.random() * 0.001;
 
 
     return ring;
@@ -850,33 +662,32 @@ function createOrbit(
 
 function createParticles() {
 
-    const particleCount =
+    const count =
         state.isTouch
-            ? 700
-            : 1500;
+            ? 650
+            : 1400;
 
 
     const positions =
         new Float32Array(
-            particleCount * 3
+            count * 3
         );
 
 
     for (
         let i = 0;
-        i < particleCount;
+        i < count;
         i++
     ) {
 
         const radius =
             3 +
-            Math.random() * 7;
+            Math.random() * 8;
 
 
         const theta =
             Math.random() *
-            Math.PI *
-            2;
+            Math.PI * 2;
 
 
         const phi =
@@ -887,25 +698,19 @@ function createParticles() {
             );
 
 
-        positions[
-            i * 3
-        ] =
+        positions[i * 3] =
             radius *
             Math.sin(phi) *
             Math.cos(theta);
 
 
-        positions[
-            i * 3 + 1
-        ] =
+        positions[i * 3 + 1] =
             radius *
             Math.sin(phi) *
             Math.sin(theta);
 
 
-        positions[
-            i * 3 + 2
-        ] =
+        positions[i * 3 + 2] =
             radius *
             Math.cos(phi);
 
@@ -930,7 +735,10 @@ function createParticles() {
 
             color: 0xffffff,
 
-            size: 0.025,
+            size:
+                state.isTouch
+                    ? 0.035
+                    : 0.025,
 
             transparent: true,
 
@@ -1009,10 +817,63 @@ window.addEventListener(
     "resize",
     resizeThree
 );
+
+
 /* =========================================================
-   PHASE 2 — PART 2/3
-   CINEMATIC WORLD + SCROLL JOURNEY
+   SCROLL TARGET
    ========================================================= */
+
+function getScrollProgress() {
+
+    const maxScroll =
+        document.documentElement
+            .scrollHeight -
+        window.innerHeight;
+
+
+    if (
+        maxScroll <= 0
+    ) {
+
+        return 0;
+
+    }
+
+
+    return clamp(
+        window.scrollY /
+        maxScroll,
+        0,
+        1
+    );
+
+}
+
+
+/* =========================================================
+   SCROLL SETUP
+   ========================================================= */
+
+function setupScroll() {
+
+    state.scrollY =
+        window.scrollY;
+
+
+    window.addEventListener(
+        "scroll",
+        function () {
+
+            state.targetScrollY =
+                window.scrollY;
+
+        },
+        {
+            passive: true
+        }
+    );
+
+}
 
 
 /* =========================================================
@@ -1041,173 +902,135 @@ function updateInput() {
         lerp(
             state.scrollY,
             state.targetScrollY,
-            0.085
-        );
-
-
-    state.scrollProgress =
-        lerp(
-            state.scrollProgress,
-            state.targetScrollProgress,
-            0.075
+            0.08
         );
 
 }
 
 
 /* =========================================================
-   CINEMATIC CAMERA
+   CINEMATIC TIMELINE
    ========================================================= */
 
-function updateCameraJourney() {
+function updateJourney() {
 
-    if (!camera) {
+    if (
+        !camera ||
+        !heroObject
+    ) {
+
         return;
+
     }
 
 
     const progress =
-        state.scrollProgress;
-
-
-    /* -----------------------------------------------------
-       HERO
-       ----------------------------------------------------- */
-
-    const heroProgress =
-        easeInOutCubic(
-            clamp(
-                progress / 0.32,
-                0,
-                1
-            )
+        clamp(
+            state.scrollY /
+            Math.max(
+                1,
+                document.documentElement
+                    .scrollHeight -
+                window.innerHeight
+            ),
+            0,
+            1
         );
 
 
     /* -----------------------------------------------------
-       HERO → WORK
+       HERO PHASE
        ----------------------------------------------------- */
 
-    const workProgress =
-        easeInOutCubic(
-            clamp(
-                (
-                    progress -
-                    0.12
-                ) /
-                0.34,
-                0,
-                1
-            )
+    const hero =
+        ease(
+            progress / 0.22
         );
 
 
     /* -----------------------------------------------------
-       WORK → ABOUT
+       WORK PHASE
        ----------------------------------------------------- */
 
-    const aboutProgress =
-        easeInOutCubic(
-            clamp(
-                (
-                    progress -
-                    0.38
-                ) /
-                0.30,
-                0,
-                1
-            )
+    const work =
+        ease(
+            (
+                progress -
+                0.12
+            ) / 0.28
         );
 
 
     /* -----------------------------------------------------
-       ABOUT → CONTACT
+       ABOUT PHASE
        ----------------------------------------------------- */
 
-    const contactProgress =
-        easeInOutCubic(
-            clamp(
-                (
-                    progress -
-                    0.68
-                ) /
-                0.32,
-                0,
-                1
-            )
+    const about =
+        ease(
+            (
+                progress -
+                0.38
+            ) / 0.28
         );
 
 
     /* -----------------------------------------------------
-       CAMERA TARGET
+       CONTACT PHASE
        ----------------------------------------------------- */
 
-    let cameraX = 0;
-    let cameraY = 0;
+    const contact =
+        ease(
+            (
+                progress -
+                0.70
+            ) / 0.30
+        );
+
+
+    /* -----------------------------------------------------
+       CAMERA
+       ----------------------------------------------------- */
+
+    let cameraX =
+        state.mouseX * 0.18;
+
+
+    let cameraY =
+        state.mouseY * 0.12;
+
+
     let cameraZ = 7;
-
-
-    /*
-       Hero begins with subtle mouse-driven
-       camera movement.
-    */
-
-    cameraX +=
-        state.mouseX *
-        0.22;
-
-
-    cameraY +=
-        state.mouseY *
-        0.16;
-
-
-    /*
-       Work transition moves the camera
-       slightly forward and left.
-    */
-
-    cameraZ =
-        lerp(
-            cameraZ,
-            5.4,
-            workProgress
-        );
 
 
     cameraX =
         lerp(
             cameraX,
-            -0.65,
-            workProgress
+            -0.8,
+            work
         );
 
 
     cameraY =
         lerp(
             cameraY,
-            0.25,
-            workProgress
+            0.3,
+            work
         );
 
-
-    /*
-       About pushes the camera deeper.
-    */
 
     cameraZ =
         lerp(
             cameraZ,
-            4.7,
-            aboutProgress
+            5.2,
+            work
         );
 
 
     cameraX =
         lerp(
             cameraX,
-            0.25,
-            aboutProgress
+            0.35,
+            about
         );
 
 
@@ -1215,28 +1038,23 @@ function updateCameraJourney() {
         lerp(
             cameraY,
             -0.25,
-            aboutProgress
+            about
         );
 
-
-    /*
-       Contact slightly pulls the camera
-       back for the final composition.
-    */
 
     cameraZ =
         lerp(
             cameraZ,
-            5.8,
-            contactProgress
+            4.5,
+            about
         );
 
 
     cameraX =
         lerp(
             cameraX,
-            0.45,
-            contactProgress
+            0.5,
+            contact
         );
 
 
@@ -1244,13 +1062,17 @@ function updateCameraJourney() {
         lerp(
             cameraY,
             0.1,
-            contactProgress
+            contact
         );
 
 
-    /* -----------------------------------------------------
-       SMOOTH CAMERA
-       ----------------------------------------------------- */
+    cameraZ =
+        lerp(
+            cameraZ,
+            6,
+            contact
+        );
+
 
     world.targetCameraX =
         cameraX;
@@ -1268,7 +1090,7 @@ function updateCameraJourney() {
         lerp(
             world.cameraX,
             world.targetCameraX,
-            0.055
+            0.06
         );
 
 
@@ -1276,7 +1098,7 @@ function updateCameraJourney() {
         lerp(
             world.cameraY,
             world.targetCameraY,
-            0.055
+            0.06
         );
 
 
@@ -1284,151 +1106,66 @@ function updateCameraJourney() {
         lerp(
             world.cameraZ,
             world.targetCameraZ,
-            0.055
+            0.06
         );
 
 
-    camera.position.x =
-        world.cameraX;
-
-
-    camera.position.y =
-        world.cameraY;
-
-
-    camera.position.z =
-        world.cameraZ;
-
-
-    /*
-       Camera continuously looks toward
-       the center of the world.
-    */
-
-    camera.lookAt(
-        state.mouseX * 0.18,
-        state.mouseY * 0.12,
-        0
+    camera.position.set(
+        world.cameraX,
+        world.cameraY,
+        world.cameraZ
     );
-
-}
-
-
-/* =========================================================
-   HERO JOURNEY
-   ========================================================= */
-
-function updateHeroJourney(
-    elapsed
-) {
-
-    if (!heroObject) {
-        return;
-    }
-
-
-    const progress =
-        state.scrollProgress;
 
 
     /* -----------------------------------------------------
-       HERO EXIT
+       CAMERA LOOK TARGET
        ----------------------------------------------------- */
 
-    const exitProgress =
-        easeInOutCubic(
-            clamp(
-                progress / 0.42,
-                0,
-                1
-            )
-        );
+    camera.lookAt(
+        state.mouseX * 0.15,
+        state.mouseY * 0.1,
+        -progress * 1.5
+    );
 
 
-    /*
-       Starting position:
-       x = 1.7
-       y = 0.15
-       z = 0
-
-       During scroll:
-       object moves deeper and left.
-    */
+    /* -----------------------------------------------------
+       HERO POSITION
+       ----------------------------------------------------- */
 
     world.targetHeroX =
         1.7 -
-        exitProgress *
-        1.55;
+        work * 1.8;
 
 
     world.targetHeroY =
         0.15 +
-        exitProgress *
-        0.45;
+        work * 0.45;
 
 
     world.targetHeroZ =
-        -exitProgress *
-        2.2;
-
-
-    /* -----------------------------------------------------
-       SCALE
-       ----------------------------------------------------- */
-
-    const scaleUp =
-        clamp(
-            progress / 0.12,
-            0,
-            1
-        );
-
-
-    const scaleDown =
-        clamp(
-            (
-                progress -
-                0.12
-            ) /
-            0.40,
-            0,
-            1
-        );
+        -work * 2.8;
 
 
     world.targetHeroScale =
-        1 +
-        scaleUp * 0.12 -
-        scaleDown * 0.42;
+        1 -
+        work * 0.42;
 
 
-    /* -----------------------------------------------------
-       ROTATION
-       ----------------------------------------------------- */
-
-    world.targetHeroRotationX =
-        state.mouseY *
-        0.15 +
-        progress *
-        0.9;
+    world.targetRotationX =
+        state.mouseY * 0.18 +
+        progress * 1.2;
 
 
-    world.targetHeroRotationY =
-        state.mouseX *
-        0.18 +
-        progress *
-        1.8;
+    world.targetRotationY =
+        state.mouseX * 0.22 +
+        progress * 2.4;
 
-
-    /* -----------------------------------------------------
-       SMOOTH TRANSFORM
-       ----------------------------------------------------- */
 
     world.heroX =
         lerp(
             world.heroX,
             world.targetHeroX,
-            0.055
+            0.065
         );
 
 
@@ -1436,7 +1173,7 @@ function updateHeroJourney(
         lerp(
             world.heroY,
             world.targetHeroY,
-            0.055
+            0.065
         );
 
 
@@ -1444,7 +1181,7 @@ function updateHeroJourney(
         lerp(
             world.heroZ,
             world.targetHeroZ,
-            0.055
+            0.065
         );
 
 
@@ -1452,23 +1189,23 @@ function updateHeroJourney(
         lerp(
             world.heroScale,
             world.targetHeroScale,
-            0.055
+            0.065
         );
 
 
-    world.heroRotationX =
+    world.rotationX =
         lerp(
-            world.heroRotationX,
-            world.targetHeroRotationX,
-            0.055
+            world.rotationX,
+            world.targetRotationX,
+            0.065
         );
 
 
-    world.heroRotationY =
+    world.rotationY =
         lerp(
-            world.heroRotationY,
-            world.targetHeroRotationY,
-            0.055
+            world.rotationY,
+            world.targetRotationY,
+            0.065
         );
 
 
@@ -1490,32 +1227,90 @@ function updateHeroJourney(
 
 
     heroObject.rotation.x =
-        world.heroRotationX;
+        world.rotationX;
 
 
     heroObject.rotation.y =
-        world.heroRotationY;
+        world.rotationY;
 
 
-    /*
-       Small floating movement keeps
-       the object alive between scrolls.
-    */
+    /* -----------------------------------------------------
+       PARTICLE JOURNEY
+       ----------------------------------------------------- */
 
-    heroObject.position.y +=
-        Math.sin(
-            elapsed * 0.7
-        ) *
-        0.035;
+    if (particles) {
 
-}
+        particles.position.z =
+            -progress * 3;
+
+
+        particles.position.x =
+            state.mouseX * 0.35 -
+            progress * 0.8;
+
+
+        particles.position.y =
+            state.mouseY * 0.2 +
+            progress * 0.25;
+
+
+        particles.rotation.y =
+            progress * 0.8;
+
+
+        particles.rotation.x =
+            progress * 0.15;
+
+
+        if (particleMaterial) {
+
+            particleMaterial.opacity =
+                0.65 -
+                progress * 0.2;
+
+        }
+
+    }
+
+
+    /* -----------------------------------------------------
+       WORLD ROTATION
+       ----------------------------------------------------- */
+
+    scene.rotation.y =
+        progress * 0.06;
+
+
+    scene.rotation.x =
+        state.mouseY * 0.015;
+
+
+    /* -----------------------------------------------------
+       CSS SCROLL VARIABLE
+       ----------------------------------------------------- */
+
+    if (site) {
+
+        site.style.setProperty(
+            "--scroll-progress",
+            progress
+        );
+
+    }
+
+       }
+/* =========================================================
+   VOID — PHASE 2
+   SCRIPT.JS — PART 3/4
+   OBJECT ANIMATION + UI INTERACTION
+   ========================================================= */
 
 
 /* =========================================================
    HERO INTERNAL ANIMATION
    ========================================================= */
 
-function updateHeroDetails(
+function updateHeroAnimation(
     elapsed
 ) {
 
@@ -1524,9 +1319,41 @@ function updateHeroDetails(
     }
 
 
-    const progress =
-        state.scrollProgress;
+    /* -----------------------------------------------------
+       MAIN OBJECT
+       ----------------------------------------------------- */
 
+    heroObject.rotation.z =
+        Math.sin(
+            elapsed * 0.35
+        ) * 0.08;
+
+
+    /* -----------------------------------------------------
+       INNER WIREFRAME
+       ----------------------------------------------------- */
+
+    if (innerObject) {
+
+        innerObject.rotation.y -=
+            0.0035;
+
+
+        innerObject.rotation.z +=
+            0.0015;
+
+
+        innerObject.rotation.x +=
+            Math.sin(
+                elapsed * 0.5
+            ) * 0.0004;
+
+    }
+
+
+    /* -----------------------------------------------------
+       CHILD OBJECTS
+       ----------------------------------------------------- */
 
     heroObject.children.forEach(
         function (
@@ -1534,35 +1361,16 @@ function updateHeroDetails(
             index
         ) {
 
-            /* ------------------------------------------------
-               INNER WIREFRAME
-               ------------------------------------------------ */
-
             if (
-                child ===
-                innerObject
+                child.userData &&
+                child.userData.speed
             ) {
 
-                child.rotation.y -=
-                    0.0035;
-
-
                 child.rotation.z +=
-                    0.0014;
-
-
-                child.rotation.x +=
-                    Math.sin(
-                        elapsed * 0.4
-                    ) *
-                    0.0005;
+                    child.userData.speed;
 
             }
 
-
-            /* ------------------------------------------------
-               OUTER WIREFRAME
-               ------------------------------------------------ */
 
             if (
                 index === 2
@@ -1577,223 +1385,28 @@ function updateHeroDetails(
 
             }
 
-
-            /* ------------------------------------------------
-               ORBIT RINGS
-               ------------------------------------------------ */
-
-            if (
-                child.userData &&
-                child.userData.rotationSpeed
-            ) {
-
-                child.rotation.z +=
-                    child.userData
-                        .rotationSpeed *
-                    (
-                        1 +
-                        progress * 2
-                    );
-
-            }
-
         }
     );
 
-}
 
+    /* -----------------------------------------------------
+       FLOATING MOVEMENT
+       ----------------------------------------------------- */
 
-/* =========================================================
-   PARTICLE JOURNEY
-   ========================================================= */
-
-function updateParticles(
-    elapsed
-) {
-
-    if (!particles) {
-        return;
-    }
-
-
-    const progress =
-        state.scrollProgress;
-
-
-    /*
-       Base rotation.
-    */
-
-    particles.rotation.y =
-        elapsed * 0.018;
-
-
-    particles.rotation.x =
+    const floating =
         Math.sin(
-            elapsed * 0.1
-        ) *
-        0.05;
+            elapsed * 0.75
+        ) * 0.045;
 
 
-    /*
-       Scroll transforms the entire
-       particle field.
-    */
-
-    particles.position.z =
-        -progress * 2.4;
-
-
-    particles.position.x =
-        state.mouseX * 0.25 -
-        progress * 0.35;
-
-
-    particles.position.y =
-        state.mouseY * 0.16 +
-        progress * 0.15;
-
-
-    /*
-       Slightly reduce particles
-       during deep sections.
-    */
-
-    if (particleMaterial) {
-
-        particleMaterial.opacity =
-            0.65 -
-            progress * 0.18;
-
-    }
+    heroObject.position.y +=
+        floating;
 
 }
 
 
 /* =========================================================
-   3D WORLD DEPTH
-   ========================================================= */
-
-function updateWorldDepth() {
-
-    if (!scene) {
-        return;
-    }
-
-
-    const progress =
-        state.scrollProgress;
-
-
-    /*
-       Very subtle world rotation.
-       This makes the whole environment
-       feel connected instead of static.
-    */
-
-    scene.rotation.y =
-        progress *
-        0.035;
-
-
-    scene.rotation.x =
-        state.mouseY *
-        0.012;
-
-
-    /*
-       Keep movement subtle so the camera
-       remains the main cinematic motion.
-    */
-
-}
-
-
-/* =========================================================
-   SECTION PROGRESS CLASSES
-   ========================================================= */
-
-function updateSectionClasses() {
-
-    const progress =
-        state.scrollProgress;
-
-
-    if (site) {
-
-        site.style.setProperty(
-            "--scroll-progress",
-            progress
-        );
-
-    }
-
-
-    /*
-       Hero state.
-    */
-
-    if (progress > 0.08) {
-
-        body.classList.add(
-            "journey-started"
-        );
-
-    } else {
-
-        body.classList.remove(
-            "journey-started"
-        );
-
-    }
-
-
-    /*
-       Work state.
-    */
-
-    if (progress > 0.18) {
-
-        body.classList.add(
-            "work-journey"
-        );
-
-    } else {
-
-        body.classList.remove(
-            "work-journey"
-        );
-
-    }
-
-
-    /*
-       Deep journey.
-    */
-
-    if (progress > 0.62) {
-
-        body.classList.add(
-            "deep-journey"
-        );
-
-    } else {
-
-        body.classList.remove(
-            "deep-journey"
-        );
-
-    }
-
-}
-/* =========================================================
-   PHASE 2 — PART 3/3
-   INTERACTION + ANIMATION + INITIALIZATION
-   ========================================================= */
-
-
-/* =========================================================
-   CUSTOM CURSOR
+   CURSOR
    ========================================================= */
 
 function setupCursor() {
@@ -1802,7 +1415,9 @@ function setupCursor() {
         !cursor ||
         state.isTouch
     ) {
+
         return;
+
     }
 
 
@@ -1810,6 +1425,7 @@ function setupCursor() {
         cursor.querySelector(
             ".cursor-dot"
         );
+
 
     const ring =
         cursor.querySelector(
@@ -1821,18 +1437,23 @@ function setupCursor() {
         !dot ||
         !ring
     ) {
+
         return;
+
     }
 
 
     let cursorX =
         window.innerWidth / 2;
 
+
     let cursorY =
         window.innerHeight / 2;
 
+
     let ringX =
         cursorX;
+
 
     let ringY =
         cursorY;
@@ -1845,6 +1466,7 @@ function setupCursor() {
             cursorX =
                 event.clientX;
 
+
             cursorY =
                 event.clientY;
 
@@ -1852,7 +1474,7 @@ function setupCursor() {
     );
 
 
-    function cursorLoop() {
+    function animateCursor() {
 
         ringX =
             lerp(
@@ -1887,22 +1509,22 @@ function setupCursor() {
 
 
         requestAnimationFrame(
-            cursorLoop
+            animateCursor
         );
 
     }
 
 
-    cursorLoop();
+    animateCursor();
 
 
-    const interactiveElements =
+    const interactive =
         document.querySelectorAll(
             "a, button, .work-item"
         );
 
 
-    interactiveElements.forEach(
+    interactive.forEach(
         function (element) {
 
             element.addEventListener(
@@ -1952,7 +1574,7 @@ function setupCursor() {
 
 
 /* =========================================================
-   WORK OBSERVER
+   WORK REVEAL
    ========================================================= */
 
 function setupWorkObserver() {
@@ -1961,7 +1583,9 @@ function setupWorkObserver() {
         !workItems ||
         !workItems.length
     ) {
+
         return;
+
     }
 
 
@@ -2055,6 +1679,10 @@ function closeMenu() {
 }
 
 
+/* =========================================================
+   MENU SETUP
+   ========================================================= */
+
 function setupMenu() {
 
     if (menuButton) {
@@ -2123,7 +1751,7 @@ function setupMenu() {
 
 
 /* =========================================================
-   VISIBILITY
+   PAGE VISIBILITY
    ========================================================= */
 
 function setupVisibility() {
@@ -2135,7 +1763,9 @@ function setupVisibility() {
             if (
                 document.hidden
             ) {
+
                 return;
+
             }
 
 
@@ -2148,20 +1778,47 @@ function setupVisibility() {
 
 
 /* =========================================================
-   REDUCED MOTION
+   PAGE EVENTS
    ========================================================= */
 
-function prefersReducedMotion() {
+function setupPageEvents() {
 
-    return window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-    ).matches;
+    window.addEventListener(
+        "pageshow",
+        function () {
+
+            resizeThree();
+
+        }
+    );
+
+
+    window.addEventListener(
+        "orientationchange",
+        function () {
+
+            setTimeout(
+                function () {
+
+                    resizeThree();
+
+                },
+                150
+            );
+
+        }
+    );
 
 }
+/* =========================================================
+   VOID — PHASE 2
+   SCRIPT.JS — PART 4/4
+   ANIMATION LOOP + INITIALIZATION
+   ========================================================= */
 
 
 /* =========================================================
-   THREE ANIMATION LOOP
+   ANIMATION LOOP
    ========================================================= */
 
 function animateThree() {
@@ -2195,47 +1852,19 @@ function animateThree() {
 
 
     /* -----------------------------------------------------
-       CAMERA
+       CINEMATIC JOURNEY
        ----------------------------------------------------- */
 
-    updateCameraJourney();
+    updateJourney();
 
 
     /* -----------------------------------------------------
-       HERO
+       HERO ANIMATION
        ----------------------------------------------------- */
 
-    updateHeroJourney(
+    updateHeroAnimation(
         elapsed
     );
-
-
-    updateHeroDetails(
-        elapsed
-    );
-
-
-    /* -----------------------------------------------------
-       PARTICLES
-       ----------------------------------------------------- */
-
-    updateParticles(
-        elapsed
-    );
-
-
-    /* -----------------------------------------------------
-       WORLD
-       ----------------------------------------------------- */
-
-    updateWorldDepth();
-
-
-    /* -----------------------------------------------------
-       PAGE STATE
-       ----------------------------------------------------- */
-
-    updateSectionClasses();
 
 
     /* -----------------------------------------------------
@@ -2251,27 +1880,26 @@ function animateThree() {
 
 
 /* =========================================================
-   REDUCED MOTION HANDLING
+   REDUCED MOTION
    ========================================================= */
 
 function setupReducedMotion() {
 
     if (
-        !prefersReducedMotion()
+        !window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        ).matches
     ) {
+
         return;
+
     }
 
-
-    /*
-       Keep the 3D world visible,
-       but remove aggressive movement.
-    */
 
     if (particleMaterial) {
 
         particleMaterial.opacity =
-            0.35;
+            0.3;
 
     }
 
@@ -2279,49 +1907,14 @@ function setupReducedMotion() {
 
 
 /* =========================================================
-   PAGE LOAD SAFETY
-   ========================================================= */
-
-function setupPageSafety() {
-
-    window.addEventListener(
-        "pageshow",
-        function () {
-
-            resizeThree();
-
-        }
-    );
-
-
-    window.addEventListener(
-        "orientationchange",
-        function () {
-
-            setTimeout(
-                function () {
-
-                    resizeThree();
-
-                },
-                150
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   MAIN INITIALIZATION
+   INITIALIZATION
    ========================================================= */
 
 function init() {
 
-    /*
-       Input
-    */
+    /* -----------------------------------------------------
+       INPUT
+       ----------------------------------------------------- */
 
     setupMouse();
 
@@ -2330,9 +1923,9 @@ function init() {
     setupScroll();
 
 
-    /*
+    /* -----------------------------------------------------
        UI
-    */
+       ----------------------------------------------------- */
 
     setupCursor();
 
@@ -2341,35 +1934,37 @@ function init() {
     setupMenu();
 
 
-    /*
-       Browser lifecycle
-    */
+    /* -----------------------------------------------------
+       PAGE
+       ----------------------------------------------------- */
 
     setupVisibility();
 
-    setupPageSafety();
+    setupPageEvents();
 
 
-    /*
-       Three.js
-    */
+    /* -----------------------------------------------------
+       THREE.JS
+       ----------------------------------------------------- */
 
     initThree();
 
 
-    /*
-       Motion
-    */
+    /* -----------------------------------------------------
+       MOTION
+       ----------------------------------------------------- */
 
     setupReducedMotion();
 
 
-    /*
-       Start renderer
-    */
+    /* -----------------------------------------------------
+       START
+       ----------------------------------------------------- */
 
     if (
-        renderer
+        renderer &&
+        scene &&
+        camera
     ) {
 
         animateThree();
@@ -2380,7 +1975,7 @@ function init() {
 
 
 /* =========================================================
-   START
+   START AFTER DOM
    ========================================================= */
 
 if (
@@ -2400,4 +1995,4 @@ if (
 
     init();
 
-    }
+}
