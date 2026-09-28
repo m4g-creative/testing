@@ -1,6 +1,6 @@
 /* =========================================================
-   VOID — INTERACTIVE EXPERIENCE
-   JAVASCRIPT
+   VOID — IMMERSIVE 3D EXPERIENCE
+   THREE.JS HERO WORLD
    ========================================================= */
 
 
@@ -43,18 +43,16 @@ const overlayLinks =
 const state = {
 
     mouseX: 0,
+
     mouseY: 0,
 
     targetMouseX: 0,
+
     targetMouseY: 0,
 
     scrollY: 0,
+
     targetScrollY: 0,
-
-    width: window.innerWidth,
-    height: window.innerHeight,
-
-    loaded: false,
 
     menuOpen: false,
 
@@ -66,18 +64,951 @@ const state = {
 
 
 /* =========================================================
-   INTRO
+   THREE.JS VARIABLES
    ========================================================= */
 
-function startIntro() {
+let scene;
 
-    if (!site) {
+let camera;
+
+let renderer;
+
+let heroObject;
+
+let innerObject;
+
+let particles;
+
+let particleMaterial;
+
+let particleGeometry;
+
+let clock;
+
+let animationFrame;
+
+
+/* =========================================================
+   THREE.JS INITIALIZATION
+   ========================================================= */
+
+function initThree() {
+
+    if (!canvas) {
         return;
     }
 
-    state.loaded = true;
 
-    site.classList.add("is-visible");
+    if (
+        typeof THREE ===
+        "undefined"
+    ) {
+
+        console.warn(
+            "Three.js failed to load."
+        );
+
+        return;
+
+    }
+
+
+    /*
+     * Scene
+     */
+
+    scene =
+        new THREE.Scene();
+
+
+    /*
+     * Camera
+     */
+
+    camera =
+        new THREE.PerspectiveCamera(
+            42,
+            window.innerWidth /
+            window.innerHeight,
+            0.1,
+            100
+        );
+
+
+    camera.position.z =
+        7;
+
+
+    /*
+     * Renderer
+     */
+
+    renderer =
+        new THREE.WebGLRenderer({
+
+            canvas: canvas,
+
+            antialias: true,
+
+            alpha: true,
+
+            powerPreference:
+                "high-performance"
+
+        });
+
+
+    renderer.setPixelRatio(
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        )
+    );
+
+
+    renderer.setSize(
+        window.innerWidth,
+        window.innerHeight
+    );
+
+
+    renderer.outputEncoding =
+        THREE.sRGBEncoding;
+
+
+    /*
+     * Clock
+     */
+
+    clock =
+        new THREE.Clock();
+
+
+    /*
+     * Lights
+     */
+
+    createLights();
+
+
+    /*
+     * Main 3D object
+     */
+
+    createHeroObject();
+
+
+    /*
+     * Particles
+     */
+
+    createParticles();
+
+
+    /*
+     * Resize
+     */
+
+    resizeThree();
+
+}
+
+
+/* =========================================================
+   LIGHTING
+   ========================================================= */
+
+function createLights() {
+
+    const ambientLight =
+        new THREE.AmbientLight(
+            0xffffff,
+            0.45
+        );
+
+
+    scene.add(
+        ambientLight
+    );
+
+
+    const keyLight =
+        new THREE.PointLight(
+            0xffffff,
+            4,
+            20
+        );
+
+
+    keyLight.position.set(
+        3,
+        4,
+        5
+    );
+
+
+    scene.add(
+        keyLight
+    );
+
+
+    const purpleLight =
+        new THREE.PointLight(
+            0x8b5cf6,
+            7,
+            15
+        );
+
+
+    purpleLight.position.set(
+        -4,
+        1,
+        2
+    );
+
+
+    scene.add(
+        purpleLight
+    );
+
+
+    const blueLight =
+        new THREE.PointLight(
+            0x22d3ee,
+            5,
+            15
+        );
+
+
+    blueLight.position.set(
+        4,
+        -3,
+        1
+    );
+
+
+    scene.add(
+        blueLight
+    );
+
+}
+
+
+/* =========================================================
+   HERO 3D OBJECT
+   ========================================================= */
+
+function createHeroObject() {
+
+    heroObject =
+        new THREE.Group();
+
+
+    /*
+     * Outer geometry
+     */
+
+    const outerGeometry =
+        new THREE.IcosahedronGeometry(
+            1.55,
+            2
+        );
+
+
+    const outerMaterial =
+        new THREE.MeshPhysicalMaterial({
+
+            color:
+                0x101018,
+
+            roughness:
+                0.22,
+
+            metalness:
+                0.72,
+
+            transparent:
+                true,
+
+            opacity:
+                0.92,
+
+            clearcoat:
+                1,
+
+            clearcoatRoughness:
+                0.18
+
+        });
+
+
+    const outerMesh =
+        new THREE.Mesh(
+            outerGeometry,
+            outerMaterial
+        );
+
+
+    heroObject.add(
+        outerMesh
+    );
+
+
+    /*
+     * Inner wireframe
+     */
+
+    const innerGeometry =
+        new THREE.IcosahedronGeometry(
+            1.72,
+            1
+        );
+
+
+    const innerMaterial =
+        new THREE.MeshBasicMaterial({
+
+            color:
+                0x8b5cf6,
+
+            wireframe:
+                true,
+
+            transparent:
+                true,
+
+            opacity:
+                0.22
+
+        });
+
+
+    innerObject =
+        new THREE.Mesh(
+            innerGeometry,
+            innerMaterial
+        );
+
+
+    heroObject.add(
+        innerObject
+    );
+
+
+    /*
+     * Second wire layer
+     */
+
+    const detailGeometry =
+        new THREE.IcosahedronGeometry(
+            1.9,
+            1
+        );
+
+
+    const detailMaterial =
+        new THREE.MeshBasicMaterial({
+
+            color:
+                0x22d3ee,
+
+            wireframe:
+                true,
+
+            transparent:
+                true,
+
+            opacity:
+                0.08
+
+        });
+
+
+    const detailMesh =
+        new THREE.Mesh(
+            detailGeometry,
+            detailMaterial
+        );
+
+
+    detailMesh.rotation.x =
+        0.4;
+
+
+    detailMesh.rotation.y =
+        0.7;
+
+
+    heroObject.add(
+        detailMesh
+    );
+
+
+    /*
+     * Small orbital rings
+     */
+
+    createOrbit(
+        2.15,
+        0.012,
+        0x8b5cf6,
+        0.32,
+        0.3
+    );
+
+
+    createOrbit(
+        2.45,
+        0.008,
+        0x22d3ee,
+        -0.48,
+        -0.2
+    );
+
+
+    createOrbit(
+        2.75,
+        0.005,
+        0xffffff,
+        0.7,
+        0.4
+    );
+
+
+    /*
+     * Position
+     */
+
+    heroObject.position.set(
+        1.7,
+        0.15,
+        0
+    );
+
+
+    /*
+     * Scale
+     */
+
+    heroObject.scale.set(
+        1,
+        1,
+        1
+    );
+
+
+    scene.add(
+        heroObject
+    );
+
+}
+
+
+/* =========================================================
+   ORBIT RINGS
+   ========================================================= */
+
+function createOrbit(
+    radius,
+    thickness,
+    color,
+    rotationX,
+    rotationY
+) {
+
+    const geometry =
+        new THREE.TorusGeometry(
+            radius,
+            thickness,
+            8,
+            120
+        );
+
+
+    const material =
+        new THREE.MeshBasicMaterial({
+
+            color:
+                color,
+
+            transparent:
+                true,
+
+            opacity:
+                0.5
+
+        });
+
+
+    const ring =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+
+    ring.rotation.x =
+        rotationX;
+
+
+    ring.rotation.y =
+        rotationY;
+
+
+    ring.userData.rotationSpeed =
+        (
+            Math.random() *
+            0.0015
+        ) +
+        0.0005;
+
+
+    heroObject.add(
+        ring
+    );
+
+}
+
+
+/* =========================================================
+   PARTICLES
+   ========================================================= */
+
+function createParticles() {
+
+    const particleCount =
+        state.isTouch
+            ? 700
+            : 1500;
+
+
+    particleGeometry =
+        new THREE.BufferGeometry();
+
+
+    const positions =
+        new Float32Array(
+            particleCount * 3
+        );
+
+
+    const sizes =
+        new Float32Array(
+            particleCount
+        );
+
+
+    for (
+        let i = 0;
+        i < particleCount;
+        i++
+    ) {
+
+        const radius =
+            3 +
+            Math.random() * 7;
+
+
+        const theta =
+            Math.random() *
+            Math.PI *
+            2;
+
+
+        const phi =
+            Math.acos(
+                (
+                    Math.random() *
+                    2
+                ) - 1
+            );
+
+
+        positions[
+            i * 3
+        ] =
+            radius *
+            Math.sin(phi) *
+            Math.cos(theta);
+
+
+        positions[
+            i * 3 + 1
+        ] =
+            radius *
+            Math.sin(phi) *
+            Math.sin(theta);
+
+
+        positions[
+            i * 3 + 2
+        ] =
+            radius *
+            Math.cos(phi);
+
+
+        sizes[i] =
+            Math.random() * 2 + 0.4;
+
+    }
+
+
+    particleGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(
+            positions,
+            3
+        )
+    );
+
+
+    particleGeometry.setAttribute(
+        "size",
+        new THREE.BufferAttribute(
+            sizes,
+            1
+        )
+    );
+
+
+    particleMaterial =
+        new THREE.PointsMaterial({
+
+            color:
+                0xffffff,
+
+            size:
+                0.025,
+
+            transparent:
+                true,
+
+            opacity:
+                0.65,
+
+            depthWrite:
+                false,
+
+            blending:
+                THREE.AdditiveBlending
+
+        });
+
+
+    particles =
+        new THREE.Points(
+            particleGeometry,
+            particleMaterial
+        );
+
+
+    scene.add(
+        particles
+    );
+
+}
+
+
+/* =========================================================
+   MOUSE INPUT
+   ========================================================= */
+
+function setupMouse() {
+
+    if (state.isTouch) {
+        return;
+    }
+
+
+    window.addEventListener(
+        "mousemove",
+        function (event) {
+
+            state.targetMouseX =
+                (
+                    event.clientX /
+                    window.innerWidth
+                ) - 0.5;
+
+
+            state.targetMouseY =
+                (
+                    event.clientY /
+                    window.innerHeight
+                ) - 0.5;
+
+        },
+        {
+            passive: true
+        }
+    );
+
+}
+
+
+/* =========================================================
+   TOUCH INPUT
+   ========================================================= */
+
+function setupTouch() {
+
+    if (!state.isTouch) {
+        return;
+    }
+
+
+    window.addEventListener(
+        "touchmove",
+        function (event) {
+
+            if (
+                !event.touches ||
+                !event.touches.length
+            ) {
+                return;
+            }
+
+
+            const touch =
+                event.touches[0];
+
+
+            state.targetMouseX =
+                (
+                    touch.clientX /
+                    window.innerWidth
+                ) - 0.5;
+
+
+            state.targetMouseY =
+                (
+                    touch.clientY /
+                    window.innerHeight
+                ) - 0.5;
+
+        },
+        {
+            passive: true
+        }
+    );
+
+}
+
+
+/* =========================================================
+   THREE.JS ANIMATION
+   ========================================================= */
+
+function animateThree() {
+
+    animationFrame =
+        requestAnimationFrame(
+            animateThree
+        );
+
+
+    if (!scene || !camera || !renderer) {
+        return;
+    }
+
+
+    const elapsed =
+        clock.getElapsedTime();
+
+
+    /*
+     * Smooth mouse
+     */
+
+    state.mouseX +=
+        (
+            state.targetMouseX -
+            state.mouseX
+        ) * 0.045;
+
+
+    state.mouseY +=
+        (
+            state.targetMouseY -
+            state.mouseY
+        ) * 0.045;
+
+
+    /*
+     * Hero object rotation
+     */
+
+    if (heroObject) {
+
+        heroObject.rotation.y +=
+            0.0022;
+
+
+        heroObject.rotation.x =
+            Math.sin(
+                elapsed * 0.45
+            ) * 0.08;
+
+
+        heroObject.position.x =
+            1.7 +
+            state.mouseX * 0.55;
+
+
+        heroObject.position.y =
+            0.15 -
+            state.mouseY * 0.4;
+
+
+        heroObject.rotation.y +=
+            state.mouseX * 0.001;
+
+
+        heroObject.rotation.x +=
+            state.mouseY * 0.001;
+
+    }
+
+
+    /*
+     * Inner wireframe
+     */
+
+    if (innerObject) {
+
+        innerObject.rotation.y -=
+            0.0035;
+
+        innerObject.rotation.z +=
+            0.0015;
+
+    }
+
+
+    /*
+     * Orbit rings
+     */
+
+    if (heroObject) {
+
+        heroObject.children.forEach(
+            function (child) {
+
+                if (
+                    child.userData &&
+                    child.userData.rotationSpeed
+                ) {
+
+                    child.rotation.z +=
+                        child.userData.rotationSpeed;
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /*
+     * Particles
+     */
+
+    if (particles) {
+
+        particles.rotation.y =
+            elapsed * 0.018;
+
+        particles.rotation.x =
+            Math.sin(
+                elapsed * 0.1
+            ) * 0.05;
+
+
+        particles.position.x =
+            state.mouseX * 0.25;
+
+
+        particles.position.y =
+            -state.mouseY * 0.2;
+
+    }
+
+
+    /*
+     * Camera parallax
+     */
+
+    camera.position.x +=
+        (
+            state.mouseX * 0.55 -
+            camera.position.x
+        ) * 0.025;
+
+
+    camera.position.y +=
+        (
+            -state.mouseY * 0.35 -
+            camera.position.y
+        ) * 0.025;
+
+
+    camera.lookAt(
+        0,
+        0,
+        0
+    );
+
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+}
+
+
+/* =========================================================
+   RESIZE
+   ========================================================= */
+
+function resizeThree() {
+
+    if (
+        !camera ||
+        !renderer
+    ) {
+        return;
+    }
+
+
+    const width =
+        window.innerWidth;
+
+    const height =
+        window.innerHeight;
+
+
+    camera.aspect =
+        width / height;
+
+
+    camera.updateProjectionMatrix();
+
+
+    renderer.setPixelRatio(
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        )
+    );
+
+
+    renderer.setSize(
+        width,
+        height,
+        false
+    );
 
 }
 
@@ -92,19 +1023,27 @@ function setupCursor() {
         return;
     }
 
+
     if (state.isTouch) {
 
-        cursor.style.display = "none";
+        cursor.style.display =
+            "none";
 
         return;
+
     }
 
 
     const dot =
-        cursor.querySelector(".cursor-dot");
+        cursor.querySelector(
+            ".cursor-dot"
+        );
+
 
     const ring =
-        cursor.querySelector(".cursor-ring");
+        cursor.querySelector(
+            ".cursor-ring"
+        );
 
 
     let cursorX =
@@ -138,13 +1077,20 @@ function setupCursor() {
     );
 
 
-    function animateCursor() {
+    function updateCursor() {
 
         cursorX +=
-            (targetX - cursorX) * 0.18;
+            (
+                targetX -
+                cursorX
+            ) * 0.18;
+
 
         cursorY +=
-            (targetY - cursorY) * 0.18;
+            (
+                targetY -
+                cursorY
+            ) * 0.18;
 
 
         if (dot) {
@@ -172,13 +1118,13 @@ function setupCursor() {
 
 
         requestAnimationFrame(
-            animateCursor
+            updateCursor
         );
 
     }
 
 
-    animateCursor();
+    updateCursor();
 
 
     const interactiveElements =
@@ -250,582 +1196,6 @@ function setupCursor() {
 
 
 /* =========================================================
-   WEBGL
-   ========================================================= */
-
-let gl = null;
-
-
-/* WebGL animation state */
-
-const webglState = {
-
-    initialized: false,
-
-    time: 0,
-
-    program: null,
-
-    positionBuffer: null
-
-};
-
-
-/* =========================================================
-   WEBGL SHADERS
-   ========================================================= */
-
-const vertexShaderSource = `
-
-    attribute vec2 aPosition;
-
-    void main() {
-
-        gl_Position =
-            vec4(
-                aPosition,
-                0.0,
-                1.0
-            );
-
-    }
-
-`;
-
-
-const fragmentShaderSource = `
-
-    precision highp float;
-
-    uniform float uTime;
-    uniform vec2 uResolution;
-    uniform vec2 uMouse;
-
-    void main() {
-
-        vec2 uv =
-            gl_FragCoord.xy /
-            uResolution.xy;
-
-        vec2 centered =
-            uv - 0.5;
-
-        centered.x *=
-            uResolution.x /
-            uResolution.y;
-
-
-        float distanceFromCenter =
-            length(centered);
-
-
-        float mouseDistance =
-            distance(
-                centered,
-                uMouse
-            );
-
-
-        float glow =
-            0.035 /
-            max(
-                mouseDistance,
-                0.02
-            );
-
-
-        float pulse =
-            sin(
-                uTime * 0.4 +
-                distanceFromCenter * 4.0
-            ) * 0.005;
-
-
-        float vignette =
-            1.0 -
-            smoothstep(
-                0.15,
-                0.85,
-                distanceFromCenter
-            );
-
-
-        vec3 background =
-            vec3(
-                0.018,
-                0.018,
-                0.022
-            );
-
-
-        vec3 light =
-            vec3(
-                0.10,
-                0.07,
-                0.15
-            );
-
-
-        vec3 finalColor =
-            background;
-
-
-        finalColor +=
-            light *
-            glow *
-            vignette;
-
-
-        finalColor +=
-            pulse *
-            vec3(
-                0.5,
-                0.3,
-                0.8
-            );
-
-
-        gl_FragColor =
-            vec4(
-                finalColor,
-                1.0
-            );
-
-    }
-
-`;
-
-
-/* =========================================================
-   WEBGL HELPERS
-   ========================================================= */
-
-function createShader(
-    context,
-    type,
-    source
-) {
-
-    const shader =
-        context.createShader(type);
-
-    context.shaderSource(
-        shader,
-        source
-    );
-
-    context.compileShader(
-        shader
-    );
-
-
-    if (
-        !context.getShaderParameter(
-            shader,
-            context.COMPILE_STATUS
-        )
-    ) {
-
-        console.warn(
-            "WebGL shader error:",
-            context.getShaderInfoLog(shader)
-        );
-
-        context.deleteShader(shader);
-
-        return null;
-
-    }
-
-
-    return shader;
-
-}
-
-
-function createProgram(
-    context,
-    vertexSource,
-    fragmentSource
-) {
-
-    const vertexShader =
-        createShader(
-            context,
-            context.VERTEX_SHADER,
-            vertexSource
-        );
-
-
-    const fragmentShader =
-        createShader(
-            context,
-            context.FRAGMENT_SHADER,
-            fragmentSource
-        );
-
-
-    if (
-        !vertexShader ||
-        !fragmentShader
-    ) {
-
-        return null;
-
-    }
-
-
-    const program =
-        context.createProgram();
-
-
-    context.attachShader(
-        program,
-        vertexShader
-    );
-
-    context.attachShader(
-        program,
-        fragmentShader
-    );
-
-    context.linkProgram(
-        program
-    );
-
-
-    if (
-        !context.getProgramParameter(
-            program,
-            context.LINK_STATUS
-        )
-    ) {
-
-        console.warn(
-            "WebGL program error:",
-            context.getProgramInfoLog(program)
-        );
-
-        return null;
-
-    }
-
-
-    return program;
-
-}
-
-
-/* =========================================================
-   WEBGL SETUP
-   ========================================================= */
-
-function setupWebGL() {
-
-    if (!canvas) {
-        return;
-    }
-
-
-    gl =
-        canvas.getContext(
-            "webgl",
-            {
-                alpha: false,
-                antialias: true,
-                powerPreference: "high-performance"
-            }
-        );
-
-
-    if (!gl) {
-
-        console.warn(
-            "WebGL is not available."
-        );
-
-        return;
-
-    }
-
-
-    const program =
-        createProgram(
-            gl,
-            vertexShaderSource,
-            fragmentShaderSource
-        );
-
-
-    if (!program) {
-        return;
-    }
-
-
-    webglState.program =
-        program;
-
-
-    const positionBuffer =
-        gl.createBuffer();
-
-
-    webglState.positionBuffer =
-        positionBuffer;
-
-
-    gl.bindBuffer(
-        gl.ARRAY_BUFFER,
-        positionBuffer
-    );
-
-
-    const positions =
-        new Float32Array([
-
-            -1, -1,
-             1, -1,
-            -1,  1,
-
-            -1,  1,
-             1, -1,
-             1,  1
-
-        ]);
-
-
-    gl.bufferData(
-        gl.ARRAY_BUFFER,
-        positions,
-        gl.STATIC_DRAW
-    );
-
-
-    webglState.initialized =
-        true;
-
-
-    resizeWebGL();
-
-}
-
-
-/* =========================================================
-   WEBGL RESIZE
-   ========================================================= */
-
-function resizeWebGL() {
-
-    if (!canvas || !gl) {
-        return;
-    }
-
-
-    const pixelRatio =
-        Math.min(
-            window.devicePixelRatio || 1,
-            2
-        );
-
-
-    const width =
-        Math.floor(
-            window.innerWidth *
-            pixelRatio
-        );
-
-
-    const height =
-        Math.floor(
-            window.innerHeight *
-            pixelRatio
-        );
-
-
-    if (
-        canvas.width !== width ||
-        canvas.height !== height
-    ) {
-
-        canvas.width =
-            width;
-
-        canvas.height =
-            height;
-
-    }
-
-
-    canvas.style.width =
-        window.innerWidth + "px";
-
-    canvas.style.height =
-        window.innerHeight + "px";
-
-
-    gl.viewport(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-}
-
-
-/* =========================================================
-   WEBGL RENDER
-   ========================================================= */
-
-function renderWebGL() {
-
-    if (
-        !gl ||
-        !webglState.initialized ||
-        !webglState.program
-    ) {
-
-        return;
-
-    }
-
-
-    webglState.time +=
-        0.016;
-
-
-    const program =
-        webglState.program;
-
-
-    gl.useProgram(
-        program
-    );
-
-
-    gl.bindBuffer(
-        gl.ARRAY_BUFFER,
-        webglState.positionBuffer
-    );
-
-
-    const positionLocation =
-        gl.getAttribLocation(
-            program,
-            "aPosition"
-        );
-
-
-    gl.enableVertexAttribArray(
-        positionLocation
-    );
-
-
-    gl.vertexAttribPointer(
-        positionLocation,
-        2,
-        gl.FLOAT,
-        false,
-        0,
-        0
-    );
-
-
-    const timeLocation =
-        gl.getUniformLocation(
-            program,
-            "uTime"
-        );
-
-
-    const resolutionLocation =
-        gl.getUniformLocation(
-            program,
-            "uResolution"
-        );
-
-
-    const mouseLocation =
-        gl.getUniformLocation(
-            program,
-            "uMouse"
-        );
-
-
-    gl.uniform1f(
-        timeLocation,
-        webglState.time
-    );
-
-
-    gl.uniform2f(
-        resolutionLocation,
-        canvas.width,
-        canvas.height
-    );
-
-
-    const mouseX =
-        state.mouseX * 0.5;
-
-    const mouseY =
-        -state.mouseY * 0.5;
-
-
-    gl.uniform2f(
-        mouseLocation,
-        mouseX,
-        mouseY
-    );
-
-
-    gl.drawArrays(
-        gl.TRIANGLES,
-        0,
-        6
-    );
-
-}
-
-
-/* =========================================================
-   MOUSE PARALLAX
-   ========================================================= */
-
-function setupMouse() {
-
-    if (state.isTouch) {
-        return;
-    }
-
-
-    window.addEventListener(
-        "mousemove",
-        function (event) {
-
-            state.targetMouseX =
-                (
-                    event.clientX /
-                    window.innerWidth
-                ) - 0.5;
-
-
-            state.targetMouseY =
-                (
-                    event.clientY /
-                    window.innerHeight
-                ) - 0.5;
-
-        },
-        {
-            passive: true
-        }
-    );
-
-}
-
-
-/* =========================================================
    SCROLL
    ========================================================= */
 
@@ -848,7 +1218,7 @@ function setupScroll() {
 
 
 /* =========================================================
-   WORK INTERSECTION
+   WORK OBSERVER
    ========================================================= */
 
 function setupWorkObserver() {
@@ -974,7 +1344,9 @@ function setupMenu() {
             "click",
             function () {
 
-                if (state.menuOpen) {
+                if (
+                    state.menuOpen
+                ) {
 
                     closeMenu();
 
@@ -995,113 +1367,7 @@ function setupMenu() {
         menuClose.addEventListener(
             "click",
             closeMenu
-        );
-
     }
-
-
-    overlayLinks.forEach(
-        function (link) {
-
-            link.addEventListener(
-                "click",
-                function () {
-
-                    closeMenu();
-
-                }
-            );
-
-        }
-    );
-
-
-    document.addEventListener(
-        "keydown",
-        function (event) {
-
-            if (
-                event.key === "Escape" &&
-                state.menuOpen
-            ) {
-
-                closeMenu();
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   TOUCH
-   ========================================================= */
-
-function setupTouch() {
-
-    if (!state.isTouch) {
-        return;
-    }
-
-
-    let touchStartY =
-        0;
-
-
-    window.addEventListener(
-        "touchstart",
-        function (event) {
-
-            if (
-                event.touches &&
-                event.touches.length
-            ) {
-
-                touchStartY =
-                    event.touches[0].clientY;
-
-            }
-
-        },
-        {
-            passive: true
-        }
-    );
-
-
-    window.addEventListener(
-        "touchmove",
-        function (event) {
-
-            if (
-                !event.touches ||
-                !event.touches.length
-            ) {
-
-                return;
-
-            }
-
-
-            const currentY =
-                event.touches[0].clientY;
-
-
-            const difference =
-                currentY -
-                touchStartY;
-
-
-            state.targetMouseY =
-                difference * 0.001;
-
-        },
-        {
-            passive: true
-        }
-    );
 
 }
 
@@ -1116,15 +1382,11 @@ function setupVisibility() {
         "visibilitychange",
         function () {
 
-            if (
-                document.hidden
-            ) {
-
+            if (document.hidden) {
                 return;
-
             }
 
-            resizeWebGL();
+            resizeThree();
 
         }
     );
@@ -1133,69 +1395,54 @@ function setupVisibility() {
 
 
 /* =========================================================
-   RESIZE
+   REDUCED MOTION
    ========================================================= */
 
-function setupResize() {
+function prefersReducedMotion() {
 
-    window.addEventListener(
-        "resize",
-        function () {
-
-            state.width =
-                window.innerWidth;
-
-            state.height =
-                window.innerHeight;
-
-
-            resizeWebGL();
-
-        }
-    );
+    return window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    ).matches;
 
 }
 
 
 /* =========================================================
-   MAIN ANIMATION LOOP
+   REDUCED MOTION ADJUSTMENT
    ========================================================= */
 
-function animate() {
+function applyMotionPreference() {
 
-    state.mouseX +=
-        (
-            state.targetMouseX -
-            state.mouseX
-        ) * 0.06;
+    if (
+        prefersReducedMotion() &&
+        renderer
+    ) {
 
+        renderer.setAnimationLoop(
+            null
+        );
 
-    state.mouseY +=
-        (
-            state.targetMouseY -
-            state.mouseY
-        ) * 0.06;
-
-
-    state.scrollY +=
-        (
-            state.targetScrollY -
-            state.scrollY
-        ) * 0.08;
-
-
-    renderWebGL();
-
-
-    requestAnimationFrame(
-        animate
-    );
+    }
 
 }
 
 
 /* =========================================================
-   INITIALIZATION
+   RESIZE EVENT
+   ========================================================= */
+
+window.addEventListener(
+    "resize",
+    function () {
+
+        resizeThree();
+
+    }
+);
+
+
+/* =========================================================
+   INITIALIZE
    ========================================================= */
 
 function init() {
@@ -1204,21 +1451,21 @@ function init() {
 
     setupMouse();
 
+    setupTouch();
+
     setupScroll();
 
     setupWorkObserver();
 
     setupMenu();
 
-    setupTouch();
-
     setupVisibility();
 
-    setupResize();
+    initThree();
 
-    setupWebGL();
+    animateThree();
 
-    animate();
+    applyMotionPreference();
 
 }
 
