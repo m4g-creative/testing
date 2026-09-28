@@ -204,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 /* =========================================================
-   SCROLL REVEAL ANIMATIONS
+   GSAP SCROLL EFFECTS
    ========================================================= */
 
 if (
@@ -212,42 +212,47 @@ if (
     typeof ScrollTrigger !== "undefined"
 ) {
 
-    const revealElements =
-        document.querySelectorAll(".reveal");
+    gsap.registerPlugin(ScrollTrigger);
 
 
-    revealElements.forEach((element) => {
+    /* =====================================================
+       GENERAL REVEALS
+       ===================================================== */
 
-        gsap.fromTo(
-            element,
+    document
+        .querySelectorAll(".reveal")
+        .forEach((element) => {
 
-            {
-                opacity: 0,
-                y: 45
-            },
+            gsap.fromTo(
+                element,
 
-            {
-                opacity: 1,
-                y: 0,
+                {
+                    opacity: 0,
+                    y: 45
+                },
 
-                duration: 1,
+                {
+                    opacity: 1,
+                    y: 0,
 
-                ease: "power3.out",
+                    duration: 1,
 
-                scrollTrigger: {
-                    trigger: element,
+                    ease: "power3.out",
 
-                    start: "top 84%",
+                    scrollTrigger: {
+                        trigger: element,
 
-                    end: "top 55%",
+                        start: "top 84%",
 
-                    toggleActions:
-                        "play none none reverse"
+                        toggleActions:
+                            "play none none reverse",
+
+                        invalidateOnRefresh: true
+                    }
                 }
-            }
-        );
+            );
 
-    });
+        });
 
 
     /* =====================================================
@@ -282,7 +287,9 @@ if (
                         start: "top 82%",
 
                         toggleActions:
-                            "play none none reverse"
+                            "play none none reverse",
+
+                        invalidateOnRefresh: true
                     }
                 }
             );
@@ -291,24 +298,42 @@ if (
 
 
     /* =====================================================
-       JOURNEY PROGRESS LINE
+       JOURNEY
        ===================================================== */
-
-    const journeyProgress =
-        document.querySelector(
-            ".journey-progress"
-        );
 
     const journeyTrack =
         document.querySelector(
             ".journey-track"
         );
 
+    const journeyProgress =
+        document.querySelector(
+            ".journey-progress"
+        );
 
-    if (journeyProgress && journeyTrack) {
+    const journeyItems =
+        document.querySelectorAll(
+            ".journey-item"
+        );
 
-        gsap.to(
+
+    if (
+        journeyTrack &&
+        journeyProgress
+    ) {
+
+
+        /* ================================================
+           JOURNEY PROGRESS LINE
+           ================================================ */
+
+        gsap.fromTo(
             journeyProgress,
+
+            {
+                height: "0%"
+            },
+
             {
                 height: "100%",
 
@@ -317,39 +342,37 @@ if (
                 scrollTrigger: {
                     trigger: journeyTrack,
 
-                    start: "top 65%",
+                    start: "top 72%",
 
-                    end: "bottom 55%",
+                    end: "bottom 58%",
 
-                    scrub: 1
+                    scrub: 1,
+
+                    invalidateOnRefresh: true
                 }
             }
         );
 
-    }
 
+        /* ================================================
+           JOURNEY ITEMS
+           ================================================ */
 
-    /* =====================================================
-       JOURNEY ITEMS
-       ===================================================== */
-
-    document
-        .querySelectorAll(".journey-item")
-        .forEach((item) => {
+        journeyItems.forEach((item) => {
 
             gsap.fromTo(
                 item,
 
                 {
                     opacity: 0,
-                    x: -30
+                    x: -45
                 },
 
                 {
                     opacity: 1,
                     x: 0,
 
-                    duration: 0.8,
+                    duration: 0.9,
 
                     ease: "power3.out",
 
@@ -359,12 +382,60 @@ if (
                         start: "top 82%",
 
                         toggleActions:
-                            "play none none reverse"
+                            "play none none reverse",
+
+                        invalidateOnRefresh: true
                     }
                 }
             );
 
+
+            /* ============================================
+               JOURNEY NUMBER
+               ============================================ */
+
+            const number =
+                item.querySelector(
+                    ".journey-number"
+                );
+
+
+            if (number) {
+
+                gsap.fromTo(
+                    number,
+
+                    {
+                        scale: 0.65,
+                        opacity: 0.3
+                    },
+
+                    {
+                        scale: 1,
+                        opacity: 1,
+
+                        duration: 0.6,
+
+                        ease: "back.out(2)",
+
+                        scrollTrigger: {
+                            trigger: item,
+
+                            start: "top 82%",
+
+                            toggleActions:
+                                "play none none reverse",
+
+                            invalidateOnRefresh: true
+                        }
+                    }
+                );
+
+            }
+
         });
+
+    }
 
 
     /* =====================================================
@@ -381,6 +452,7 @@ if (
 
         gsap.to(
             aboutCard,
+
             {
                 y: -12,
 
@@ -400,7 +472,7 @@ if (
 
 
     /* =====================================================
-       CONTACT WATER MOVEMENT
+       CONTACT WATER PARALLAX
        ===================================================== */
 
     const contactWater =
@@ -413,9 +485,12 @@ if (
 
         gsap.to(
             contactWater,
+
             {
                 x: -35,
                 y: 25,
+
+                ease: "none",
 
                 scrollTrigger: {
                     trigger: ".contact",
@@ -424,7 +499,9 @@ if (
 
                     end: "bottom top",
 
-                    scrub: 1.5
+                    scrub: 1.5,
+
+                    invalidateOnRefresh: true
                 }
             }
         );
@@ -433,7 +510,7 @@ if (
 
 
     /* =====================================================
-       PROJECT CARD PARALLAX
+       PROJECT WATER PARALLAX
        ===================================================== */
 
     document
@@ -445,6 +522,7 @@ if (
                     ".project-water"
                 );
 
+
             if (!water) {
                 return;
             }
@@ -452,6 +530,7 @@ if (
 
             gsap.to(
                 water,
+
                 {
                     y: -35,
 
@@ -464,14 +543,34 @@ if (
 
                         end: "bottom top",
 
-                        scrub: 1.2
+                        scrub: 1.2,
+
+                        invalidateOnRefresh: true
                     }
                 }
             );
 
         });
 
-               }
+
+    /* =====================================================
+       REFRESH SCROLLTRIGGER
+       ===================================================== */
+
+    window.addEventListener(
+        "load",
+        () => {
+
+            setTimeout(() => {
+
+                ScrollTrigger.refresh();
+
+            }, 400);
+
+        }
+    );
+
+}
 /* =========================================================
    RAIN FOREST — SCRIPT.JS
    PART 3
@@ -779,7 +878,7 @@ document
         );
 
     });
-/* =========================================================
+           /* =========================================================
    RAIN FOREST — SCRIPT.JS
    PART 4
    FORM + MOBILE NAV + FINAL POLISH
