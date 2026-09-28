@@ -2,194 +2,146 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0"
     >
 
-    <meta
-        name="description"
-        content="Rain Forest — an immersive liquid-inspired portfolio experience."
-    >
+    <title>VOID — Interactive Experience</title>
 
-    <title>Rain Forest</title>
-
-    <!-- Google Font -->
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         rel="stylesheet"
     >
 
-    <!-- Main stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
     <!-- =====================================================
-         LIQUID BACKGROUND
-         ===================================================== -->
+         LOADER
+    ====================================================== -->
 
-    <div class="rain-layer" aria-hidden="true"></div>
+    <div class="loader" id="loader">
+        <div class="loader-inner">
+            <span class="loader-label">LOADING</span>
 
-    <div class="mist-layer mist-layer-one" aria-hidden="true"></div>
-    <div class="mist-layer mist-layer-two" aria-hidden="true"></div>
-
-    <div class="water-glow water-glow-one" aria-hidden="true"></div>
-    <div class="water-glow water-glow-two" aria-hidden="true"></div>
-
-
-    <!-- =====================================================
-         CURSOR / TOUCH WATER EFFECT
-         ===================================================== -->
-
-    <div
-        class="water-cursor"
-        id="waterCursor"
-        aria-hidden="true"
-    ></div>
-
-
-    <!-- =====================================================
-         NAVIGATION
-         ===================================================== -->
-
-    <header class="site-header">
-
-        <nav class="navbar">
-
-            <a
-                href="#hero"
-                class="brand"
-                aria-label="Rain Forest home"
-            >
-                <span class="brand-mark">
-                    RF
-                </span>
-
-                <span class="brand-name">
-                    Rain Forest
-                </span>
-            </a>
-
-
-            <div class="nav-links">
-
-                <a href="#about" class="nav-link">
-                    About
-                </a>
-
-                <a href="#work" class="nav-link">
-                    Work
-                </a>
-
-                <a href="#journey" class="nav-link">
-                    Journey
-                </a>
-
-                <a href="#contact" class="nav-link">
-                    Contact
-                </a>
-
+            <div class="loader-line">
+                <div class="loader-progress" id="loaderProgress"></div>
             </div>
 
+            <span class="loader-percent" id="loaderPercent">0%</span>
+        </div>
+    </div>
+
+
+    <!-- =====================================================
+         WEBGL BACKGROUND
+    ====================================================== -->
+
+    <canvas id="webglCanvas"></canvas>
+
+
+    <!-- =====================================================
+         CUSTOM CURSOR
+    ====================================================== -->
+
+    <div class="cursor" id="cursor">
+        <div class="cursor-dot"></div>
+        <div class="cursor-ring"></div>
+    </div>
+
+
+    <!-- =====================================================
+         SITE
+    ====================================================== -->
+
+    <main class="site" id="site">
+
+        <!-- ==================== NAVBAR ==================== -->
+
+        <header class="navbar">
+
+            <a href="#" class="brand" data-cursor="hover">
+                VOID<span>.</span>
+            </a>
+
+            <nav class="desktop-nav">
+
+                <a href="#work" data-cursor="hover">
+                    WORK
+                </a>
+
+                <a href="#about" data-cursor="hover">
+                    ABOUT
+                </a>
+
+                <a href="#contact" data-cursor="hover">
+                    CONTACT
+                </a>
+
+            </nav>
 
             <button
-                class="nav-menu-button liquid-button"
-                id="navMenuButton"
-                type="button"
-                aria-label="Open navigation"
-                aria-expanded="false"
+                class="menu-button"
+                id="menuButton"
+                data-cursor="hover"
+                aria-label="Open menu"
             >
                 <span></span>
                 <span></span>
             </button>
 
-        </nav>
-
-    </header>
+        </header>
 
 
-    <!-- =====================================================
-         MAIN
-         ===================================================== -->
+        <!-- ==================== HERO ==================== -->
 
-    <main>
+        <section class="hero" id="hero">
 
+            <div class="hero-top">
 
-        <!-- =================================================
-             HERO
-             ================================================= -->
+                <span class="eyebrow">
+                    DIGITAL EXPERIENCE / 01
+                </span>
 
-        <section
-            class="hero section"
-            id="hero"
-        >
+                <span class="hero-location">
+                    LA — NYC — WORLD
+                </span>
 
-            <div
-                class="hero-water-orb"
-                aria-hidden="true"
-            ></div>
+            </div>
 
 
             <div class="hero-content">
 
-                <p class="eyebrow hero-eyebrow">
-                    CREATIVE PORTFOLIO
-                </p>
+                <div class="hero-title-wrap">
 
+                    <h1 class="hero-title">
+                        WE CREATE
+                        <span>WORLDS.</span>
+                    </h1>
 
-                <h1 class="hero-title">
+                </div>
 
-                    <span class="hero-title-line">
-                        Flow
-                    </span>
+                <div class="hero-description">
 
-                    <span class="hero-title-line hero-title-accent">
-                        beyond
-                    </span>
-
-                    <span class="hero-title-line">
-                        the ordinary.
-                    </span>
-
-                </h1>
-
-
-                <p class="hero-description">
-                    A digital space shaped by creativity,
-                    motion and the quiet power of nature.
-                </p>
-
-
-                <div class="hero-actions">
+                    <p>
+                        Digital experiences built at the
+                        intersection of technology, design
+                        and imagination.
+                    </p>
 
                     <a
                         href="#work"
-                        class="liquid-button primary-button"
+                        class="explore-link"
+                        data-cursor="hover"
                     >
-                        <span>Explore Work</span>
-                        <span class="button-arrow">↗</span>
-                    </a>
-
-
-                    <a
-                        href="#about"
-                        class="liquid-button secondary-button"
-                    >
-                        <span>Discover</span>
+                        <span>EXPLORE</span>
+                        <span class="arrow">↘</span>
                     </a>
 
                 </div>
@@ -197,110 +149,19 @@
             </div>
 
 
-            <!-- Floating liquid element -->
+            <div class="hero-bottom">
 
-            <div
-                class="hero-droplet droplet-one"
-                aria-hidden="true"
-            ></div>
-
-            <div
-                class="hero-droplet droplet-two"
-                aria-hidden="true"
-            ></div>
-
-            <div
-                class="hero-droplet droplet-three"
-                aria-hidden="true"
-            ></div>
-
-
-            <!-- Scroll indicator -->
-
-            <a
-                href="#about"
-                class="scroll-indicator"
-                aria-label="Scroll to about section"
-            >
-
-                <span class="scroll-text">
-                    SCROLL TO EXPLORE
+                <span>
+                    SCROLL TO ENTER
                 </span>
 
-                <span class="scroll-line"></span>
-
-            </a>
-
-        </section>
-
-
-        <!-- =================================================
-             ABOUT / INTRO
-             ================================================= -->
-
-        <section
-            class="about section"
-            id="about"
-        >
-
-            <div class="section-container">
-
-                <div class="section-heading reveal">
-
-                    <p class="eyebrow">
-                        01 / THE FLOW
-                    </p>
-
-                    <h2>
-                        Ideas should move
-                        <span>like water.</span>
-                    </h2>
-
+                <div class="scroll-line">
+                    <span></span>
                 </div>
 
-
-                <div class="about-grid">
-
-                    <div class="about-copy reveal">
-
-                        <p class="large-copy">
-                            Rain Forest is a creative portfolio
-                            built around movement, atmosphere
-                            and meaningful digital experiences.
-                        </p>
-
-                        <p>
-                            Every interaction is designed to feel
-                            fluid — from the smallest button
-                            response to the journey between
-                            entire sections.
-                        </p>
-
-                    </div>
-
-
-                    <div
-                        class="liquid-card about-card reveal"
-                    >
-
-                        <div class="card-water-shine"></div>
-
-                        <span class="card-number">
-                            01
-                        </span>
-
-                        <h3>
-                            Fluid
-                        </h3>
-
-                        <p>
-                            Interfaces that respond naturally
-                            to movement and interaction.
-                        </p>
-
-                    </div>
-
-                </div>
+                <span>
+                    2026
+                </span>
 
             </div>
 
@@ -309,141 +170,93 @@
 
         <!-- =================================================
              WORK
-             ================================================= -->
+        ================================================== -->
 
-        <section
-            class="work section"
-            id="work"
-        >
+        <section class="work-section" id="work">
 
-            <div class="section-container">
+            <div class="section-heading">
 
-                <div class="section-heading work-heading reveal">
+                <span class="section-number">
+                    02
+                </span>
 
-                    <p class="eyebrow">
-                        02 / SELECTED WORK
-                    </p>
+                <h2>
+                    SELECTED
+                    <span>WORK.</span>
+                </h2>
 
-                    <h2>
-                        Projects shaped
-                        <span>with intent.</span>
-                    </h2>
-
-                </div>
+            </div>
 
 
-                <div class="projects-grid">
+            <div class="work-list">
 
+                <article
+                    class="work-item"
+                    data-cursor="view"
+                >
 
-                    <article
-                        class="project-card liquid-card reveal"
-                        data-project="01"
-                    >
+                    <div class="work-image image-one">
+                        <div class="image-glow"></div>
+                    </div>
 
-                        <div class="project-image project-image-one">
+                    <div class="work-info">
 
-                            <div class="project-water"></div>
-
-                            <span class="project-index">
-                                01
-                            </span>
-
+                        <div>
+                            <span>01 / EXPERIENCE</span>
+                            <h3>UNKNOWN<br>MATTER</h3>
                         </div>
 
-                        <div class="project-info">
+                        <span class="work-arrow">↗</span>
 
-                            <div>
-                                <p class="project-category">
-                                    DIGITAL EXPERIENCE
-                                </p>
+                    </div>
 
-                                <h3>
-                                    Project One
-                                </h3>
-                            </div>
+                </article>
 
-                            <span class="project-arrow">
-                                ↗
-                            </span>
 
+                <article
+                    class="work-item"
+                    data-cursor="view"
+                >
+
+                    <div class="work-image image-two">
+                        <div class="image-glow"></div>
+                    </div>
+
+                    <div class="work-info">
+
+                        <div>
+                            <span>02 / DIGITAL</span>
+                            <h3>DEEP<br>SPACE</h3>
                         </div>
 
-                    </article>
+                        <span class="work-arrow">↗</span>
+
+                    </div>
+
+                </article>
 
 
-                    <article
-                        class="project-card liquid-card reveal"
-                        data-project="02"
-                    >
+                <article
+                    class="work-item"
+                    data-cursor="view"
+                >
 
-                        <div class="project-image project-image-two">
+                    <div class="work-image image-three">
+                        <div class="image-glow"></div>
+                    </div>
 
-                            <div class="project-water"></div>
+                    <div class="work-info">
 
-                            <span class="project-index">
-                                02
-                            </span>
-
+                        <div>
+                            <span>03 / INTERACTIVE</span>
+                            <h3>LIQUID<br>MEMORY</h3>
                         </div>
 
-                        <div class="project-info">
+                        <span class="work-arrow">↗</span>
 
-                            <div>
-                                <p class="project-category">
-                                    CREATIVE DEVELOPMENT
-                                </p>
+                    </div>
 
-                                <h3>
-                                    Project Two
-                                </h3>
-                            </div>
-
-                            <span class="project-arrow">
-                                ↗
-                            </span>
-
-                        </div>
-
-                    </article>
-
-
-                    <article
-                        class="project-card liquid-card reveal"
-                        data-project="03"
-                    >
-
-                        <div class="project-image project-image-three">
-
-                            <div class="project-water"></div>
-
-                            <span class="project-index">
-                                03
-                            </span>
-
-                        </div>
-
-                        <div class="project-info">
-
-                            <div>
-                                <p class="project-category">
-                                    INTERACTIVE DESIGN
-                                </p>
-
-                                <h3>
-                                    Project Three
-                                </h3>
-                            </div>
-
-                            <span class="project-arrow">
-                                ↗
-                            </span>
-
-                        </div>
-
-                    </article>
-
-
-                </div>
+                </article>
 
             </div>
 
@@ -451,131 +264,32 @@
 
 
         <!-- =================================================
-             JOURNEY
-             ================================================= -->
+             ABOUT
+        ================================================== -->
 
-        <section
-            class="journey section"
-            id="journey"
-        >
+        <section class="about-section" id="about">
 
-            <div class="section-container">
+            <div class="about-number">
+                03
+            </div>
 
-                <div class="journey-intro reveal">
+            <div class="about-content">
 
-                    <p class="eyebrow">
-                        03 / THE JOURNEY
-                    </p>
+                <span class="eyebrow">
+                    WHO WE ARE
+                </span>
 
-                    <h2>
-                        From a single drop
-                        <span>to an entire world.</span>
-                    </h2>
+                <h2>
+                    WE TURN
+                    <span>IDEAS</span>
+                    INTO EXPERIENCES.
+                </h2>
 
-                </div>
-
-
-                <div class="journey-track">
-
-                    <div class="journey-line">
-                        <span class="journey-progress"></span>
-                    </div>
-
-
-                    <div
-                        class="journey-item reveal"
-                        data-step="01"
-                    >
-
-                        <span class="journey-number">
-                            01
-                        </span>
-
-                        <div>
-                            <h3>
-                                Observe
-                            </h3>
-
-                            <p>
-                                Understand the problem,
-                                the environment and the people.
-                            </p>
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        class="journey-item reveal"
-                        data-step="02"
-                    >
-
-                        <span class="journey-number">
-                            02
-                        </span>
-
-                        <div>
-                            <h3>
-                                Shape
-                            </h3>
-
-                            <p>
-                                Turn ideas into a clear,
-                                intentional visual direction.
-                            </p>
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        class="journey-item reveal"
-                        data-step="03"
-                    >
-
-                        <span class="journey-number">
-                            03
-                        </span>
-
-                        <div>
-                            <h3>
-                                Build
-                            </h3>
-
-                            <p>
-                                Bring the experience to life
-                                through design and technology.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        class="journey-item reveal"
-                        data-step="04"
-                    >
-
-                        <span class="journey-number">
-                            04
-                        </span>
-
-                        <div>
-                            <h3>
-                                Flow
-                            </h3>
-
-                            <p>
-                                Refine every interaction until
-                                the experience feels effortless.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
+                <p>
+                    We build immersive digital experiences
+                    that blur the line between technology
+                    and imagination.
+                </p>
 
             </div>
 
@@ -584,176 +298,92 @@
 
         <!-- =================================================
              CONTACT
-             ================================================= -->
+        ================================================== -->
 
-        <section
-            class="contact section"
-            id="contact"
-        >
+        <section class="contact-section" id="contact">
 
-            <div class="section-container">
+            <div class="contact-number">
+                04
+            </div>
 
-                <div class="contact-wrapper liquid-card reveal">
+            <div class="contact-content">
 
-                    <div class="contact-water"></div>
+                <span class="eyebrow">
+                    HAVE AN IDEA?
+                </span>
 
-                    <div class="contact-content">
+                <h2>
+                    LET'S MAKE
+                    <span>SOMETHING.</span>
+                </h2>
 
-                        <p class="eyebrow">
-                            04 / LET'S CONNECT
-                        </p>
-
-                        <h2>
-                            Let's create
-                            <span>something fluid.</span>
-                        </h2>
-
-                        <p>
-                            Have an idea, project or experience
-                            worth bringing to life?
-                        </p>
-
-
-                        <form
-                            class="contact-form"
-                            id="contactForm"
-                        >
-
-                            <div class="input-wrap">
-
-                                <input
-                                    type="text"
-                                    id="name"
-                                    name="name"
-                                    autocomplete="name"
-                                    placeholder=" "
-                                    required
-                                >
-
-                                <label for="name">
-                                    Your name
-                                </label>
-
-                                <span class="input-water-line"></span>
-
-                            </div>
-
-
-                            <div class="input-wrap">
-
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    autocomplete="email"
-                                    placeholder=" "
-                                    required
-                                >
-
-                                <label for="email">
-                                    Your email
-                                </label>
-
-                                <span class="input-water-line"></span>
-
-                            </div>
-
-
-                            <div class="input-wrap">
-
-                                <textarea
-                                    id="message"
-                                    name="message"
-                                    rows="4"
-                                    placeholder=" "
-                                    required
-                                ></textarea>
-
-                                <label for="message">
-                                    Tell me about your idea
-                                </label>
-
-                                <span class="input-water-line"></span>
-
-                            </div>
-
-
-                            <button
-                                type="submit"
-                                class="liquid-button submit-button"
-                            >
-                                <span>
-                                    Send Message
-                                </span>
-
-                                <span class="button-arrow">
-                                    ↗
-                                </span>
-                            </button>
-
-                        </form>
-
-                    </div>
-
-                </div>
+                <a
+                    href="mailto:hello@example.com"
+                    class="contact-link"
+                    data-cursor="hover"
+                >
+                    START A CONVERSATION
+                    <span>↗</span>
+                </a>
 
             </div>
 
         </section>
 
+
+        <!-- =================================================
+             FOOTER
+        ================================================== -->
+
+        <footer class="footer">
+
+            <span>
+                VOID STUDIO
+            </span>
+
+            <span>
+                © 2026
+            </span>
+
+            <span>
+                DIGITAL EXPERIENCES
+            </span>
+
+        </footer>
+
     </main>
 
 
     <!-- =====================================================
-         FOOTER
-         ===================================================== -->
+         MENU OVERLAY
+    ====================================================== -->
 
-    <footer class="site-footer">
+    <div class="menu-overlay" id="menuOverlay">
 
-        <div class="footer-inner">
+        <button
+            class="menu-close"
+            id="menuClose"
+            data-cursor="hover"
+        >
+            CLOSE
+        </button>
 
-            <div class="footer-brand">
+        <nav class="overlay-nav">
 
-                <span class="brand-mark">
-                    RF
-                </span>
+            <a href="#hero">HOME</a>
+            <a href="#work">WORK</a>
+            <a href="#about">ABOUT</a>
+            <a href="#contact">CONTACT</a>
 
-                <span>
-                    Rain Forest
-                </span>
+        </nav>
 
-            </div>
-
-
-            <p>
-                Designed to flow.
-            </p>
-
-
-            <p>
-                © <span id="currentYear"></span>
-                Rain Forest
-            </p>
-
+        <div class="overlay-footer">
+            <span>CREATIVE TECHNOLOGY</span>
+            <span>2026</span>
         </div>
 
-    </footer>
+    </div>
 
-
-    <!-- =====================================================
-         GSAP
-         ===================================================== -->
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
-    ></script>
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"
-    ></script>
-
-
-    <!-- Main JavaScript -->
 
     <script src="script.js"></script>
 
